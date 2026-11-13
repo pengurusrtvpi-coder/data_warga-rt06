@@ -1,9 +1,23 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/integrations/supabase/client'
+import { PortalNav } from '@/components/warga/PortalNav'
+import { getMyAccessRole, hasActiveSession } from '@/lib/warga'
 import { Users, Shield, Award, Edit2, Plus, Trash2, Save, X, Sparkles } from 'lucide-react'
 
 export const Route = createFileRoute('/pengurus')({
+  ssr: false,
+  beforeLoad: async () => {
+    if (!(await hasActiveSession())) throw redirect({ to: '/login', replace: true })
+    const accessRole = await getMyAccessRole()
+    return { accessRole }
+  },
+  head: () => ({
+    meta: [
+      { title: 'Struktur Pengurus RT 06 — Portal RT 06 VPI-2' },
+      { name: 'description', content: 'Susunan Pengurus RT 06 Villa Padurenan Indah 2 Periode 2025-2030.' },
+    ],
+  }),
   component: StrukturPengurusPage,
 })
 
@@ -16,9 +30,11 @@ interface Pengurus {
 }
 
 function StrukturPengurusPage() {
+  const { accessRole } = Route.useRouteContext()
+  const isAdmin = accessRole === 'admin'
+
   const [pengurus, setPengurus] = useState<Pengurus[]>([])
   const [loading, setLoading] = useState(true)
-  const [isAdmin, setIsAdmin] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState({ jabatan: '', nama: '', kategori: 'Inti', urutan: 1 })
   const [showAddForm, setShowAddForm] = useState(false)
@@ -26,21 +42,11 @@ function StrukturPengurusPage() {
 
   useEffect(() => {
     fetchPengurus()
-    checkAdminStatus()
   }, [])
-
-  async function checkAdminStatus() {
-    // Mengecek sesi Supabase Auth atau status admin di localStorage
-    const { data: { session } } = await supabase.auth.getSession()
-    const localAdmin = localStorage.getItem('isAdmin') === 'true' || localStorage.getItem('role') === 'admin'
-    if (session || localAdmin) {
-      setIsAdmin(true)
-    }
-  }
 
   async function fetchPengurus() {
     setLoading(true)
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('pengurus_rt')
       .select('*')
       .order('urutan', { ascending: true })
@@ -52,7 +58,7 @@ function StrukturPengurusPage() {
   }
 
   async function handleSaveEdit(id: string) {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('pengurus_rt')
       .update({
         jabatan: editForm.jabatan,
@@ -72,7 +78,7 @@ function StrukturPengurusPage() {
 
   async function handleAddNew() {
     if (!newForm.jabatan || !newForm.nama) return alert('Jabatan dan nama wajib diisi')
-    const { error } = await supabase.from('pengurus_rt').insert([
+    const { error } = await (supabase as any).from('pengurus_rt').insert([
       {
         jabatan: newForm.jabatan,
         nama: newForm.nama,
@@ -92,7 +98,7 @@ function StrukturPengurusPage() {
 
   async function handleDelete(id: string, nama: string) {
     if (!confirm(`Hapus ${nama} dari daftar pengurus?`)) return
-    const { error } = await supabase.from('pengurus_rt').delete().eq('id', id)
+    const { error } = await (supabase as any).from('pengurus_rt').delete().eq('id', id)
     if (!error) fetchPengurus()
   }
 
@@ -205,7 +211,9 @@ function StrukturPengurusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-12">
+    <div className="min-h-screen bg-background pb-12">
+      <PortalNav role={accessRole} />
+
       {/* Header & Banner Moto */}
       <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white py-10 px-4 shadow-md">
         <div className="max-w-5xl mx-auto text-center">
@@ -226,9 +234,8 @@ function StrukturPengurusPage() {
               <Sparkles className="w-3.5 h-3.5" /> Moto Pengurus RT 06 <Sparkles className="w-3.5 h-3.5" />
             </p>
             <p className="text-xl md:text-2xl font-extrabold text-white tracking-wide">
-              “Berubah – Peduli – Berbagi”
+              “Beubah – Peduli – Beebagi”
             </p>
-            <p className="text-xs text-emerald-100/80 italic mt-0.5">(Beubah - Peduli - Beebagi)</p>
           </div>
         </div>
       </div>
@@ -249,8 +256,3 @@ function StrukturPengurusPage() {
         {/* Form Tambah Baru */}
         {isAdmin && showAddForm && (
           <div className="bg-white p-5 rounded-xl border border-emerald-200 shadow-sm mb-8">
-            <h3 className="font-bold text-slate-800 mb-3 text-sm">Tambah Data Pengurus</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <input
-                type="text"
-                placeholder="Jabatan (misal: Seksi Humas)"
