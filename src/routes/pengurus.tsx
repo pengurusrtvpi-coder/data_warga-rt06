@@ -9,250 +9,128 @@ export const Route = createFileRoute('/pengurus')({
   ssr: false,
   beforeLoad: async () => {
     if (!(await hasActiveSession())) throw redirect({ to: '/login', replace: true })
-    const accessRole = await getMyAccessRole()
-    return { accessRole }
+    return { accessRole: await getMyAccessRole() }
   },
-  head: () => ({
-    meta: [
-      { title: 'Struktur Pengurus RT 06 — Portal RT 06 VPI-2' },
-      { name: 'description', content: 'Susunan Pengurus RT 06 Villa Padurenan Indah 2 Periode 2025-2030.' },
-    ],
-  }),
   component: StrukturPengurusPage,
 })
-
-interface Pengurus {
-  id: string
-  jabatan: string
-  nama: string
-  kategori: string
-  urutan: number
-}
 
 function StrukturPengurusPage() {
   const { accessRole } = Route.useRouteContext()
   const isAdmin = accessRole === 'admin'
-
-  const [pengurus, setPengurus] = useState<Pengurus[]>([])
+  const [list, setList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [editForm, setEditForm] = useState({ jabatan: '', nama: '', kategori: 'Inti', urutan: 1 })
-  const [showAddForm, setShowAddForm] = useState(false)
-  const [newForm, setNewForm] = useState({ jabatan: '', nama: '', kategori: 'Seksi', urutan: 13 })
+  const [editId, setEditId] = useState<string | null>(null)
+  const [form, setForm] = useState({ jabatan: '', nama: '', kategori: 'Inti', urutan: 1 })
+  const [adding, setAdding] = useState(false)
 
-  useEffect(() => {
-    fetchPengurus()
-  }, [])
-
-  async function fetchPengurus() {
+  const load = async () => {
     setLoading(true)
-    const { data, error } = await (supabase as any)
-      .from('pengurus_rt')
-      .select('*')
-      .order('urutan', { ascending: true })
-
-    if (!error && data) {
-      setPengurus(data)
-    }
+    const { data } = await (supabase as any).from('pengurus_rt').select('*').order('urutan', { ascending: true })
+    if (data) setList(data)
     setLoading(false)
   }
 
-  async function handleSaveEdit(id: string) {
-    const { error } = await (supabase as any)
-      .from('pengurus_rt')
-      .update({
-        jabatan: editForm.jabatan,
-        nama: editForm.nama,
-        kategori: editForm.kategori,
-        urutan: Number(editForm.urutan),
-      })
-      .eq('id', id)
+  useEffect(() => { load() }, [])
 
-    if (!error) {
-      setEditingId(null)
-      fetchPengurus()
-    } else {
-      alert('Gagal menyimpan perubahan: ' + error.message)
-    }
+  const saveEdit = async (id: string) => {
+    await (supabase as any).from('pengurus_rt').update({ ...form, urutan: Number(form.urutan) }).eq('id', id)
+    setEditId(null)
+    load()
   }
 
-  async function handleAddNew() {
-    if (!newForm.jabatan || !newForm.nama) return alert('Jabatan dan nama wajib diisi')
-    const { error } = await (supabase as any).from('pengurus_rt').insert([
-      {
-        jabatan: newForm.jabatan,
-        nama: newForm.nama,
-        kategori: newForm.kategori,
-        urutan: Number(newForm.urutan),
-      },
-    ])
-
-    if (!error) {
-      setShowAddForm(false)
-      setNewForm({ jabatan: '', nama: '', kategori: 'Seksi', urutan: pengurus.length + 1 })
-      fetchPengurus()
-    } else {
-      alert('Gagal menambah pengurus: ' + error.message)
-    }
+  const addNew = async () => {
+    if (!form.jabatan || !form.nama) return
+    await (supabase as any).from('pengurus_rt').insert([{ ...form, urutan: Number(form.urutan) }])
+    setAdding(false)
+    load()
   }
 
-  async function handleDelete(id: string, nama: string) {
-    if (!confirm(`Hapus ${nama} dari daftar pengurus?`)) return
-    const { error } = await (supabase as any).from('pengurus_rt').delete().eq('id', id)
-    if (!error) fetchPengurus()
+  const remove = async (id: string) => {
+    if (!confirm('Hapus data pengurus ini?')) return
+    await (supabase as any).from('pengurus_rt').delete().eq('id', id)
+    load()
   }
 
-  const pengurusInti = pengurus.filter((p) => p.kategori === 'Inti')
-  const pengurusSeksi = pengurus.filter((p) => p.kategori === 'Seksi')
-  const pengurusPKK = pengurus.filter((p) => p.kategori === 'Kesra & PKK')
-
-  const renderCard = (item: Pengurus, badgeColor: string) => {
-    const isEditing = editingId === item.id
-
-    return (
-      <div
-        key={item.id}
-        className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
-      >
-        {isEditing ? (
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-medium text-slate-500">Jabatan</label>
-              <input
-                type="text"
-                value={editForm.jabatan}
-                onChange={(e) => setEditForm({ ...editForm, jabatan: e.target.value })}
-                className="w-full mt-1 px-3 py-1.5 text-sm border rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-slate-500">Nama Pengurus</label>
-              <input
-                type="text"
-                value={editForm.nama}
-                onChange={(e) => setEditForm({ ...editForm, nama: e.target.value })}
-                className="w-full mt-1 px-3 py-1.5 text-sm border rounded-lg"
-              />
-            </div>
-            <div className="flex gap-2">
-              <div className="w-2/3">
-                <label className="text-xs font-medium text-slate-500">Kategori</label>
-                <select
-                  value={editForm.kategori}
-                  onChange={(e) => setEditForm({ ...editForm, kategori: e.target.value })}
-                  className="w-full mt-1 px-2 py-1.5 text-sm border rounded-lg"
-                >
-                  <option value="Inti">Inti</option>
-                  <option value="Seksi">Seksi</option>
-                  <option value="Kesra & PKK">Kesra & PKK</option>
-                </select>
-              </div>
-              <div className="w-1/3">
-                <label className="text-xs font-medium text-slate-500">Urutan</label>
-                <input
-                  type="number"
-                  value={editForm.urutan}
-                  onChange={(e) => setEditForm({ ...editForm, urutan: Number(e.target.value) })}
-                  className="w-full mt-1 px-2 py-1.5 text-sm border rounded-lg"
-                />
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                onClick={() => setEditingId(null)}
-                className="px-3 py-1.5 text-xs bg-slate-100 text-slate-700 rounded-lg flex items-center gap-1"
-              >
-                <X className="w-3.5 h-3.5" /> Batal
-              </button>
-              <button
-                onClick={() => handleSaveEdit(item.id)}
-                className="px-3 py-1.5 text-xs bg-emerald-600 text-white rounded-lg flex items-center gap-1"
-              >
-                <Save className="w-3.5 h-3.5" /> Simpan
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div>
-              <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold mb-3 ${badgeColor}`}>
-                {item.jabatan}
-              </span>
-              <h3 className="text-lg font-bold text-slate-800 leading-snug">{item.nama}</h3>
-            </div>
-            {isAdmin && (
-              <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end gap-2">
-                <button
-                  onClick={() => {
-                    setEditingId(item.id)
-                    setEditForm({
-                      jabatan: item.jabatan,
-                      nama: item.nama,
-                      kategori: item.kategori,
-                      urutan: item.urutan,
-                    })
-                  }}
-                  className="text-xs text-blue-600 hover:bg-blue-50 px-2.5 py-1 rounded-md flex items-center gap-1"
-                >
-                  <Edit2 className="w-3.5 h-3.5" /> Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(item.id, item.nama)}
-                  className="text-xs text-red-600 hover:bg-red-50 px-2.5 py-1 rounded-md flex items-center gap-1"
-                >
-                  <Trash2 className="w-3.5 h-3.5" /> Hapus
-                </button>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    )
-  }
+  const groups = [
+    { title: 'Pengurus Inti RT 06', key: 'Inti', badge: 'bg-emerald-100 text-emerald-800', Icon: Award },
+    { title: 'Seksi-Seksi Bidang', key: 'Seksi', badge: 'bg-blue-100 text-blue-800', Icon: Shield },
+    { title: 'Bidang Kesra & PKK', key: 'Kesra & PKK', badge: 'bg-rose-100 text-rose-800', Icon: Users },
+  ]
 
   return (
     <div className="min-h-screen bg-background pb-12">
       <PortalNav role={accessRole} />
-
-      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white py-10 px-4 shadow-md">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-medium tracking-wide uppercase mb-4">
-            <Shield className="w-4 h-4 text-amber-300" />
-            Periode Bakti 2025 – 2030
-          </div>
-          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2">
-            Struktur Kepengurusan RT 06
-          </h1>
-          <p className="text-emerald-100 text-sm md:text-base mb-6">
-            Perumahan Villa Padurenan Indah 2 • Kel. Padurenan, Kec. Mustikajaya
-          </p>
-
-          <div className="inline-block bg-white/10 border border-white/25 backdrop-blur-md rounded-2xl px-6 py-4 shadow-lg">
-            <p className="text-xs uppercase tracking-widest text-amber-200 font-semibold mb-1 flex items-center justify-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Moto Pengurus RT 06 <Sparkles className="w-3.5 h-3.5" />
-            </p>
-            <p className="text-xl md:text-2xl font-extrabold text-white tracking-wide">
-              “Beubah – Peduli – Beebagi”
-            </p>
-          </div>
+      <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white py-10 px-4 text-center shadow">
+        <span className="inline-block bg-white/15 px-3 py-1 rounded-full text-xs font-semibold mb-3">PERIODE 2025 – 2030</span>
+        <h1 className="text-2xl md:text-4xl font-extrabold mb-1">Struktur Kepengurusan RT 06</h1>
+        <p className="text-emerald-100 text-sm mb-5">Perumahan Villa Padurenan Indah 2</p>
+        <div className="inline-block bg-white/10 border border-white/25 rounded-2xl px-6 py-3">
+          <p className="text-xs text-amber-200 font-semibold flex items-center justify-center gap-1"><Sparkles className="w-3.5 h-3.5" /> MOTO PENGURUS</p>
+          <p className="text-xl font-extrabold">“Beubah – Peduli – Beebagi”</p>
         </div>
       </div>
 
       <div className="max-w-5xl mx-auto px-4 mt-8">
         {isAdmin && (
           <div className="mb-6 flex justify-end">
-            <button
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg shadow flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" /> Tambah Pengurus Baru
+            <button onClick={() => { setAdding(!adding); setForm({ jabatan: '', nama: '', kategori: 'Seksi', urutan: list.length + 1 }) }} className="bg-emerald-600 text-white text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Tambah Pengurus
             </button>
           </div>
         )}
 
-        {isAdmin && showAddForm && (
-          <div className="bg-white p-5 rounded-xl border border-emerald-200 shadow-sm mb-8">
-            <h3 className="font-bold text-slate-800 mb-3 text-sm">Tambah Data Pengurus</h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-              <input
-                type="text"
+        {isAdmin && adding && (
+          <div className="bg-white p-4 rounded-xl border mb-6 grid grid-cols-1 md:grid-cols-4 gap-3">
+            <input placeholder="Jabatan" value={form.jabatan} onChange={(e) => setForm({ ...form, jabatan: e.target.value })} className="px-3 py-2 text-sm border rounded-lg" />
+            <input placeholder="Nama" value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className="px-3 py-2 text-sm border rounded-lg" />
+            <select value={form.kategori} onChange={(e) => setForm({ ...form, kategori: e.target.value })} className="px-3 py-2 text-sm border rounded-lg">
+              <option value="Inti">Inti</option>
+              <option value="Seksi">Seksi</option>
+              <option value="Kesra & PKK">Kesra & PKK</option>
+            </select>
+            <button onClick={addNew} className="bg-emerald-600 text-white text-sm font-medium rounded-lg px-3 py-2">Simpan</button>
+          </div>
+        )}
+
+        {loading ? <p className="text-center py-10 text-muted-foreground">Memuat data...</p> : (
+          <div className="space-y-8">
+            {groups.map(({ title, key, badge, Icon }) => (
+              <section key={key}>
+                <h2 className="text-lg font-bold mb-3 flex items-center gap-2"><Icon className="w-5 h-5 text-emerald-700" /> {title}</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {list.filter((i) => i.kategori === key).map((item) => (
+                    <div key={item.id} className="bg-card rounded-xl border p-4 shadow-sm flex flex-col justify-between">
+                      {editId === item.id ? (
+                        <div className="space-y-2">
+                          <input value={form.jabatan} onChange={(e) => setForm({ ...form, jabatan: e.target.value })} className="w-full px-2 py-1 text-sm border rounded" />
+                          <input value={form.nama} onChange={(e) => setForm({ ...form, nama: e.target.value })} className="w-full px-2 py-1 text-sm border rounded" />
+                          <div className="flex justify-end gap-2">
+                            <button onClick={() => setEditId(null)} className="px-2 py-1 text-xs bg-muted rounded"><X className="w-3 h-3 inline" /> Batal</button>
+                            <button onClick={() => saveEdit(item.id)} className="px-2 py-1 text-xs bg-emerald-600 text-white rounded"><Save className="w-3 h-3 inline" /> Simpan</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <div>
+                            <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold mb-2 ${badge}`}>{item.jabatan}</span>
+                            <h3 className="text-base font-bold">{item.nama}</h3>
+                          </div>
+                          {isAdmin && (
+                            <div className="mt-3 pt-2 border-t flex justify-end gap-2">
+                              <button onClick={() => { setEditId(item.id); setForm({ jabatan: item.jabatan, nama: item.nama, kategori: item.kategori, urutan: item.urutan }) }} className="text-xs text-blue-600 flex items-center gap-1"><Edit2 className="w-3 h-3" /> Edit</button>
+                              <button onClick={() => remove(item.id)} className="text-xs text-red-600 flex items-center gap-1"><Trash2 className="w-3 h-3" /> Hapus</button>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
