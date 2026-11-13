@@ -92,7 +92,7 @@ function LoginPage() {
             <p className="mt-2 text-sm text-muted-foreground">
               {tab === "warga"
                 ? "Masuk dengan NIK dan password yang diberikan pengurus RT."
-                 : "Masuk dengan akun email admin atau bendahara RT."}
+                : "Masuk dengan akun email admin atau bendahara RT."}
             </p>
           </div>
 
@@ -104,7 +104,7 @@ function LoginPage() {
               </TabsList>
 
               <TabsContent value="warga" className="mt-5">
-                <form onSubmit={onSubmit} className="space-y-5" noValidate>
+                <form onSubmit={onSubmit} className="space-y-5" autoComplete="off" noValidate>
                   <div className="space-y-2">
                     <Label htmlFor="nik">NIK</Label>
                     <div className="relative">
@@ -113,7 +113,9 @@ function LoginPage() {
                         id="nik"
                         type="text"
                         inputMode="numeric"
-                        autoComplete="username"
+                        autoComplete="off"
+                        data-lpignore="true"
+                        data-form-type="other"
                         placeholder="16 digit NIK"
                         name="nik"
                         className="h-11 pl-10"
@@ -129,7 +131,8 @@ function LoginPage() {
                       <Input
                         id="password-warga"
                         type="password"
-                        autoComplete="current-password"
+                        autoComplete="new-password"
+                        data-lpignore="true"
                         placeholder="••••••••"
                         name="password"
                         className="h-11 pl-10"
