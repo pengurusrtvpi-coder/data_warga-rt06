@@ -1,0 +1,26 @@
+# Roadmap — Portal Warga RT 06
+
+- [x] Design system (light-blue accent, Plus Jakarta Sans)
+- [x] /login page (NIK + "@warga.lokal", red error, no sign-up)
+- [x] /keluarga page (guard, Logout, KK search, cards)
+- [x] Edit dialog (pre-filled, Simpan, refresh)
+- [x] Wire `src/lib/warga.ts` to the user's Supabase (VPI-2 Mobile)
+- [x] Match card/form fields to the real data_warga columns (from user-provided schema)
+- [x] Check data_warga read/update permissions (RLS: own no_kk only)
+- [x] Edit form validation by column type / NOT NULL / enums, with clear messages
+- [ ] End-to-end check with a real resident account — external Supabase authenticated checks unavailable here
+- [x] DB guard: residents cannot change NIK, No. KK, RT/RW, status warga; pengurus RT (user_roles admin) can
+- [x] Separate NIK and admin email/password tabs on /login
+- [x] Automatic role detection from `user_roles` (never from editable user metadata)
+- [x] Admin panel: view all residents, add residents, edit all resident-data columns, and delete with confirmation
+- [x] Preserve resident KK-only access and locked sensitive columns; verify both access rules with tests
+- [ ] End-to-end check with the real admin account — external Supabase session cannot be minted here; verify in preview by signing in as pengurus RT
+- [x] Audit log: record actor, time, action, and changed values for every resident add/edit/delete; admin-only history view
+- [x] Finance: role-secured transactions, dashboard, yearly analysis, monthly/yearly printable reports
+- [x] Letters: NIK lookup, submission, official A4 preview, history, reprint, admin delete
+- [x] Verify finance/letter permission definitions, calculations, simulated UI flows, and print layouts
+- [ ] Finance/letter end-to-end verification with real accounts — external Supabase authenticated sessions unavailable here
+- [x] Official two-logo print letterhead with centered RT/VPI-2 text, motto, secretariat address, and phone
+- [x] Final official letterhead address — Villa Padurenan Indah 2 Blok C No. 5, HP 08961149233
+- [ ] Role-based login destinations, navigation, resident-page guards, and finance CRUD for bendahara
+- [ ] Verify role rules with tests and public navigation; real-account checks remain unavailable for external Supabase
