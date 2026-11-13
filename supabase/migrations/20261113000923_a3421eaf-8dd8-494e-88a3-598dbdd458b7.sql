@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.isi_biodata_surat() FROM PUBLIC, anon, authenticated;
