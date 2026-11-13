@@ -214,7 +214,6 @@ function StrukturPengurusPage() {
     <div className="min-h-screen bg-background pb-12">
       <PortalNav role={accessRole} />
 
-      {/* Header & Banner Moto */}
       <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-800 text-white py-10 px-4 shadow-md">
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-1.5 rounded-full text-xs font-medium tracking-wide uppercase mb-4">
@@ -228,7 +227,6 @@ function StrukturPengurusPage() {
             Perumahan Villa Padurenan Indah 2 • Kel. Padurenan, Kec. Mustikajaya
           </p>
 
-          {/* Kartu Moto */}
           <div className="inline-block bg-white/10 border border-white/25 backdrop-blur-md rounded-2xl px-6 py-4 shadow-lg">
             <p className="text-xs uppercase tracking-widest text-amber-200 font-semibold mb-1 flex items-center justify-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" /> Moto Pengurus RT 06 <Sparkles className="w-3.5 h-3.5" />
@@ -241,7 +239,6 @@ function StrukturPengurusPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 mt-8">
-        {/* Tombol Tambah Pengurus (Khusus Admin) */}
         {isAdmin && (
           <div className="mb-6 flex justify-end">
             <button
@@ -253,6 +250,9 @@ function StrukturPengurusPage() {
           </div>
         )}
 
-        {/* Form Tambah Baru */}
         {isAdmin && showAddForm && (
           <div className="bg-white p-5 rounded-xl border border-emerald-200 shadow-sm mb-8">
+            <h3 className="font-bold text-slate-800 mb-3 text-sm">Tambah Data Pengurus</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+              <input
+                type="text"
