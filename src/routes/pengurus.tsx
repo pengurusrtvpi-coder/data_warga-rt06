@@ -199,7 +199,7 @@ function StrukturPengurusPage() {
               <Sparkles className="w-3.5 h-3.5" /> Moto Pengurus RT 06 <Sparkles className="w-3.5 h-3.5" />
             </p>
             <p className="text-xl md:text-2xl font-extrabold text-white tracking-wide">
-              “Beubah – Peduli – Beebagi”
+              “Berubah – Peduli – Berbagi”
             </p>
           </div>
         </div>
