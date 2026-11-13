@@ -4,11 +4,13 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Users, ArrowLeft } from "lucide-react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
@@ -124,6 +126,8 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const isPengurusPage = pathname === "/pengurus";
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
@@ -138,6 +142,28 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+
+      {/* Tombol Navigasi Cepat Struktur Pengurus RT 06 */}
+      <div className="fixed bottom-5 right-5 z-50">
+        {isPengurusPage ? (
+          <button
+            onClick={() => window.history.back()}
+            className="inline-flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2.5 text-xs md:text-sm font-semibold text-white shadow-lg transition-all hover:bg-slate-900 hover:scale-105"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Kembali ke Portal
+          </button>
+        ) : (
+          <Link
+            to="/pengurus"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-2.5 text-xs md:text-sm font-semibold text-white shadow-lg transition-all hover:bg-emerald-700 hover:scale-105"
+          >
+            <Users className="h-4 w-4" />
+            Struktur Pengurus RT 06
+          </Link>
+        )}
+      </div>
+
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
