@@ -227,17 +227,31 @@ export function LetterView({ role }: { role: AccessRole }) {
             </div>
           </div>
           <article className="letter-paper print-target">
-            <header className="letter-head">
-              <img className="letter-logo" src="/logo-kota-bekasi.jpg" alt="Logo Kota Bekasi" />
-              <div className="letter-head-text">
-                <p className="letter-head-title">PENGURUS RUKUN TETANGGA 06 / RW 07</p>
-                <p className="letter-head-subtitle">VILLA PADURENAN INDAH 2 (VPI-2)</p>
-                <p className="letter-head-motto">Motto: BERUBAH , PEDULI , BERBAGI</p>
-                <p className="letter-head-address">
+            <header className="letter-head flex items-center justify-between gap-3 border-b-4 border-double border-slate-900 pb-4 mb-5">
+              <img
+                className="letter-logo h-20 w-20 shrink-0 object-contain"
+                src="/logo_kota_bekasi.jpg"
+                alt="Logo Kota Bekasi"
+              />
+              <div className="letter-head-text flex-1 text-center leading-tight">
+                <p className="letter-head-title text-base sm:text-lg font-extrabold tracking-wide text-slate-900">
+                  PENGURUS RUKUN TETANGGA 06 / RW 07
+                </p>
+                <p className="letter-head-subtitle text-sm sm:text-base font-bold text-slate-800">
+                  VILLA PADURENAN INDAH 2 (VPI-2)
+                </p>
+                <p className="letter-head-motto text-xs font-semibold italic text-slate-700 mt-0.5">
+                  Motto: BERUBAH - PEDULI - BERBAGI
+                </p>
+                <p className="letter-head-address text-[11px] sm:text-xs text-slate-600 mt-1">
                   Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
                 </p>
               </div>
-              <img className="letter-logo" src="/logo-rt-06.jpg" alt="Logo RT 06 VPI-2" />
+              <img
+                className="letter-logo h-20 w-20 shrink-0 object-contain rounded-full"
+                src="/logo_rt06.jpg"
+                alt="Logo RT 06 VPI-2"
+              />
             </header>
             <div className="letter-title">
               <h2>
@@ -255,7 +269,7 @@ export function LetterView({ role }: { role: AccessRole }) {
               {[
                 ['Nama', preview.nama_pemohon],
                 ['NIK', preview.nik],
-                ['Tempat / Tgl Lahir', preview.tempat_tgl_lahir],
+          ['Tempat / Tgl Lahir', preview.tempat_tgl_lahir],
                 ['Jenis Kelamin', preview.jenis_kelamin],
                 ['Agama', preview.agama],
                 ['Pekerjaan', preview.pekerjaan],
@@ -271,7 +285,7 @@ export function LetterView({ role }: { role: AccessRole }) {
               Nama tersebut di atas adalah warga di lingkungan RT 06 / RW 07. Surat ini dibuat
               untuk keperluan:
             </p>
-<p className="letter-purpose">{preview.keperluan}</p>
+            <p className="letter-purpose">{preview.keperluan}</p>
             <p>
               Demikian surat ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana
               mestinya.
