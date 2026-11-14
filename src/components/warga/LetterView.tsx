@@ -6,10 +6,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Choice } from './Choice';
 import { suratOptions } from '@/lib/portal-queries';
-import { JENIS_SURAT, findWargaNik, createSurat, createSuratByNik, deleteSurat, formatTanggal, type Warga, type Surat, type AccessRole } from '@/lib/warga';
+import {
+  JENIS_SURAT,
+  findWargaNik,
+  createSurat,
+  createSuratByNik,
+  deleteSurat,
+  formatTanggal,
+  type Warga,
+  type Surat,
+  type AccessRole,
+} from '@/lib/warga';
 
 export function LetterView({ role }: { role: AccessRole }) {
   const { data: history } = useSuspenseQuery(suratOptions),
@@ -88,12 +105,17 @@ export function LetterView({ role }: { role: AccessRole }) {
         <section className="mb-8 border-b pb-8">
           <h2 className="mb-4 text-lg font-bold">Pengajuan Surat</h2>
           {role === 'admin' ? (
-            <form onSubmit={check} className="flex max-w-xl items-end gap-2">
+            <form onSubmit={check} autoComplete="off" className="flex max-w-xl items-end gap-2">
               <div className="min-w-0 flex-1">
-                <Label htmlFor="cek-nik">NIK Pemohon</Label>
+                <Label htmlFor="cek-nik-admin">NIK Pemohon</Label>
                 <Input
-                  id="cek-nik"
+                  id="cek-nik-admin"
+                  name="nik_pemohon_no_save"
+                  type="text"
                   inputMode="numeric"
+                  autoComplete="off"
+                  data-lpignore="true"
+                  data-form-type="other"
                   maxLength={16}
                   value={nik}
                   onChange={(e) => {
@@ -110,10 +132,15 @@ export function LetterView({ role }: { role: AccessRole }) {
             </form>
           ) : (
             <div className="max-w-xl">
-              <Label htmlFor="cek-nik">NIK Pemohon (Anda atau anggota KK Anda)</Label>
+              <Label htmlFor="cek-nik-warga">NIK Pemohon (Anda atau anggota KK Anda)</Label>
               <Input
-                id="cek-nik"
+                id="cek-nik-warga"
+                name="nik_pemohon_warga_no_save"
+                type="text"
                 inputMode="numeric"
+                autoComplete="off"
+                data-lpignore="true"
+                data-form-type="other"
                 maxLength={16}
                 value={nik}
                 onChange={(e) => setNik(e.target.value)}
@@ -130,7 +157,7 @@ export function LetterView({ role }: { role: AccessRole }) {
             </p>
           )}
           {(warga || role !== 'admin') && (
-            <form onSubmit={submit} className="mt-6 space-y-5">
+            <form onSubmit={submit} autoComplete="off" className="mt-6 space-y-5">
               {warga && (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {[
@@ -244,120 +271,3 @@ export function LetterView({ role }: { role: AccessRole }) {
               Nama tersebut di atas adalah warga di lingkungan RT 06 / RW 07. Surat ini dibuat
               untuk keperluan:
             </p>
-            <p className="letter-purpose">{preview.keperluan}</p>
-            <p>
-              Demikian surat ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana
-              mestinya.
-            </p>
-            <div className="letter-signature">
-              <p>
-                Bekasi,{' '}
-                {preview.created_at
-                  ? new Date(preview.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                   year: 'numeric',
-                      timeZone: 'Asia/Jakarta',
-                    })
-                  : '—'}
-              </p>
-              <p>Ketua RT 06 / RW 07</p>
-              <div className="signature-space" />
-              <p>( ........................................ )</p>
-            </div>
-          </article>
-        </section>
-      )}
-
-      <section className="no-print">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">Riwayat Surat</h2>
-          <Input
-            className="max-w-sm"
-            aria-label="Cari riwayat surat"
-            placeholder="Cari NIK atau nama pemohon"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <div className="report-scroll">
-          <table className="report-table">
-            <thead>
-              <tr>
-                {[
-                  'Tanggal',
-                  'Nomor Surat',
-                  'NIK',
-                  'Nama Pemohon',
-                  'Jenis Surat',
-                  'Keperluan',
-                  'Aksi',
-                ].map((v) => (
-                  <th key={v}>{v}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.id}>
-                  <td>{formatTanggal(r.created_at)}</td>
-                  <td>{r.nomor_surat}</td>
-                  <td>{r.nik}</td>
-                  <td>{r.nama_pemohon}</td>
-                  <td>{r.jenis_surat}</td>
-                  <td className="max-w-xs whitespace-normal">{r.keperluan}</td>
-                  <td>
-                    <div className="flex gap-1">
-                      <Button variant="outline" size="sm" onClick={() => setPreview(r)}>
-                        <Eye />
-                        Lihat / Cetak Ulang
-                      </Button>
-                      {role === 'admin' && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          title="Hapus surat"
-                          aria-label={`Hapus surat ${r.nomor_surat}`}
-                          onClick={() => setDeleting(r)}
-                        >
-                          <Trash2 />
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {!rows.length && (
-                <tr>
-                  <td colSpan={7} className="py-12 text-center">
-                    {search ? 'Surat tidak ditemukan.' : 'Belum ada surat.'}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <Dialog open={!!deleting} onOpenChange={(v) => !busy && !v && setDeleting(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Hapus Riwayat Surat?</DialogTitle>
-            <DialogDescription>
-              Surat nomor <strong>{deleting?.nomor_surat}</strong> atas nama{' '}
-              <strong>{deleting?.nama_pemohon}</strong> akan dihapus permanen.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" disabled={busy} onClick={() => setDeleting(null)}>
-              Batal
-            </Button>
-            <Button variant="destructive" disabled={busy} onClick={remove}>
-              {busy ? 'Menghapus…' : 'Hapus Surat'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </main>
-  );
-}
