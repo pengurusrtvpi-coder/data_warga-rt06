@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AspirasiRouteImport } from './routes/aspirasi'
 import { Route as DataWargaRouteImport } from './routes/data-warga'
 import { Route as KeluargaRouteImport } from './routes/keluarga'
 import { Route as KeuanganRouteImport } from './routes/keuangan'
@@ -23,6 +24,11 @@ import { Route as KeuanganBulananRouteImport } from './routes/keuangan.bulanan'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AspirasiRoute = AspirasiRouteImport.update({
+  id: '/aspirasi',
+  path: '/aspirasi',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DataWargaRoute = DataWargaRouteImport.update({
@@ -73,6 +79,7 @@ const KeuanganBulananRoute = KeuanganBulananRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aspirasi': typeof AspirasiRoute
   '/data-warga': typeof DataWargaRoute
   '/keluarga': typeof KeluargaRoute
   '/keuangan': typeof KeuanganRouteWithChildren
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aspirasi': typeof AspirasiRoute
   '/data-warga': typeof DataWargaRoute
   '/keluarga': typeof KeluargaRoute
   '/login': typeof LoginRoute
@@ -97,6 +105,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aspirasi': typeof AspirasiRoute
   '/data-warga': typeof DataWargaRoute
   '/keluarga': typeof KeluargaRoute
   '/keuangan': typeof KeuanganRouteWithChildren
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/aspirasi'
     | '/data-warga'
     | '/keluarga'
     | '/keuangan'
@@ -123,6 +133,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/aspirasi'
     | '/data-warga'
     | '/keluarga'
     | '/login'
@@ -134,6 +145,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/aspirasi'
     | '/data-warga'
     | '/keluarga'
     | '/keuangan'
@@ -147,6 +159,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AspirasiRoute: typeof AspirasiRoute
   DataWargaRoute: typeof DataWargaRoute
   KeluargaRoute: typeof KeluargaRoute
   KeuanganRoute: typeof KeuanganRouteWithChildren
@@ -163,6 +176,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aspirasi': {
+      id: '/aspirasi'
+      path: '/aspirasi'
+      fullPath: '/aspirasi'
+      preLoaderRoute: typeof AspirasiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/data-warga': {
@@ -247,6 +267,7 @@ const KeuanganRouteWithChildren = KeuanganRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AspirasiRoute: AspirasiRoute,
   DataWargaRoute: DataWargaRoute,
   KeluargaRoute: KeluargaRoute,
   KeuanganRoute: KeuanganRouteWithChildren,
