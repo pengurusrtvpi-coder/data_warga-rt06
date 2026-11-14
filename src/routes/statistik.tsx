@@ -64,7 +64,7 @@ function StatistikUsiaPage() {
       setLoading(true)
       let allWarga: Warga[] = []
       if (isAdmin) {
-        const { data } = await (supabase as any).from('warga').select('*').order('nama_lengkap', { ascending: true })
+        const { data } = await (supabase as any).from('data_warga').select('*').order('nama_lengkap', { ascending: true })
         if (data) {
           allWarga = data
           setWargaList(data)
