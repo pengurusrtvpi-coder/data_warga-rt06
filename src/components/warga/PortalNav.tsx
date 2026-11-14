@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Users, Wallet, FileText, Award, BarChart3, LogOut } from 'lucide-react';
+import { Users, Wallet, FileText, Award, BarChart3, MessageSquarePlus, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 import { BrandMark } from './BrandMark';
@@ -14,6 +14,7 @@ export function PortalNav({ role }: { role: AccessRole }) {
     '/surat': FileText,
     '/pengurus': Award,
     '/statistik': BarChart3,
+    '/aspirasi': MessageSquarePlus,
   };
 
   let menuList = [...getPortalMenu(role)];
@@ -22,6 +23,9 @@ export function PortalNav({ role }: { role: AccessRole }) {
   }
   if (!menuList.some((item) => item.to === '/statistik')) {
     menuList.push({ to: '/statistik' as any, label: 'Statistik Usia' });
+  }
+  if (!menuList.some((item) => item.to === '/aspirasi')) {
+    menuList.push({ to: '/aspirasi' as any, label: 'Aspirasi Warga' });
   }
 
   return (
