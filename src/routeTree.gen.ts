@@ -15,6 +15,7 @@ import { Route as KeluargaRouteImport } from './routes/keluarga'
 import { Route as KeuanganRouteImport } from './routes/keuangan'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PengurusRouteImport } from './routes/pengurus'
+import { Route as StatistikRouteImport } from './routes/statistik'
 import { Route as SuratRouteImport } from './routes/surat'
 import { Route as KeuanganIndexRouteImport } from './routes/keuangan.index'
 import { Route as KeuanganBulananRouteImport } from './routes/keuangan.bulanan'
@@ -49,6 +50,11 @@ const PengurusRoute = PengurusRouteImport.update({
   path: '/pengurus',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StatistikRoute = StatistikRouteImport.update({
+  id: '/statistik',
+  path: '/statistik',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuratRoute = SuratRouteImport.update({
   id: '/surat',
   path: '/surat',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/keuangan': typeof KeuanganRouteWithChildren
   '/login': typeof LoginRoute
   '/pengurus': typeof PengurusRoute
+  '/statistik': typeof StatistikRoute
   '/surat': typeof SuratRoute
   '/keuangan/bulanan': typeof KeuanganBulananRoute
   '/keuangan/': typeof KeuanganIndexRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/keluarga': typeof KeluargaRoute
   '/login': typeof LoginRoute
   '/pengurus': typeof PengurusRoute
+  '/statistik': typeof StatistikRoute
   '/surat': typeof SuratRoute
   '/keuangan/bulanan': typeof KeuanganBulananRoute
   '/keuangan': typeof KeuanganIndexRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/keuangan': typeof KeuanganRouteWithChildren
   '/login': typeof LoginRoute
   '/pengurus': typeof PengurusRoute
+  '/statistik': typeof StatistikRoute
   '/surat': typeof SuratRoute
   '/keuangan/bulanan': typeof KeuanganBulananRoute
   '/keuangan/': typeof KeuanganIndexRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/keuangan'
     | '/login'
     | '/pengurus'
+    | '/statistik'
     | '/surat'
     | '/keuangan/bulanan'
     | '/keuangan/'
@@ -117,6 +127,7 @@ export interface FileRouteTypes {
     | '/keluarga'
     | '/login'
     | '/pengurus'
+    | '/statistik'
     | '/surat'
     | '/keuangan/bulanan'
     | '/keuangan'
@@ -128,6 +139,7 @@ export interface FileRouteTypes {
     | '/keuangan'
     | '/login'
     | '/pengurus'
+    | '/statistik'
     | '/surat'
     | '/keuangan/bulanan'
     | '/keuangan/'
@@ -140,6 +152,7 @@ export interface RootRouteChildren {
   KeuanganRoute: typeof KeuanganRouteWithChildren
   LoginRoute: typeof LoginRoute
   PengurusRoute: typeof PengurusRoute
+  StatistikRoute: typeof StatistikRoute
   SuratRoute: typeof SuratRoute
 }
 
@@ -187,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PengurusRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/statistik': {
+      id: '/statistik'
+      path: '/statistik'
+      fullPath: '/statistik'
+      preLoaderRoute: typeof StatistikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/surat': {
       id: '/surat'
       path: '/surat'
@@ -232,6 +252,7 @@ const rootRouteChildren: RootRouteChildren = {
   KeuanganRoute: KeuanganRouteWithChildren,
   LoginRoute: LoginRoute,
   PengurusRoute: PengurusRoute,
+  StatistikRoute: StatistikRoute,
   SuratRoute: SuratRoute,
 }
 export const routeTree = rootRouteImport
