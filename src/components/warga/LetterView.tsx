@@ -271,3 +271,122 @@ export function LetterView({ role }: { role: AccessRole }) {
               Nama tersebut di atas adalah warga di lingkungan RT 06 / RW 07. Surat ini dibuat
               untuk keperluan:
             </p>
+<p className="letter-purpose">{preview.keperluan}</p>
+            <p>
+              Demikian surat ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana
+              mestinya.
+            </p>
+            <div className="letter-signature">
+              <p>
+                Bekasi,{' '}
+                {preview.created_at
+                  ? new Date(preview.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      timeZone: 'Asia/Jakarta',
+                    })
+                  : '—'}
+              </p>
+              <p>Ketua RT 06 / RW 07</p>
+              <div className="signature-space" />
+              <p>( ........................................ )</p>
+            </div>
+          </article>
+        </section>
+      )}
+
+      <section className="no-print">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-bold">Riwayat Surat</h2>
+          <Input
+            className="max-w-sm"
+            autoComplete="off"
+            name="cari_surat_no_save"
+            aria-label="Cari riwayat surat"
+            placeholder="Cari NIK atau nama pemohon"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <div className="report-scroll">
+          <table className="report-table">
+            <thead>
+              <tr>
+                {[
+                  'Tanggal',
+                  'Nomor Surat',
+                  'NIK',
+                  'Nama Pemohon',
+                  'Jenis Surat',
+                  'Keperluan',
+                  'Aksi',
+                ].map((v) => (
+                  <th key={v}>{v}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.id}>
+                  <td>{formatTanggal(r.created_at)}</td>
+                  <td>{r.nomor_surat}</td>
+                  <td>{r.nik}</td>
+                  <td>{r.nama_pemohon}</td>
+                  <td>{r.jenis_surat}</td>
+                  <td className="max-w-xs whitespace-normal">{r.keperluan}</td>
+                  <td>
+                    <div className="flex gap-1">
+                      <Button variant="outline" size="sm" onClick={() => setPreview(r)}>
+                        <Eye />
+                        Lihat / Cetak Ulang
+                      </Button>
+                      {role === 'admin' && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          title="Hapus surat"
+                          aria-label={`Hapus surat ${r.nomor_surat}`}
+                          onClick={() => setDeleting(r)}
+                        >
+                          <Trash2 />
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {!rows.length && (
+                <tr>
+                  <td colSpan={7} className="py-12 text-center">
+                    {search ? 'Surat tidak ditemukan.' : 'Belum ada surat.'}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <Dialog open={!!deleting} onOpenChange={(v) => !busy && !v && setDeleting(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Hapus Riwayat Surat?</DialogTitle>
+            <DialogDescription>
+              Surat nomor <strong>{deleting?.nomor_surat}</strong> atas nama{' '}
+              <strong>{deleting?.nama_pemohon}</strong> akan dihapus permanen.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" disabled={busy} onClick={() => setDeleting(null)}>
+              Batal
+            </Button>
+            <Button variant="destructive" disabled={busy} onClick={remove}>
+              {busy ? 'Menghapus…' : 'Hapus Surat'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </main>
+  );
+}
