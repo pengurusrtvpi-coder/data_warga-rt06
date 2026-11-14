@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Users, Wallet, FileText, Award, LogOut } from 'lucide-react';
+import { Users, Wallet, FileText, Award, BarChart3, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 import { BrandMark } from './BrandMark';
@@ -13,12 +13,16 @@ export function PortalNav({ role }: { role: AccessRole }) {
     '/keuangan': Wallet,
     '/surat': FileText,
     '/pengurus': Award,
+    '/statistik': BarChart3,
   };
 
-  const baseMenu = getPortalMenu(role);
-  const fullMenu = baseMenu.some((item) => item.to === '/pengurus')
-    ? baseMenu
-    : [...baseMenu, { to: '/pengurus', label: 'Struktur Pengurus' }];
+  let menuList = [...getPortalMenu(role)];
+  if (!menuList.some((item) => item.to === '/pengurus')) {
+    menuList.push({ to: '/pengurus' as any, label: 'Struktur Pengurus' });
+  }
+  if (!menuList.some((item) => item.to === '/statistik')) {
+    menuList.push({ to: '/statistik' as any, label: 'Statistik Usia' });
+  }
 
   return (
     <header className="no-print border-b bg-card">
@@ -40,7 +44,7 @@ export function PortalNav({ role }: { role: AccessRole }) {
           </Button>
         </div>
         <nav aria-label="Menu portal" className="mt-3 flex flex-wrap gap-2">
-          {fullMenu.map(({ to, label }) => {
+          {menuList.map(({ to, label }) => {
             const Icon = icons[to] || Award;
             return (
               <Button key={to} variant="ghost" size="sm" asChild>
