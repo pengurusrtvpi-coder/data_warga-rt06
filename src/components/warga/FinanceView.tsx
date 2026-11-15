@@ -354,30 +354,17 @@ function TransactionForm({
   row: Transaksi | null;
   onSaved: () => Promise<void>;
 }) {
-  const { data: semuaWarga = [] } = useQuery({
-    queryKey: ['data-warga-kk-keuangan'],
-    queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from('data_warga')
-        .select('id, nama_lengkap, status_hub_keluarga, alamat')
-        .ilike('status_hub_keluarga', '%kepala%')
-        .order('nama_lengkap', { ascending: true });
-      if (error) return [];
-      return data || [];
-    },
-    enabled: open,
-  });
-
-  const alamatTerpakai = new Set<string>();
-  const kepalaKeluargaList = semuaWarga.filter((w: any) => {
-    const normAlamat = String(w.alamat || '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, '');
-    if (!normAlamat) return true;
-    if (alamatTerpakai.has(normAlamat)) return false;
-    alamatTerpakai.add(normAlamat);
-    return true;
-  });
+  const { data: kepalaKeluargaList = [] } = useQuery({
+  queryKey: ['data-warga-kk-keuangan'],
+  queryFn: async () => {
+    const { data, error } = await (supabase as any).rpc('get_kepala_keluarga_keuangan');
+    if (error || !data) return [];
+    return [...data].sort((a: any, b: any) =>
+      String(a.nama_lengkap || '').localeCompare(String(b.nama_lengkap || ''), 'id')
+    );
+  },
+  enabled: open,
+});
 
   const initialNama = row?.nama_warga || '';
   const isInitialInKK =
