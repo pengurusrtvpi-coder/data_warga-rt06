@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, BarChart, ResponsiveContainer } from 'recharts';
 import { Plus, Pencil, Trash2, Printer, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
@@ -354,13 +354,30 @@ function TransactionForm({
   onSaved: () => Promise<void>;
 }) {
   const { data: semuaWarga = [] } = useQuery({
-    queryKey: ['warga-all-kk'],
-    queryFn: fetchSemuaWarga,
+    queryKey: ['data-warga-kk-keuangan'],
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from('data_warga')
+        .select('id, nama_lengkap, status_hub_keluarga, alamat')
+        .ilike('status_hub_keluarga', '%kepala%')
+        .order('nama_lengkap', { ascending: true });
+      if (error) return [];
+      return data || [];
+    },
     enabled: open,
   });
 
-  const semuaKK = semuaWarga.filter(
-    (w: any) =>
+  // Tetapkan maksimal 1 Kepala Keluarga per alamat rumah (cegah tagihan ganda 1 rumah > 1 KK)
+  const alamatTerpakai = new Set<string>();
+  const kepalaKeluargaList = semuaWarga.filter((w: any) => {
+    const normAlamat = String(w.alamat || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+    if (!normAlamat) return true;
+    if (alamatTerpakai.has(normAlamat)) return false;
+    alamatTerpakai.add(normAlamat);
+    return true;
+  });
       String(w.status_hub_keluarga || w.hubungan_keluarga || '')
         .trim()
         .toLowerCase() === 'kepala keluarga'
