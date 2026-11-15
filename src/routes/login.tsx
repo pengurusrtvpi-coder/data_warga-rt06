@@ -47,13 +47,12 @@ interface RunningTextRow {
   updated_at: string;
 }
 
-// Nada notifikasi lonceng lembut menggunakan Web Audio API (tanpa file MP3 eksternal)
 function playNotificationChime() {
   try {
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     if (!AudioCtx) return;
     const ctx = new AudioCtx();
-    const notes = [659.25, 880, 1046.5]; // Nada E5 - A5 - C6 (lonceng lembut)
+    const notes = [659.25, 880, 1046.5];
     notes.forEach((freq, idx) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -78,7 +77,6 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // State Running Text & Admin Control
   const [announcements, setAnnouncements] = useState<RunningTextRow[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showManager, setShowManager] = useState(false);
@@ -109,7 +107,6 @@ function LoginPage() {
   useEffect(() => {
     loadAnnouncements();
 
-    // Cek apakah yang membuka halaman ini memiliki sesi Admin
     (async () => {
       try {
         const { data } = await supabase.auth.getSession();
@@ -122,7 +119,6 @@ function LoginPage() {
       }
     })();
 
-    // Dengarkan perubahan pengumuman secara realtime untuk bunyi notifikasi otomatis
     const channel = supabase
       .channel("realtime-running-text")
       .on(
@@ -135,7 +131,6 @@ function LoginPage() {
       )
       .subscribe();
 
-    // Putar suara notifikasi pada sentuhan pertama jika browser memblokir autoplay awal
     const unlockAudio = () => {
       if (!hasPlayedRef.current) {
         hasPlayedRef.current = true;
@@ -279,35 +274,25 @@ function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col bg-sky-gradient">
-    <section className="flex flex-1 flex-col items-center justify-center px-4 py-6 sm:px-5 sm:py-8">
-        <div className="mb-5 w-full max-w-2xl">
-          <div className="rt06-marquee-wrapper relative overflow-hidden rounded-2xl border-2 border-amber-400/80 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 px-3.5 py-3 shadow-lg sm:px-5 sm:py-4">
-            <div className="mb-1.5 flex items-center justify-between gap-2">
-              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-300 sm:text-[11px]">
-                <Megaphone className="h-3 w-3 shrink-0 text-amber-300 sm:h-3.5 sm:w-3.5" />
-                <span>Pengumuman RT 06</span>
-              </span>
-              <span className="shrink-0 text-[10px] text-amber-200/75">Sentuh untuk jeda</span>
-            </div>
+      <style>{`
+        @keyframes rt06Marquee {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-100%); }
+        }
+        .rt06-marquee-track {
+          display: inline-block;
+          white-space: nowrap;
+          padding-left: 100%;
+          animation: rt06Marquee 16s linear infinite;
+          will-change: transform;
+        }
+        .rt06-marquee-wrapper:hover .rt06-marquee-track,
+        .rt06-marquee-wrapper:active .rt06-marquee-track {
+          animation-play-state: paused;
+        }
+      `}</style>
 
-            <div className="w-full overflow-hidden py-0.5">
-              <div
-                className="rt06-marquee-track text-lg font-extrabold leading-snug tracking-tight drop-shadow-[0_2px_6px_rgba(250,204,21,0.35)] sm:text-2xl md:text-3xl"
-                style={{ color: "#FACC15" }}
-              >
-                {combinedBannerText}
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-3 text-center text-xs text-muted-foreground sm:text-sm">
-            {tab === "warga"
-              ? "Masuk dengan NIK dan password yang diberikan pengurus RT."
-              : "Masuk dengan akun email admin atau bendahara RT."}
-          </p>
-        </div>
-
-      <header className="flex items-center justify-between px-5 pt-6 sm:px-8">
+      <header className="flex items-center justify-between px-4 pt-5 sm:px-8 sm:pt-6">
         <BrandMark />
         <div className="flex items-center gap-2">
           <button
@@ -336,19 +321,20 @@ function LoginPage() {
         </div>
       </header>
 
-      <section className="flex flex-1 flex-col items-center justify-center px-5 py-8">
+      <section className="flex flex-1 flex-col items-center justify-center px-4 py-6 sm:px-5 sm:py-8">
         <div className="mb-5 w-full max-w-2xl">
-          <div className="rt06-marquee-wrapper relative overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 px-4 py-3.5 shadow-lg">
-            <div className="mb-1 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-amber-300">
-                <Megaphone className="h-3.5 w-3.5 text-amber-300" /> Pengumuman Pengurus RT 06
+          <div className="rt06-marquee-wrapper relative overflow-hidden rounded-2xl border-2 border-amber-400/80 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 px-3.5 py-3 shadow-lg sm:px-5 sm:py-4">
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-300 sm:text-[11px]">
+                <Megaphone className="h-3 w-3 shrink-0 text-amber-300 sm:h-3.5 sm:w-3.5" />
+                <span>Pengumuman RT 06</span>
               </span>
-              <span className="text-[10px] text-amber-200/70">Sentuh untuk jeda</span>
+              <span className="shrink-0 text-[10px] text-amber-200/75">Sentuh untuk jeda</span>
             </div>
 
-            <div className="overflow-hidden">
+            <div className="w-full overflow-hidden py-0.5">
               <div
-                className="rt06-marquee-track text-3xl font-extrabold tracking-tight drop-shadow-[0_2px_6px_rgba(250,204,21,0.35)]"
+                className="rt06-marquee-track text-lg font-extrabold leading-snug tracking-tight drop-shadow-[0_2px_6px_rgba(250,204,21,0.35)] sm:text-2xl md:text-3xl"
                 style={{ color: "#FACC15" }}
               >
                 {combinedBannerText}
@@ -356,7 +342,7 @@ function LoginPage() {
             </div>
           </div>
 
-          <p className="mt-3 text-center text-sm text-muted-foreground">
+          <p className="mt-3 text-center text-xs text-muted-foreground sm:text-sm">
             {tab === "warga"
               ? "Masuk dengan NIK dan password yang diberikan pengurus RT."
               : "Masuk dengan akun email admin atau bendahara RT."}
@@ -537,7 +523,6 @@ function LoginPage() {
               </TabsContent>
             </Tabs>
           </div>
-
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Lupa password? Hubungi pengurus RT 06.
           </p>
