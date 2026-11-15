@@ -17,15 +17,24 @@ export function PortalNav({ role }: { role: AccessRole }) {
     '/aspirasi': MessageSquarePlus,
   };
 
-  let menuList = [...getPortalMenu(role)];
-  if (!menuList.some((item) => item.to === '/pengurus')) {
-    menuList.push({ to: '/pengurus' as any, label: 'Struktur Pengurus' });
-  }
-  if (!menuList.some((item) => item.to === '/statistik')) {
-    menuList.push({ to: '/statistik' as any, label: 'Statistik Usia' });
-  }
-  if (!menuList.some((item) => item.to === '/aspirasi')) {
-    menuList.push({ to: '/aspirasi' as any, label: 'Aspirasi Warga' });
+  let menuList =
+    (role as string) === 'bendahara'
+      ? [
+          { to: '/keuangan' as any, label: 'Keuangan RT' },
+          { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
+        ]
+      : [...getPortalMenu(role)];
+
+  if ((role as string) !== 'bendahara') {
+    if (!menuList.some((item) => item.to === '/pengurus')) {
+      menuList.push({ to: '/pengurus' as any, label: 'Struktur Pengurus' });
+    }
+    if (!menuList.some((item) => item.to === '/statistik')) {
+      menuList.push({ to: '/statistik' as any, label: 'Statistik Usia' });
+    }
+    if (!menuList.some((item) => item.to === '/aspirasi')) {
+      menuList.push({ to: '/aspirasi' as any, label: 'Aspirasi Warga' });
+    }
   }
 
   return (
