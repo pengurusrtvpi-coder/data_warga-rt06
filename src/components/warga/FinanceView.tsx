@@ -1,8 +1,9 @@
-import { supabase } from '@/integrations/supabase/client';
+import { useState } from 'react';
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { CartesianGrid, XAxis, YAxis, Tooltip, Legend, Bar, BarChart, ResponsiveContainer } from 'recharts';
 import { Plus, Pencil, Trash2, Printer, Wallet, TrendingUp, TrendingDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,7 +18,6 @@ import {
   financeSummary,
   yearSeries,
   analyseYear,
-  fetchSemuaWarga,
   saveTransaksi,
   deleteTransaksi,
   transaksiSchema,
@@ -37,6 +37,7 @@ const KATEGORI_KEUANGAN = [
   'Lainnya',
 ];
 
+const UMUM_OPTION = '__UMUM__';
 const MANUAL_OPTION = '__MANUAL__';
 
 export function FinanceView({ role, monthly = false }: { role: AccessRole; monthly?: boolean }) {
@@ -249,7 +250,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
               <thead>
                 <tr>
                   {['Tanggal', 'Nama Warga', 'Kategori', 'Keterangan', 'Jenis', 'Jumlah'].map((x) => (
-          <th key={x}>{x}</th>
+                    <th key={x}>{x}</th>
                   ))}
                   {role === 'admin' && <th className="no-print">Aksi</th>}
                 </tr>
@@ -367,7 +368,6 @@ function TransactionForm({
     enabled: open,
   });
 
-  // Tetapkan maksimal 1 Kepala Keluarga per alamat rumah (cegah tagihan ganda 1 rumah > 1 KK)
   const alamatTerpakai = new Set<string>();
   const kepalaKeluargaList = semuaWarga.filter((w: any) => {
     const normAlamat = String(w.alamat || '')
@@ -381,7 +381,7 @@ function TransactionForm({
 
   const initialNama = row?.nama_warga || '';
   const isInitialInKK =
-    !initialNama || kepalaKeluargaList.some((k) => k.nama_lengkap === initialNama);
+    !initialNama || kepalaKeluargaList.some((k: any) => k.nama_lengkap === initialNama);
 
   const [tanggal, setTanggal] = useState(row?.tanggal || jakartaToday());
   const [jenis, setJenis] = useState<'Pemasukan' | 'Pengeluaran'>(
@@ -389,7 +389,7 @@ function TransactionForm({
   );
   const [kategori, setKategori] = useState(row?.kategori || 'Iuran Bulanan');
   const [selectedWarga, setSelectedWarga] = useState<string>(
-    isInitialInKK ? initialNama : MANUAL_OPTION
+    !initialNama ? UMUM_OPTION : isInitialInKK ? initialNama : MANUAL_OPTION
   );
   const [manualNama, setManualNama] = useState<string>(isInitialInKK ? '' : initialNama);
   const [jumlah, setJumlah] = useState(row?.jumlah ? String(row.jumlah) : '');
@@ -400,7 +400,13 @@ function TransactionForm({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const namaFinal = isManualMode ? manualNama.trim() : selectedWarga.trim();
+    const namaFinal =
+      selectedWarga === UMUM_OPTION
+        ? ''
+        : isManualMode
+        ? manualNama.trim()
+        : selectedWarga.trim();
+
     const payload: TransaksiInput = {
       tanggal,
       jenis,
@@ -482,13 +488,14 @@ function TransactionForm({
                 if (v !== MANUAL_OPTION) setManualNama('');
               }}
               options={[
-                { value: '', label: '— Tanpa Nama Warga (Umum) —' },
+                { value: UMUM_OPTION, label: '— Tanpa Nama Warga (Umum) —' },
                 { value: MANUAL_OPTION, label: '+ Ketik Nama Manual (Non-KK / Lainnya)' },
                 ...kepalaKeluargaList.map((k: any) => {
                   const blokMatch = String(k.alamat || '').match(
                     /BLOK\s*[A-Z0-9]+\s*NO\.?\s*[0-9A-Z]+/i
                   );
-                  const infoBlok = blokMatch ? ` (${blokMatch[0].toUpperCase()})` : '';
+                  const infoBlok =
+                    blokMatch && blokMatch[0] ? ` (${blokMatch[0].toUpperCase()})` : '';
                   return {
                     value: k.nama_lengkap,
                     label: `${k.nama_lengkap}${infoBlok}`,
@@ -531,6 +538,7 @@ function TransactionForm({
               onChange={(e) => setKeterangan(e.target.value)}
             />
           </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" disabled={saving} onClick={onClose}>
               Batal
