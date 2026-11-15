@@ -104,7 +104,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
               <Plus />
               Tambah Transaksi
             </Button>
-          )}
+          ))}
         </div>
       </div>
 
@@ -264,7 +264,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
                     <td className="max-w-xs whitespace-normal">{r.keterangan || '—'}</td>
                     <td>{r.jenis}</td>
                     <td>{rupiah(r.jumlah)}</td>
-                    {role === 'admin' && (
+                    {(role === 'admin' || (role as string) === 'bendahara') && (
                       <td className="no-print">
                         <div className="flex gap-1">
                           <Button
@@ -306,7 +306,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
         </>
       )}
 
-      {role === 'admin' && (
+     {(role === 'admin' || (role as string) === 'bendahara') && (
         <>
           <TransactionForm
             key={`${open}-${editing?.id}`}
