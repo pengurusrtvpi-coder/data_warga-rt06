@@ -279,22 +279,33 @@ function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col bg-sky-gradient">
-      {/* Animasi Running Text */}
-      <style>{`
-        @keyframes rt06Marquee {
-          0% { transform: translateX(100%); }
-          100% { transform: translateX(-100%); }
-        }
-        .rt06-marquee-track {
-          display: inline-block;
-          white-space: nowrap;
-          padding-left: 100%;
-          animation: rt06Marquee 22s linear infinite;
-        }
-        .rt06-marquee-wrapper:hover .rt06-marquee-track {
-          animation-play-state: paused;
-        }
-      `}</style>
+    <section className="flex flex-1 flex-col items-center justify-center px-4 py-6 sm:px-5 sm:py-8">
+        <div className="mb-5 w-full max-w-2xl">
+          <div className="rt06-marquee-wrapper relative overflow-hidden rounded-2xl border-2 border-amber-400/80 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 px-3.5 py-3 shadow-lg sm:px-5 sm:py-4">
+            <div className="mb-1.5 flex items-center justify-between gap-2">
+              <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wide text-amber-300 sm:text-[11px]">
+                <Megaphone className="h-3 w-3 shrink-0 text-amber-300 sm:h-3.5 sm:w-3.5" />
+                <span>Pengumuman RT 06</span>
+              </span>
+              <span className="shrink-0 text-[10px] text-amber-200/75">Sentuh untuk jeda</span>
+            </div>
+
+            <div className="w-full overflow-hidden py-0.5">
+              <div
+                className="rt06-marquee-track text-lg font-extrabold leading-snug tracking-tight drop-shadow-[0_2px_6px_rgba(250,204,21,0.35)] sm:text-2xl md:text-3xl"
+                style={{ color: "#FACC15" }}
+              >
+                {combinedBannerText}
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-3 text-center text-xs text-muted-foreground sm:text-sm">
+            {tab === "warga"
+              ? "Masuk dengan NIK dan password yang diberikan pengurus RT."
+              : "Masuk dengan akun email admin atau bendahara RT."}
+          </p>
+        </div>
 
       <header className="flex items-center justify-between px-5 pt-6 sm:px-8">
         <BrandMark />
