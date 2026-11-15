@@ -246,12 +246,7 @@ export function LetterView({ role }: { role: AccessRole }) {
                 <p className="letter-head-address text-[11px] sm:text-xs text-slate-600 mt-1">
                   Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
                 </p>
-              </div>
-              <img
-                className="letter-logo h-20 w-20 shrink-0 object-contain rounded-full"
-                src="/logo_rt06.jpg"
-                alt="Logo RT 06 VPI-2"
-              />
+              </div
             </header>
             <div className="letter-title">
               <h2>
