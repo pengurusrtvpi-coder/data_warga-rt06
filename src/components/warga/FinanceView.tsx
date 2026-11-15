@@ -89,12 +89,12 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
           <p className="text-sm font-semibold text-primary-deep">RT 06 / RW 07 · VPI-2</p>
           <h1 className="mt-1 text-3xl font-extrabold">{monthly ? 'Laporan Bulanan' : 'Keuangan RT'}</h1>
         </div>
-        <div className="flex flex-wrap gap-2">
+   <div className="flex flex-wrap gap-2">
           <Button variant="outline" onClick={() => window.print()}>
             <Printer />
             Cetak Laporan
           </Button>
-         (role === 'admin' || (role as string) === 'bendahara')
+          {(role === 'admin' || (role as string) === 'bendahara') && (
             <Button
               onClick={() => {
                 setEditing(null);
