@@ -104,7 +104,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
               <Plus />
               Tambah Transaksi
             </Button>
-          ))}
+          )}
         </div>
       </div>
 
