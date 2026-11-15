@@ -94,7 +94,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
             <Printer />
             Cetak Laporan
           </Button>
-          {role === 'admin' && (
+         (role === 'admin' || (role as string) === 'bendahara')
             <Button
               onClick={() => {
                 setEditing(null);
