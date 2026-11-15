@@ -378,23 +378,6 @@ function TransactionForm({
     alamatTerpakai.add(normAlamat);
     return true;
   });
-      String(w.status_hub_keluarga || w.hubungan_keluarga || '')
-        .trim()
-        .toLowerCase() === 'kepala keluarga'
-  );
-
-  const alamatTerpakai = new Set<string>();
-  const kepalaKeluargaList = semuaKK
-    .filter((w: any) => {
-      const normAlamat = String(w.alamat || '')
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, '');
-      if (!normAlamat) return true;
-      if (alamatTerpakai.has(normAlamat)) return false;
-      alamatTerpakai.add(normAlamat);
-      return true;
-    })
-    .sort((a, b) => a.nama_lengkap.localeCompare(b.nama_lengkap, 'id'));
 
   const initialNama = row?.nama_warga || '';
   const isInitialInKK =
