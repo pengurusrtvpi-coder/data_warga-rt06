@@ -7,36 +7,519 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Choice } from './Choice';
 import { financeOptions } from '@/lib/portal-queries';
-import { BULAN, jakartaToday, rupiah, financeSummary, yearSeries, analyseYear, fetchSemuaWarga, saveTransaksi, deleteTransaksi, transaksiSchema, type Transaksi, type TransaksiInput, type AccessRole } from '@/lib/warga';
+import {
+  BULAN,
+  jakartaToday,
+  rupiah,
+  financeSummary,
+  yearSeries,
+  analyseYear,
+  fetchSemuaWarga,
+  saveTransaksi,
+  deleteTransaksi,
+  transaksiSchema,
+  type Transaksi,
+  type TransaksiInput,
+  type AccessRole,
+} from '@/lib/warga';
 
-export function FinanceView({role,monthly=false}:{role:AccessRole;monthly?:boolean}) {
- const {data}=useSuspenseQuery(financeOptions);const qc=useQueryClient();
- const today=jakartaToday(),currentYear=Number(today.slice(0,4));
- const [year,setYear]=useState(currentYear),[month,setMonth]=useState(Number(today.slice(5,7)));
- const [editing,setEditing]=useState<Transaksi|null>(null),[open,setOpen]=useState(false),[deleting,setDeleting]=useState<Transaksi|null>(null),[busy,setBusy]=useState(false);
- const series=yearSeries(data.bulanan,year),analysis=analyseYear(series),all=financeSummary(data.transaksi);
- const current=financeSummary(data.transaksi.filter(r=>r.tanggal.startsWith(today.slice(0,7))));
- const prefix=`${year}-${String(month).padStart(2,'0')}`;
- const filtered=data.transaksi.filter(r=>r.tanggal.startsWith(prefix)),summary=financeSummary(filtered);
- const years=Array.from(new Set([currentYear,...data.transaksi.map(r=>Number(r.tanggal.slice(0,4))),...data.bulanan.map(r=>Number(r.tahun_angka)).filter(Boolean)])).sort((a,b)=>b-a);
- async function remove(){if(!deleting)return;setBusy(true);try{await deleteTransaksi(deleting.id);setDeleting(null);await qc.invalidateQueries({queryKey:['finance']});toast.success('Transaksi dihapus.');}catch(e){toast.error(e instanceof Error?e.message:'Gagal menghapus.');}finally{setBusy(false);}}
- return <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6"><div className="no-print mb-7 flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-semibold text-primary-deep">RT 06 / RW 07 · VPI-2</p><h1 className="mt-1 text-3xl font-extrabold">{monthly?'Laporan Bulanan':'Keuangan RT'}</h1></div><div className="flex flex-wrap gap-2"><Button variant="outline" onClick={()=>window.print()}><Printer/>Cetak Laporan</Button>{role==='admin'&&<Button onClick={()=>{setEditing(null);setOpen(true);}}><Plus/>Tambah Transaksi</Button>}</div></div>
- <h1 className="print-only mb-4 text-center text-xl font-bold">LAPORAN KEUANGAN RT 06 / RW 07 VPI-2<br/>{monthly?`${BULAN[month-1]} ${year}`:`Tahun ${year}`}</h1>
- <div className="no-print mb-6 flex flex-wrap items-end gap-4">{monthly&&<div className="w-44"><Label>Bulan</Label><Choice label="Bulan" value={String(month)} onChange={v=>setMonth(Number(v))} options={BULAN.map((b,i)=>({value:String(i+1),label:b}))}/></div>}<div className="w-32"><Label>Tahun</Label><Choice label="Tahun" value={String(year)} onChange={v=>setYear(Number(v))} options={years.map(y=>({value:String(y),label:String(y)}))}/></div></div>
- {!monthly&&<><div className="mb-8 grid gap-4 sm:grid-cols-3">{[{label:'Kas RT saat ini',value:all.saldo,Icon:Wallet},{label:'Pemasukan bulan ini',value:current.pemasukan,Icon:TrendingUp},{label:'Pengeluaran bulan ini',value:current.pengeluaran,Icon:TrendingDown}].map(({label,value,Icon})=><div key={label} className="rounded-lg border bg-card p-5"><Icon className="mb-3 h-5 w-5 text-primary-deep"/><p className="text-sm text-muted-foreground">{label}</p><p className="mt-2 break-words text-2xl font-bold">{rupiah(value)}</p></div>)}</div><section className="mb-8"><h2 className="mb-4 text-lg font-bold">Pemasukan & Pengeluaran · {year}</h2><div className="finance-chart h-80 w-full" role="img" aria-label={`Grafik pemasukan dan pengeluaran 12 bulan tahun ${year}`}><ResponsiveContainer width="100%" height="100%"><BarChart data={series} margin={{left:5,right:10}}><CartesianGrid stroke="var(--border)" vertical={false}/><XAxis dataKey="bulan" tickFormatter={v=>v.slice(0,3)} tick={{fontSize:11,fill:'var(--muted-foreground)'}}/><YAxis width={70} tickFormatter={v=>`${Number(v)/1000000} jt`} tick={{fontSize:11,fill:'var(--muted-foreground)'}}/><Tooltip formatter={v=>rupiah(Number(v))} contentStyle={{background:'var(--card)',borderColor:'var(--border)',color:'var(--foreground)'}}/><Legend/><Bar isAnimationActive={false} name="Pemasukan" dataKey="pemasukan" fill="var(--chart-2)" radius={[3,3,0,0]}/><Bar isAnimationActive={false} name="Pengeluaran" dataKey="pengeluaran" fill="var(--chart-1)" radius={[3,3,0,0]}/></BarChart></ResponsiveContainer></div></section><section className="mb-8 border-y py-5"><h2 className="mb-3 font-bold">Analisa Keuangan Otomatis</h2>{analysis?<ul className="grid gap-3 text-sm sm:grid-cols-2"><li>Pengeluaran tertinggi: <strong>{analysis.highestExpense.bulan} · {rupiah(analysis.highestExpense.pengeluaran)}</strong></li><li>Pengeluaran terendah (bulan tercatat): <strong>{analysis.lowestExpense.bulan} · {rupiah(analysis.lowestExpense.pengeluaran)}</strong></li><li>Pemasukan tertinggi: <strong>{analysis.highestIncome.bulan} · {rupiah(analysis.highestIncome.pemasukan)}</strong></li><li>{analysis.saldo<0?'Defisit':analysis.saldo>0?'Surplus':'Seimbang'} tahun {year}: <strong>{rupiah(analysis.saldo)}</strong> · Kas saat ini {all.saldo<0?'defisit':all.saldo>0?'surplus':'seimbang'}</li></ul>:<p className="text-sm text-muted-foreground">Belum ada transaksi untuk tahun {year}.</p>}</section><div className="report-scroll"><table className="report-table"><caption>Laporan Tahunan {year}</caption><thead><tr><th>Bulan</th><th>Pemasukan</th><th>Pengeluaran</th><th>Surplus / Defisit</th></tr></thead><tbody>{series.map(r=><tr key={r.bulan}><td>{r.bulan}</td><td>{rupiah(r.pemasukan)}</td><td>{rupiah(r.pengeluaran)}</td><td>{rupiah(r.saldo)}</td></tr>)}</tbody><tfoot><tr><th>Total</th><th>{rupiah(series.reduce((s,r)=>s+r.pemasukan,0))}</th><th>{rupiah(series.reduce((s,r)=>s+r.pengeluaran,0))}</th><th>{rupiah(series.reduce((s,r)=>s+r.saldo,0))}</th></tr></tfoot></table></div></>}
- {monthly&&<><div className="mb-5 flex flex-wrap gap-6 text-sm"><p>Pemasukan: <strong>{rupiah(summary.pemasukan)}</strong></p><p>Pengeluaran: <strong>{rupiah(summary.pengeluaran)}</strong></p><p>Surplus / Defisit: <strong>{rupiah(summary.saldo)}</strong></p></div><div className="report-scroll"><table className="report-table"><caption>{BULAN[month-1]} {year}</caption><thead><tr>{['Tanggal','Nama Warga','Kategori','Keterangan','Jenis','Jumlah'].map(x=><th key={x}>{x}</th>)}{role==='admin'&&<th className="no-print">Aksi</th>}</tr></thead><tbody>{filtered.map(r=><tr key={r.id}><td>{new Date(`${r.tanggal}T00:00:00`).toLocaleDateString('id-ID')}</td><td>{r.nama_warga||'—'}</td><td>{r.kategori}</td><td className="max-w-xs whitespace-normal">{r.keterangan||'—'}</td><td>{r.jenis}</td><td>{rupiah(r.jumlah)}</td>{role==='admin'&&<td className="no-print"><div className="flex gap-1"><Button variant="ghost" size="icon" title="Edit transaksi" aria-label={`Edit transaksi ${r.kategori}`} onClick={()=>{setEditing(r);setOpen(true);}}><Pencil/></Button><Button variant="ghost" size="icon" title="Hapus transaksi" aria-label={`Hapus transaksi ${r.kategori}`} onClick={()=>setDeleting(r)}><Trash2/></Button></div></td>}</tr>)}{!filtered.length&&<tr><td colSpan={role==='admin'?7:6} className="py-12 text-center">Belum ada transaksi pada periode ini.</td></tr>}</tbody></table></div></>}
- {role==='admin'&&<><TransactionForm key={`${open}-${editing?.id}`} open={open} onClose={()=>setOpen(false)} row={editing} onSaved={async()=>{setOpen(false);await qc.invalidateQueries({queryKey:['finance']});}}/><Dialog open={!!deleting} onOpenChange={v=>!busy&&!v&&setDeleting(null)}><DialogContent><DialogHeader><DialogTitle>Hapus transaksi?</DialogTitle></DialogHeader><p>{deleting?.kategori} · {rupiah(deleting?.jumlah??0)}</p><div className="flex justify-end gap-2"><Button variant="outline" disabled={busy} onClick={()=>setDeleting(null)}>Batal</Button><Button variant="destructive" disabled={busy} onClick={remove}>{busy?'Menghapus…':'Hapus'}</Button></div></DialogContent></Dialog></>}
- </main>;
+const KATEGORI_KEUANGAN = [
+  'Iuran Bulanan',
+  'Iuran Keamanan & Kebersihan',
+  'Sumbangan / Donasi',
+  'Kas Sosial / Kematian',
+  'Operasional RT',
+  'Perbaikan Fasilitas',
+  'Kegiatan Warga / 17 Agustus',
+  'Lainnya',
+];
+
+const MANUAL_OPTION = '__MANUAL__';
+
+export function FinanceView({ role, monthly = false }: { role: AccessRole; monthly?: boolean }) {
+  const { data } = useSuspenseQuery(financeOptions);
+  const qc = useQueryClient();
+  const today = jakartaToday(),
+    currentYear = Number(today.slice(0, 4));
+  const [year, setYear] = useState(currentYear),
+    [month, setMonth] = useState(Number(today.slice(5, 7)));
+  const [editing, setEditing] = useState<Transaksi | null>(null),
+    [open, setOpen] = useState(false),
+    [deleting, setDeleting] = useState<Transaksi | null>(null),
+    [busy, setBusy] = useState(false);
+
+  const series = yearSeries(data.bulanan, year),
+    analysis = analyseYear(series),
+    all = financeSummary(data.transaksi);
+  const current = financeSummary(data.transaksi.filter((r) => r.tanggal.startsWith(today.slice(0, 7))));
+  const prefix = `${year}-${String(month).padStart(2, '0')}`;
+  const filtered = data.transaksi.filter((r) => r.tanggal.startsWith(prefix)),
+    summary = financeSummary(filtered);
+  const years = Array.from(
+    new Set([
+      currentYear,
+      ...data.transaksi.map((r) => Number(r.tanggal.slice(0, 4))),
+      ...data.bulanan.map((r) => Number(r.tahun_angka)).filter(Boolean),
+    ])
+  ).sort((a, b) => b - a);
+
+  async function remove() {
+    if (!deleting) return;
+    setBusy(true);
+    try {
+      await deleteTransaksi(deleting.id);
+      setDeleting(null);
+      await qc.invalidateQueries({ queryKey: ['finance'] });
+      toast.success('Transaksi dihapus.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Gagal menghapus.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="no-print mb-7 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <p className="text-sm font-semibold text-primary-deep">RT 06 / RW 07 · VPI-2</p>
+          <h1 className="mt-1 text-3xl font-extrabold">{monthly ? 'Laporan Bulanan' : 'Keuangan RT'}</h1>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => window.print()}>
+            <Printer />
+            Cetak Laporan
+          </Button>
+          {role === 'admin' && (
+            <Button
+              onClick={() => {
+                setEditing(null);
+                setOpen(true);
+              }}
+            >
+              <Plus />
+              Tambah Transaksi
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <h1 className="print-only mb-4 text-center text-xl font-bold">
+        LAPORAN KEUANGAN RT 06 / RW 07 VPI-2
+        <br />
+        {monthly ? `${BULAN[month - 1]} ${year}` : `Tahun ${year}`}
+      </h1>
+
+      <div className="no-print mb-6 flex flex-wrap items-end gap-4">
+        {monthly && (
+          <div className="w-44">
+            <Label>Bulan</Label>
+            <Choice
+              label="Bulan"
+              value={String(month)}
+              onChange={(v) => setMonth(Number(v))}
+              options={BULAN.map((b, i) => ({ value: String(i + 1), label: b }))}
+            />
+          </div>
+        )}
+        <div className="w-32">
+          <Label>Tahun</Label>
+          <Choice
+            label="Tahun"
+            value={String(year)}
+            onChange={(v) => setYear(Number(v))}
+            options={years.map((y) => ({ value: String(y), label: String(y) }))}
+          />
+        </div>
+      </div>
+
+      {!monthly && (
+        <>
+          <div className="mb-8 grid gap-4 sm:grid-cols-3">
+            {[
+              { label: 'Kas RT saat ini', value: all.saldo, Icon: Wallet },
+              { label: 'Pemasukan bulan ini', value: current.pemasukan, Icon: TrendingUp },
+              { label: 'Pengeluaran bulan ini', value: current.pengeluaran, Icon: TrendingDown },
+            ].map(({ label, value, Icon }) => (
+              <div key={label} className="rounded-lg border bg-card p-5">
+                <Icon className="mb-3 h-5 w-5 text-primary-deep" />
+                <p className="text-sm text-muted-foreground">{label}</p>
+                <p className="mt-2 break-words text-2xl font-bold">{rupiah(value)}</p>
+              </div>
+            ))}
+          </div>
+
+          <section className="mb-8">
+            <h2 className="mb-4 text-lg font-bold">Pemasukan & Pengeluaran · {year}</h2>
+            <div className="finance-chart h-80 w-full" role="img" aria-label={`Grafik pemasukan dan pengeluaran 12 bulan tahun ${year}`}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={series} margin={{ left: 5, right: 10 }}>
+                  <CartesianGrid stroke="var(--border)" vertical={false} />
+                  <XAxis dataKey="bulan" tickFormatter={(v) => v.slice(0, 3)} tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }} />
+                  <YAxis width={70} tickFormatter={(v) => `${Number(v) / 1000000} jt`} tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }} />
+                  <Tooltip
+                    formatter={(v) => rupiah(Number(v))}
+                    contentStyle={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
+                  />
+                  <Legend />
+                  <Bar isAnimationActive={false} name="Pemasukan" dataKey="pemasukan" fill="var(--chart-2)" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} name="Pengeluaran" dataKey="pengeluaran" fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+
+          <section className="mb-8 border-y py-5">
+            <h2 className="mb-3 font-bold">Analisa Keuangan Otomatis</h2>
+            {analysis ? (
+              <ul className="grid gap-3 text-sm sm:grid-cols-2">
+                <li>
+                  Pengeluaran tertinggi: <strong>{analysis.highestExpense.bulan} · {rupiah(analysis.highestExpense.pengeluaran)}</strong>
+                </li>
+                <li>
+                  Pengeluaran terendah (bulan tercatat): <strong>{analysis.lowestExpense.bulan} · {rupiah(analysis.lowestExpense.pengeluaran)}</strong>
+                </li>
+                <li>
+                  Pemasukan tertinggi: <strong>{analysis.highestIncome.bulan} · {rupiah(analysis.highestIncome.pemasukan)}</strong>
+                </li>
+                <li>
+                  {analysis.saldo < 0 ? 'Defisit' : analysis.saldo > 0 ? 'Surplus' : 'Seimbang'} tahun {year}: <strong>{rupiah(analysis.saldo)}</strong> · Kas saat ini {all.saldo < 0 ? 'defisit' : all.saldo > 0 ? 'surplus' : 'seimbang'}
+                </li>
+              </ul>
+            ) : (
+              <p className="text-sm text-muted-foreground">Belum ada transaksi untuk tahun {year}.</p>
+            )}
+          </section>
+
+          <div className="report-scroll">
+            <table className="report-table">
+              <caption>Laporan Tahunan {year}</caption>
+              <thead>
+                <tr>
+                  <th>Bulan</th>
+                  <th>Pemasukan</th>
+                  <th>Pengeluaran</th>
+                  <th>Surplus / Defisit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {series.map((r) => (
+                  <tr key={r.bulan}>
+                    <td>{r.bulan}</td>
+                    <td>{rupiah(r.pemasukan)}</td>
+                    <td>{rupiah(r.pengeluaran)}</td>
+                    <td>{rupiah(r.saldo)}</td>
+                  </tr>
+                ))}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <th>Total</th>
+                  <th>{rupiah(series.reduce((s, r) => s + r.pemasukan, 0))}</th>
+                  <th>{rupiah(series.reduce((s, r) => s + r.pengeluaran, 0))}</th>
+                  <th>{rupiah(series.reduce((s, r) => s + r.saldo, 0))}</th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </>
+      )}
+
+      {monthly && (
+        <>
+          <div className="mb-5 flex flex-wrap gap-6 text-sm">
+            <p>
+              Pemasukan: <strong>{rupiah(summary.pemasukan)}</strong>
+            </p>
+            <p>
+              Pengeluaran: <strong>{rupiah(summary.pengeluaran)}</strong>
+            </p>
+            <p>
+              Surplus / Defisit: <strong>{rupiah(summary.saldo)}</strong>
+            </p>
+          </div>
+          <div className="report-scroll">
+            <table className="report-table">
+              <caption>
+                {BULAN[month - 1]} {year}
+              </caption>
+              <thead>
+                <tr>
+                 {['Tanggal', 'Nama Warga', 'Kategori', 'Keterangan', 'Jenis', 'Jumlah'].map((x) => (
+                    <th key={x}>{x}</th>
+                  ))}
+                  {role === 'admin' && <th className="no-print">Aksi</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((r) => (
+                  <tr key={r.id}>
+                    <td>{new Date(`${r.tanggal}T00:00:00`).toLocaleDateString('id-ID')}</td>
+                    <td>{r.nama_warga || '—'}</td>
+                    <td>{r.kategori}</td>
+                    <td className="max-w-xs whitespace-normal">{r.keterangan || '—'}</td>
+                    <td>{r.jenis}</td>
+                    <td>{rupiah(r.jumlah)}</td>
+                    {role === 'admin' && (
+                      <td className="no-print">
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Edit transaksi"
+                            aria-label={`Edit transaksi ${r.kategori}`}
+                            onClick={() => {
+                              setEditing(r);
+                              setOpen(true);
+                            }}
+                          >
+                            <Pencil />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Hapus transaksi"
+                            aria-label={`Hapus transaksi ${r.kategori}`}
+                            onClick={() => setDeleting(r)}
+                          >
+                            <Trash2 />
+                          </Button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+                {!filtered.length && (
+                  <tr>
+                    <td colSpan={role === 'admin' ? 7 : 6} className="py-12 text-center">
+                      Belum ada transaksi pada periode ini.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {role === 'admin' && (
+        <>
+          <TransactionForm
+            key={`${open}-${editing?.id}`}
+            open={open}
+            onClose={() => setOpen(false)}
+            row={editing}
+            onSaved={async () => {
+              setOpen(false);
+              await qc.invalidateQueries({ queryKey: ['finance'] });
+            }}
+          />
+          <Dialog open={!!deleting} onOpenChange={(v) => !busy && !v && setDeleting(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Hapus Transaksi?</DialogTitle>
+                <DialogDescription>
+                  Transaksi <strong>{deleting?.kategori}</strong> sebesar{' '}
+                  <strong>{deleting ? rupiah(deleting.jumlah) : ''}</strong> akan dihapus permanen.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button variant="outline" disabled={busy} onClick={() => setDeleting(null)}>
+                  Batal
+                </Button>
+                <Button variant="destructive" disabled={busy} onClick={remove}>
+                  {busy ? 'Menghapus…' : 'Hapus Transaksi'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
+    </main>
+  );
 }
-function TransactionForm({open,onClose,row,onSaved}:{open:boolean;onClose:()=>void;row:Transaksi|null;onSaved:()=>Promise<void>}) {
- const [form,setForm]=useState<TransaksiInput>({tanggal:row?.tanggal??jakartaToday(),jenis:row?.jenis==='Pengeluaran'?'Pengeluaran':'Pemasukan',kategori:row?.kategori??'Iuran Bulanan',jumlah:row?.jumlah??0,keterangan:row?.keterangan??'',nama_warga:row?.nama_warga??''});
- const [error,setError]=useState(''),[busy,setBusy]=useState(false);
- const warga=useQuery({queryKey:['warga-options'],queryFn:()=>fetchSemuaWarga(),enabled:open});
- const set=(key:keyof TransaksiInput,value:string|number)=>setForm(f=>({...f,[key]:value}));
- const categories=Array.from(new Set(['Iuran Bulanan','Donasi','Kebersihan','Keamanan','Kegiatan RT','Pemeliharaan','Lainnya',form.kategori]));
- async function submit(e:React.FormEvent){e.preventDefault();setError('');const parsed=transaksiSchema.safeParse(form);if(!parsed.success){setError(parsed.error.issues.map(i=>i.message).join(' '));return;}setBusy(true);try{await saveTransaksi(parsed.data,row?.id);await onSaved();toast.success('Transaksi tersimpan.');}catch(e){setError(e instanceof Error?e.message:'Gagal menyimpan.');}finally{setBusy(false);}}
- return <Dialog open={open} onOpenChange={v=>!busy&&!v&&onClose()}><DialogContent className="max-h-[90dvh] overflow-y-auto"><DialogHeader><DialogTitle>{row?'Edit':'Tambah'} Transaksi</DialogTitle></DialogHeader><form onSubmit={submit} className="space-y-4">{error&&<p role="alert" className="text-sm text-destructive">{error}</p>}<div><Label htmlFor="tanggal">Tanggal</Label><Input id="tanggal" type="date" required value={form.tanggal} onChange={e=>set('tanggal',e.target.value)}/></div><div><Label>Jenis</Label><Choice label="Jenis transaksi" value={form.jenis} onChange={v=>set('jenis',v)} options={['Pemasukan','Pengeluaran'].map(v=>({value:v,label:v}))}/></div><div><Label>Kategori</Label><Choice label="Kategori" value={form.kategori} onChange={v=>setForm(f=>({...f,kategori:v,nama_warga:''}))} options={categories.filter(Boolean).map(v=>({value:v,label:v}))}/></div>{form.kategori==='Iuran Bulanan'&&<div><Label>Nama Warga</Label><Choice label="Nama Warga" value={form.nama_warga} onChange={v=>set('nama_warga',v)} options={Array.from(new Set([...(warga.data??[]).map(w=>w.nama_lengkap),...(row?.nama_warga?[row.nama_warga]:[])])).sort().map(v=>({value:v,label:v}))}/>{warga.isPending&&<p className="text-sm">Memuat nama warga…</p>}{warga.isError&&<p role="alert" className="text-sm text-destructive">Daftar warga gagal dimuat.<Button type="button" variant="link" onClick={()=>warga.refetch()}>Coba lagi</Button></p>}</div>}<div><Label htmlFor="jumlah">Jumlah (Rp)</Label><Input id="jumlah" type="number" min="0.01" step="0.01" required value={form.jumlah||''} onChange={e=>set('jumlah',Number(e.target.value))}/></div><div><Label htmlFor="keterangan">Keterangan</Label><Textarea id="keterangan" value={form.keterangan} onChange={e=>set('keterangan',e.target.value)}/></div><div className="flex justify-end gap-2"><Button type="button" variant="outline" disabled={busy} onClick={onClose}>Batal</Button><Button disabled={busy}>{busy?'Menyimpan…':'Simpan'}</Button></div></form></DialogContent></Dialog>;
+
+function TransactionForm({
+  open,
+  onClose,
+  row,
+  onSaved,
+}: {
+  open: boolean;
+  onClose: () => void;
+  row: Transaksi | null;
+  onSaved: () => Promise<void>;
+}) {
+  const { data: semuaWarga = [] } = useQuery({
+    queryKey: ['warga-all-kk'],
+    queryFn: fetchSemuaWarga,
+    enabled: open,
+  });
+
+  const kepalaKeluargaList = semuaWarga
+    .filter((w) => (w.hubungan_keluarga || '').toLowerCase().includes('kepala'))
+    .sort((a, b) => a.nama_lengkap.localeCompare(b.nama_lengkap, 'id'));
+
+  const initialNama = row?.nama_warga || '';
+  const isInitialInKK =
+    !initialNama || kepalaKeluargaList.some((k) => k.nama_lengkap === initialNama);
+
+  const [tanggal, setTanggal] = useState(row?.tanggal || jakartaToday());
+  const [jenis, setJenis] = useState<'Pemasukan' | 'Pengeluaran'>(
+    (row?.jenis as 'Pemasukan' | 'Pengeluaran') || 'Pemasukan'
+  );
+  const [kategori, setKategori] = useState(row?.kategori || 'Iuran Bulanan');
+  const [selectedWarga, setSelectedWarga] = useState<string>(
+    isInitialInKK ? initialNama : MANUAL_OPTION
+  );
+  const [manualNama, setManualNama] = useState<string>(isInitialInKK ? '' : initialNama);
+  const [jumlah, setJumlah] = useState(row?.jumlah ? String(row.jumlah) : '');
+  const [keterangan, setKeterangan] = useState(row?.keterangan || '');
+  const [saving, setSaving] = useState(false);
+
+  const isManualMode = selectedWarga === MANUAL_OPTION;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const namaFinal = isManualMode ? manualNama.trim() : selectedWarga.trim();
+    const payload: TransaksiInput = {
+      tanggal,
+      jenis,
+      kategori: kategori.trim() || 'Lainnya',
+      nama_warga: namaFinal || undefined,
+      jumlah: Number(jumlah),
+      keterangan: keterangan.trim() || undefined,
+    };
+
+    const parsed = transaksiSchema.safeParse(payload);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues.at(0)?.message || 'Periksa kembali isian transaksi.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await saveTransaksi(parsed.data, row?.id);
+      toast.success(row ? 'Transaksi diperbarui.' : 'Transaksi ditambahkan.');
+      await onSaved();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Gagal menyimpan transaksi.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !saving && !v && onClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{row ? 'Edit Transaksi' : 'Tambah Transaksi'}</DialogTitle>
+          <DialogDescription>
+            Pilih nama Kepala Keluarga atau ketik nama secara manual untuk transaksi non-KK.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="tx-tanggal">Tanggal</Label>
+            <Input
+              id="tx-tanggal"
+              type="date"
+              required
+              value={tanggal}
+              onChange={(e) => setTanggal(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Jenis</Label>
+            <Choice
+              label="Jenis"
+              value={jenis}
+              onChange={(v) => setJenis(v as 'Pemasukan' | 'Pengeluaran')}
+              options={[
+                { value: 'Pemasukan', label: 'Pemasukan' },
+                { value: 'Pengeluaran', label: 'Pengeluaran' },
+              ]}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Kategori</Label>
+            <Choice
+              label="Kategori"
+              value={kategori}
+              onChange={setKategori}
+              options={KATEGORI_KEUANGAN.map((k) => ({ value: k, label: k }))}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Nama Warga (Kepala Keluarga / Manual)</Label>
+            <Choice
+              label="Nama Warga"
+              value={selectedWarga}
+              onChange={(v) => {
+                setSelectedWarga(v);
+                if (v !== MANUAL_OPTION) setManualNama('');
+              }}
+              options={[
+                { value: '', label: '— Tanpa Nama Warga (Umum) —' },
+                { value: MANUAL_OPTION, label: '+ Ketik Nama Manual (Non-KK / Lainnya)' },
+                ...kepalaKeluargaList.map((k) => ({
+                  value: k.nama_lengkap,
+                  label: k.nama_lengkap,
+                })),
+              ]}
+            />
+            {isManualMode && (
+              <Input
+                autoComplete="off"
+                placeholder="Ketik nama warga / donatur / penerima secara manual..."
+                value={manualNama}
+                onChange={(e) => setManualNama(e.target.value)}
+                required
+              />
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="tx-jumlah">Jumlah (Rp)</Label>
+            <Input
+              id="tx-jumlah"
+              type="number"
+              inputMode="numeric"
+              min={1}
+              required
+              placeholder="Contoh: 50000"
+              value={jumlah}
+              onChange={(e) => setJumlah(e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="tx-ket">Keterangan</Label>
+            <Textarea
+              id="tx-ket"
+              rows={2}
+              placeholder="Catatan tambahan (opsional)..."
+              value={keterangan}
+              onChange={(e) => setKeterangan(e.target.value)}
+            />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="outline" disabled={saving} onClick={onClose}>
+              Batal
+            </Button>
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Menyimpan…' : 'Simpan Transaksi'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
 }
