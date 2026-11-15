@@ -48,7 +48,7 @@ async function compressImage(file: File): Promise<Blob> {
 
 function AspirasiWargaPage() {
   const { accessRole } = Route.useRouteContext()
-  const isAdmin = accessRole === 'admin'
+  const isAdmin = accessRole === 'admin' || (accessRole as string) === 'bendahara'
   const [list, setList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -80,7 +80,7 @@ function AspirasiWargaPage() {
     loadData()
     const detectUser = async () => {
       if (isAdmin) {
-        setNama('Pengurus / Admin RT 06')
+       setNama((accessRole as string) === 'bendahara' ? 'Bendahara RT 06' : 'Pengurus / Admin RT 06')
         setAlamat('Sekretariat RT 06 VPI-2')
         return
       }
