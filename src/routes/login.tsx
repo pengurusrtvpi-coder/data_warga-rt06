@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { AlertCircle, IdCard, Loader2, Lock, Mail } from "lucide-react";
 
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,26 @@ function LoginPage() {
     setLoading(true);
     try {
       if (tab === "warga") {
+        // Cek status kependudukan (hanya Tetap & Kontrak/Kost yang diizinkan masuk)
+        const { data: statusCek, error: rpcErr } = await (supabase as any).rpc(
+          "cek_status_login_warga",
+          { nik_input: credential }
+        );
+
+        if (rpcErr) {
+          throw new Error("Gagal memverifikasi status warga. Silakan coba lagi.");
+        }
+
+        if (statusCek === "NONAKTIF") {
+          throw new Error(
+            "Akses login ditolak. Status kependudukan Anda tercatat Pindah/tidak aktif di RT 06. Silakan hubungi pengurus RT 06."
+          );
+        }
+
+        if (statusCek === "TIDAK_DITEMUKAN") {
+          throw new Error("NIK tidak terdaftar di database warga RT 06. Silakan hubungi pengurus RT 06.");
+        }
+
         await signInWithNik(credential, password);
       } else {
         await signInAdmin(credential, password);
