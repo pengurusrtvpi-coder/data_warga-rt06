@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AspirasiRouteImport } from './routes/aspirasi'
 import { Route as DataWargaRouteImport } from './routes/data-warga'
-import { Route as JurnalRouteImport } from './routes/jurnal'
 import { Route as KeluargaRouteImport } from './routes/keluarga'
 import { Route as KeuanganRouteImport } from './routes/keuangan'
 import { Route as LoginRouteImport } from './routes/login'
@@ -36,11 +35,6 @@ const AspirasiRoute = AspirasiRouteImport.update({
 const DataWargaRoute = DataWargaRouteImport.update({
   id: '/data-warga',
   path: '/data-warga',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JurnalRoute = JurnalRouteImport.update({
-  id: '/jurnal',
-  path: '/jurnal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KeluargaRoute = KeluargaRouteImport.update({
@@ -93,7 +87,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aspirasi': typeof AspirasiRoute
   '/data-warga': typeof DataWargaRoute
-  '/jurnal': typeof JurnalRoute
   '/keluarga': typeof KeluargaRoute
   '/keuangan': typeof KeuanganRouteWithChildren
   '/login': typeof LoginRoute
@@ -108,7 +101,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aspirasi': typeof AspirasiRoute
   '/data-warga': typeof DataWargaRoute
-  '/jurnal': typeof JurnalRoute
   '/keluarga': typeof KeluargaRoute
   '/login': typeof LoginRoute
   '/panduan': typeof PanduanRoute
@@ -118,29 +110,12 @@ export interface FileRoutesByTo {
   '/keuangan/bulanan': typeof KeuanganBulananRoute
   '/keuangan': typeof KeuanganIndexRoute
 }
-export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/aspirasi': typeof AspirasiRoute
-  '/data-warga': typeof DataWargaRoute
-  '/jurnal': typeof JurnalRoute
-  '/keluarga': typeof KeluargaRoute
-  '/keuangan': typeof KeuanganRouteWithChildren
-  '/login': typeof LoginRoute
-  '/panduan': typeof PanduanRoute
-  '/pengurus': typeof PengurusRoute
-  '/statistik': typeof StatistikRoute
-  '/surat': typeof SuratRoute
-  '/keuangan/bulanan': typeof KeuanganBulananRoute
-  '/keuangan/': typeof KeuanganIndexRoute
-}
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/aspirasi'
     | '/data-warga'
-    | '/jurnal'
     | '/keluarga'
     | '/keuangan'
     | '/login'
@@ -155,7 +130,6 @@ export interface FileRouteTypes {
     | '/'
     | '/aspirasi'
     | '/data-warga'
-    | '/jurnal'
     | '/keluarga'
     | '/login'
     | '/panduan'
@@ -169,7 +143,6 @@ export interface FileRouteTypes {
     | '/'
     | '/aspirasi'
     | '/data-warga'
-    | '/jurnal'
     | '/keluarga'
     | '/keuangan'
     | '/login'
@@ -185,7 +158,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AspirasiRoute: typeof AspirasiRoute
   DataWargaRoute: typeof DataWargaRoute
-  JurnalRoute: typeof JurnalRoute
   KeluargaRoute: typeof KeluargaRoute
   KeuanganRoute: typeof KeuanganRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -216,13 +188,6 @@ declare module '@tanstack/react-router' {
       path: '/data-warga'
       fullPath: '/data-warga'
       preLoaderRoute: typeof DataWargaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/jurnal': {
-      id: '/jurnal'
-      path: '/jurnal'
-      fullPath: '/jurnal'
-      preLoaderRoute: typeof JurnalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/keluarga': {
@@ -309,7 +274,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AspirasiRoute: AspirasiRoute,
   DataWargaRoute: DataWargaRoute,
-  JurnalRoute: JurnalRoute,
   KeluargaRoute: KeluargaRoute,
   KeuanganRoute: KeuanganRouteWithChildren,
   LoginRoute: LoginRoute,
