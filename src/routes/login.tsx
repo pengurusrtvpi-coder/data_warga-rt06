@@ -1,6 +1,20 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { AlertCircle, IdCard, Loader2, Lock, Mail } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  AlertCircle,
+  IdCard,
+  Loader2,
+  Lock,
+  Mail,
+  Megaphone,
+  Volume2,
+  VolumeX,
+  Edit3,
+  Plus,
+  Trash2,
+  Check,
+  X,
+} from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,11 +40,175 @@ export const Route = createFileRoute("/login")({
 
 type LoginTab = "warga" | "admin";
 
+interface RunningTextRow {
+  id: string;
+  pesan: string;
+  aktif: boolean;
+  updated_at: string;
+}
+
+// Nada notifikasi lonceng lembut menggunakan Web Audio API (tanpa file MP3 eksternal)
+function playNotificationChime() {
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const notes = [659.25, 880, 1046.5]; // Nada E5 - A5 - C6 (lonceng lembut)
+    notes.forEach((freq, idx) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.14);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.14);
+      gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + idx * 0.14 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.14 + 0.55);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + idx * 0.14);
+      osc.stop(ctx.currentTime + idx * 0.14 + 0.6);
+    });
+  } catch {
+    // Abaikan jika browser memblokir autoplay audio sebelum interaksi
+  }
+}
+
 function LoginPage() {
   const navigate = useNavigate();
   const [tab, setTab] = useState<LoginTab>("warga");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // State Running Text & Admin Control
+  const [announcements, setAnnouncements] = useState<RunningTextRow[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showManager, setShowManager] = useState(false);
+  const [newPesan, setNewPesan] = useState("");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editPesan, setEditPesan] = useState("");
+  const [savingText, setSavingText] = useState(false);
+  const [soundPlayed, setSoundPlayed] = useState(false);
+  const hasPlayedRef = useRef(false);
+
+  async function loadAnnouncements() {
+    const { data } = await (supabase as any)
+      .from("running_text")
+      .select("*")
+      .order("updated_at", { ascending: false });
+
+    if (data) {
+      setAnnouncements(data);
+      const activeItems = data.filter((r: RunningTextRow) => r.aktif);
+      if (activeItems.length > 0 && !hasPlayedRef.current) {
+        hasPlayedRef.current = true;
+        playNotificationChime();
+        setSoundPlayed(true);
+      }
+    }
+  }
+
+  useEffect(() => {
+    loadAnnouncements();
+
+    // Cek apakah yang membuka halaman ini memiliki sesi Admin
+    (async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data?.session) {
+          const role = await getMyAccessRole();
+          setIsAdmin(role === "admin");
+        }
+      } catch {
+        setIsAdmin(false);
+      }
+    })();
+
+    // Dengarkan perubahan pengumuman secara realtime untuk bunyi notifikasi otomatis
+    const channel = supabase
+      .channel("realtime-running-text")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "running_text" },
+        () => {
+          hasPlayedRef.current = false;
+          loadAnnouncements();
+        }
+      )
+      .subscribe();
+
+    // Putar suara notifikasi pada sentuhan pertama jika browser memblokir autoplay awal
+    const unlockAudio = () => {
+      if (!hasPlayedRef.current) {
+        hasPlayedRef.current = true;
+        playNotificationChime();
+        setSoundPlayed(true);
+      }
+      window.removeEventListener("pointerdown", unlockAudio);
+    };
+    window.addEventListener("pointerdown", unlockAudio);
+
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("pointerdown", unlockAudio);
+    };
+  }, []);
+
+  const activeList = announcements.filter((r) => r.aktif);
+  const combinedBannerText =
+    activeList.length > 0
+      ? activeList.map((r) => `📢 ${r.pesan}`).join("     ✦     ")
+      : "Selamat datang di Portal Digital Warga RT 06 / RW 07 VPI-2";
+
+  async function handleAddAnnouncement(e: FormEvent) {
+    e.preventDefault();
+    if (!newPesan.trim()) return;
+    setSavingText(true);
+    try {
+      const { error: insErr } = await (supabase as any)
+        .from("running_text")
+        .insert([{ pesan: newPesan.trim(), aktif: true }]);
+      if (insErr) throw new Error(insErr.message);
+      setNewPesan("");
+      await loadAnnouncements();
+      playNotificationChime();
+    } catch (err: any) {
+      alert(err?.message || "Gagal menambah pengumuman.");
+    } finally {
+      setSavingText(false);
+    }
+  }
+
+  async function handleSaveEdit(id: string) {
+    if (!editPesan.trim()) return;
+    setSavingText(true);
+    try {
+      const { error: updErr } = await (supabase as any)
+        .from("running_text")
+        .update({ pesan: editPesan.trim(), updated_at: new Date().toISOString() })
+        .eq("id", id);
+      if (updErr) throw new Error(updErr.message);
+      setEditId(null);
+      await loadAnnouncements();
+      playNotificationChime();
+    } catch (err: any) {
+      alert(err?.message || "Gagal memperbarui pengumuman.");
+    } finally {
+      setSavingText(false);
+    }
+  }
+
+  async function handleToggleAktif(item: RunningTextRow) {
+    await (supabase as any)
+      .from("running_text")
+      .update({ aktif: !item.aktif, updated_at: new Date().toISOString() })
+      .eq("id", item.id);
+    await loadAnnouncements();
+  }
+
+  async function handleDeleteAnnouncement(id: string) {
+    if (!confirm("Hapus pengumuman running text ini?")) return;
+    await (supabase as any).from("running_text").delete().eq("id", id);
+    await loadAnnouncements();
+  }
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,7 +223,6 @@ function LoginPage() {
     setLoading(true);
     try {
       if (tab === "warga") {
-        // Cek status kependudukan (hanya Tetap & Kontrak/Kost yang diizinkan masuk)
         const { data: statusCek, error: rpcErr } = await (supabase as any).rpc(
           "cek_status_login_warga",
           { nik_input: credential }
@@ -102,21 +279,162 @@ function LoginPage() {
 
   return (
     <main className="flex min-h-screen flex-col bg-sky-gradient">
-      <header className="px-5 pt-6 sm:px-8">
+      {/* Animasi Running Text */}
+      <style>{`
+        @keyframes rt06Marquee {
+          0% { transform: translateX(100%); }
+          100% { transform: translateX(-100%); }
+        }
+        .rt06-marquee-track {
+          display: inline-block;
+          white-space: nowrap;
+          padding-left: 100%;
+          animation: rt06Marquee 22s linear infinite;
+        }
+        .rt06-marquee-wrapper:hover .rt06-marquee-track {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      <header className="flex items-center justify-between px-5 pt-6 sm:px-8">
         <BrandMark />
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              playNotificationChime();
+              setSoundPlayed(true);
+            }}
+            title="Putar suara notifikasi pengumuman"
+            className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/50 bg-slate-900/85 px-3 py-1.5 text-xs font-bold text-amber-300 shadow-sm hover:bg-slate-900"
+          >
+            {soundPlayed ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            <span className="hidden sm:inline">Suara Info</span>
+          </button>
+
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => setShowManager((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3.5 py-1.5 text-xs font-extrabold text-slate-950 shadow hover:bg-amber-300"
+            >
+              <Edit3 className="h-3.5 w-3.5" />
+              {showManager ? "Tutup Pengumuman" : "Kelola Running Text"}
+            </button>
+          )}
+        </div>
       </header>
 
-      <section className="flex flex-1 items-center justify-center px-5 py-10">
-        <div className="w-full max-w-sm">
-          <div className="mb-8">
-            <h1 className="text-3xl font-extrabold tracking-tight text-foreground">Selamat datang</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {tab === "warga"
-                ? "Masuk dengan NIK dan password yang diberikan pengurus RT."
-                : "Masuk dengan akun email admin atau bendahara RT."}
-            </p>
+      <section className="flex flex-1 flex-col items-center justify-center px-5 py-8">
+        <div className="mb-5 w-full max-w-2xl">
+          <div className="rt06-marquee-wrapper relative overflow-hidden rounded-2xl border-2 border-amber-400/70 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 px-4 py-3.5 shadow-lg">
+            <div className="mb-1 flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[11px] font-extrabold uppercase tracking-wider text-amber-300">
+                <Megaphone className="h-3.5 w-3.5 text-amber-300" /> Pengumuman Pengurus RT 06
+              </span>
+              <span className="text-[10px] text-amber-200/70">Sentuh untuk jeda</span>
+            </div>
+
+            <div className="overflow-hidden">
+              <div
+                className="rt06-marquee-track text-3xl font-extrabold tracking-tight drop-shadow-[0_2px_6px_rgba(250,204,21,0.35)]"
+                style={{ color: "#FACC15" }}
+              >
+                {combinedBannerText}
+              </div>
+            </div>
           </div>
 
+          <p className="mt-3 text-center text-sm text-muted-foreground">
+            {tab === "warga"
+              ? "Masuk dengan NIK dan password yang diberikan pengurus RT."
+              : "Masuk dengan akun email admin atau bendahara RT."}
+          </p>
+        </div>
+
+        {isAdmin && showManager && (
+          <div className="mb-6 w-full max-w-2xl rounded-2xl border-2 border-amber-400 bg-card p-5 shadow-lg">
+            <h2 className="mb-3 flex items-center gap-2 text-base font-extrabold text-foreground">
+              <Megaphone className="h-4 w-4 text-amber-500" /> Kelola Pengumuman Running Text (Khusus Admin)
+            </h2>
+
+            <form onSubmit={handleAddAnnouncement} className="mb-4 flex gap-2">
+              <Input
+                placeholder="Tulis pengumuman baru untuk warga RT 06..."
+                value={newPesan}
+                onChange={(e) => setNewPesan(e.target.value)}
+                required
+              />
+              <Button type="submit" disabled={savingText} className="shrink-0 bg-amber-500 font-bold text-slate-950 hover:bg-amber-400">
+                <Plus className="mr-1 h-4 w-4" /> Tambah
+              </Button>
+            </form>
+
+            <div className="space-y-2.5">
+              {announcements.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-xl border bg-muted/40 p-3 text-xs"
+                >
+                  {editId === item.id ? (
+                    <div className="flex w-full items-center gap-2">
+                      <Input
+                        value={editPesan}
+                        onChange={(e) => setEditPesan(e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                      <Button size="sm" onClick={() => handleSaveEdit(item.id)} disabled={savingText}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => setEditId(null)}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex-1 pr-2">
+                        <p className={`font-semibold ${item.aktif ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                          {item.pesan}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          size="sm"
+                          variant={item.aktif ? "default" : "outline"}
+                          className="h-7 px-2.5 text-[11px]"
+                          onClick={() => handleToggleAktif(item)}
+                        >
+                          {item.aktif ? "Aktif" : "Nonaktif"}
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-blue-600"
+                          onClick={() => {
+                            setEditId(item.id);
+                            setEditPesan(item.pesan);
+                          }}
+                        >
+                          <Edit3 className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 text-red-600"
+                          onClick={() => handleDeleteAnnouncement(item.id)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="w-full max-w-sm">
           <div className="rounded-2xl border bg-card p-6 shadow-lift">
             <Tabs value={tab} onValueChange={changeTab}>
               <TabsList className="grid h-11 w-full grid-cols-2">
