@@ -523,8 +523,11 @@ function LoginPage() {
               </TabsContent>
             </Tabs>
           </div>
-          <p className="mt-6 text-center text-xs text-muted-foreground">
-            Lupa password? Hubungi pengurus RT 06.
+         <p className="mt-6 text-center text-xs text-muted-foreground">
+            Lupa password? Hubungi pengurus RT 06 ·{" "}
+            <a href="/panduan" className="font-bold text-primary-deep underline">
+              Lihat Pamflet Panduan & Keamanan Data
+            </a>
           </p>
         </div>
       </section>
