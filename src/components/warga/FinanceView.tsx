@@ -165,8 +165,8 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
                     contentStyle={{ background: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)' }}
                   />
                   <Legend />
-                  <Bar isAnimationActive={false} name="Pemasukan" dataKey="pemasukan" fill="var(--chart-2)" radius={[3, 3, 0, 0]} />
-                  <Bar isAnimationActive={false} name="Pengeluaran" dataKey="pengeluaran" fill="var(--chart-1)" radius={[3, 3, 0, 0]} />
+                  <Bar isAnimationActive={false} name="Pemasukan" dataKey="pemasukan" fill="var(--chart-2)" radius={3} />
+                  <Bar isAnimationActive={false} name="Pengeluaran" dataKey="pengeluaran" fill="var(--chart-1)" radius={3} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -248,8 +248,8 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
               </caption>
               <thead>
                 <tr>
-                 {['Tanggal', 'Nama Warga', 'Kategori', 'Keterangan', 'Jenis', 'Jumlah'].map((x) => (
-                    <th key={x}>{x}</th>
+                  {['Tanggal', 'Nama Warga', 'Kategori', 'Keterangan', 'Jenis', 'Jumlah'].map((x) => (
+          <th key={x}>{x}</th>
                   ))}
                   {role === 'admin' && <th className="no-print">Aksi</th>}
                 </tr>
@@ -359,8 +359,24 @@ function TransactionForm({
     enabled: open,
   });
 
-  const kepalaKeluargaList = semuaWarga
-    .filter((w) => (w.hubungan_keluarga || '').toLowerCase().includes('kepala'))
+  const semuaKK = semuaWarga.filter(
+    (w: any) =>
+      String(w.status_hub_keluarga || w.hubungan_keluarga || '')
+        .trim()
+        .toLowerCase() === 'kepala keluarga'
+  );
+
+  const alamatTerpakai = new Set<string>();
+  const kepalaKeluargaList = semuaKK
+    .filter((w: any) => {
+      const normAlamat = String(w.alamat || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, '');
+      if (!normAlamat) return true;
+      if (alamatTerpakai.has(normAlamat)) return false;
+      alamatTerpakai.add(normAlamat);
+      return true;
+    })
     .sort((a, b) => a.nama_lengkap.localeCompare(b.nama_lengkap, 'id'));
 
   const initialNama = row?.nama_warga || '';
@@ -418,7 +434,7 @@ function TransactionForm({
         <DialogHeader>
           <DialogTitle>{row ? 'Edit Transaksi' : 'Tambah Transaksi'}</DialogTitle>
           <DialogDescription>
-            Pilih nama Kepala Keluarga atau ketik nama secara manual untuk transaksi non-KK.
+            Pilih perwakilan Kepala Keluarga (1 per rumah) atau ketik nama secara manual.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
@@ -457,7 +473,7 @@ function TransactionForm({
           </div>
 
           <div className="space-y-1.5">
-            <Label>Nama Warga (Kepala Keluarga / Manual)</Label>
+            <Label>Nama Warga (Perwakilan Kepala Keluarga / Manual)</Label>
             <Choice
               label="Nama Warga"
               value={selectedWarga}
@@ -468,10 +484,16 @@ function TransactionForm({
               options={[
                 { value: '', label: '— Tanpa Nama Warga (Umum) —' },
                 { value: MANUAL_OPTION, label: '+ Ketik Nama Manual (Non-KK / Lainnya)' },
-                ...kepalaKeluargaList.map((k) => ({
-                  value: k.nama_lengkap,
-                  label: k.nama_lengkap,
-                })),
+                ...kepalaKeluargaList.map((k: any) => {
+                  const blokMatch = String(k.alamat || '').match(
+                    /BLOK\s*[A-Z0-9]+\s*NO\.?\s*[0-9A-Z]+/i
+                  );
+                  const infoBlok = blokMatch ? ` (${blokMatch[0].toUpperCase()})` : '';
+                  return {
+                    value: k.nama_lengkap,
+                    label: `${k.nama_lengkap}${infoBlok}`,
+                  };
+                }),
               ]}
             />
             {isManualMode && (
@@ -509,7 +531,6 @@ function TransactionForm({
               onChange={(e) => setKeterangan(e.target.value)}
             />
           </div>
-
           <DialogFooter>
             <Button type="button" variant="outline" disabled={saving} onClick={onClose}>
               Batal
