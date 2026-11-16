@@ -63,7 +63,7 @@ function InventarisPage() {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const isAdmin = role === 'admin';
+  const isAdmin = role === 'admin' || (role as string) === 'kesra_pkk';
 
   async function loadData() {
     setLoading(true);
