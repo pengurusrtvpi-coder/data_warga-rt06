@@ -11,6 +11,7 @@ import {
   MapPin,
   Loader2,
   X,
+  Printer,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -199,10 +200,15 @@ function InventarisPage() {
               Total {items.length} jenis aset ({totalUnit} unit tercatat)
             </p>
           </div>
-          {isAdmin && (
-            <Button onClick={() => openForm(null)}>
-              <Plus /> Tambah Aset
-            </Button>
+         {isAdmin && (
+            <div className="no-print flex flex-wrap items-center gap-2">
+              <Button variant="outline" onClick={() => window.print()}>
+                <Printer /> Cetak / Download
+              </Button>
+              <Button onClick={() => openForm(null)}>
+                <Plus /> Tambah Aset
+              </Button>
+            </div>
           )}
         </div>
 
