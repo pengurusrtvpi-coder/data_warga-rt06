@@ -6,6 +6,7 @@ import {
   Award,
   BarChart3,
   MessageSquarePlus,
+  Package,
   BookOpen,
   Megaphone,
   LogOut,
@@ -25,6 +26,7 @@ export function PortalNav({ role }: { role: AccessRole }) {
     '/pengurus': Award,
     '/statistik': BarChart3,
     '/aspirasi': MessageSquarePlus,
+    '/inventaris': Package,
     '/jurnal': BookOpen,
     '/login': Megaphone,
   };
@@ -49,6 +51,12 @@ export function PortalNav({ role }: { role: AccessRole }) {
     if (!menuList.some((item) => item.to === '/aspirasi')) {
       menuList.push({ to: '/aspirasi' as any, label: 'Aspirasi Warga' });
     }
+    if (!menuList.some((item) => item.to === '/inventaris')) {
+      menuList.push({ to: '/inventaris' as any, label: 'Inventaris RT' });
+    }
+    if (!menuList.some((item) => item.to === '/jurnal')) {
+      menuList.push({ to: '/jurnal' as any, label: 'Jurnal Kegiatan' });
+    }
     if (isAdmin && !menuList.some((item) => item.to === '/login')) {
       menuList.push({ to: '/login' as any, label: 'Running Text' });
     }
@@ -57,7 +65,6 @@ export function PortalNav({ role }: { role: AccessRole }) {
   return (
     <header className="no-print sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur-md shadow-xs">
       <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-        {/* Baris Atas: Logo & Tombol Logout */}
         <div className="flex items-center justify-between gap-3">
           <BrandMark compact />
           <button
@@ -75,7 +82,6 @@ export function PortalNav({ role }: { role: AccessRole }) {
           </button>
         </div>
 
-        {/* Baris Menu Dinamis: Grid 2 Kolom Simetris di HP, Deretan Kapsul Rapi di Laptop */}
         <nav
           aria-label="Menu portal"
           className="mt-3 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-2"
