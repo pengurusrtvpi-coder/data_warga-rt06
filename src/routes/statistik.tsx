@@ -235,7 +235,7 @@ function StatistikUsiaPage() {
               <div className="px-5 py-4 border-b bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
                 <div>
                   <h2 className="font-bold text-slate-800 text-base">Rekapitulasi per Kategori Usia</h2>
-                  {isAdmin && (
+                  {canViewDetail && (
                     <p className="no-print text-xs text-emerald-700 font-medium mt-0.5 flex items-center gap-1">
                       <MousePointerClick className="w-3.5 h-3.5" /> Klik salah satu baris kategori di bawah untuk melihat rincian nama, usia, dan alamat warga
                     </p>
@@ -261,19 +261,19 @@ function StatistikUsiaPage() {
                       const val = Number(row.total)
                       const pct = totalWarga ? ((val / totalWarga) * 100).toFixed(1) : '0.0'
                       const barWidth = Math.round((val / maxVal) * 100)
-                      const isSelected = isAdmin && selectedKat === row.kategori
+                      const isSelected = canViewDetail && selectedKat === row.kategori
                       return (
                         <tr
                           key={row.kategori}
                           onClick={() => handleSelectKategori(row.kategori)}
-                          title={isAdmin ? `Klik untuk melihat daftar warga kategori ${row.kategori}` : undefined}
+                          title={canViewDetail ? `Klik untuk melihat daftar warga kategori ${row.kategori}` : undefined}
                           className={`transition ${
-                            isAdmin ? 'cursor-pointer hover:bg-emerald-50/80' : ''
+                            canViewDetail ? 'cursor-pointer hover:bg-emerald-50/80' : ''
                           } ${isSelected ? 'bg-emerald-50 font-semibold' : ''}`}
                         >
                           <td className="px-4 py-3.5 text-center text-slate-500 font-medium">{idx + 1}</td>
                           <td className="px-4 py-3.5 font-bold text-slate-800">
-                            <span className={isAdmin ? 'underline decoration-emerald-400 underline-offset-4' : ''}>
+                            <span className={canViewDetail ? 'underline decoration-emerald-400 underline-offset-4' : ''}>
                               {row.kategori}
                             </span>
                           </td>
