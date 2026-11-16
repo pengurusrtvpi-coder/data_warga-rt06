@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import {
   BookOpen,
   Plus,
+  Printer,
   Camera,
   Image as ImageIcon,
   Pencil,
@@ -56,7 +57,9 @@ function JurnalKegiatanPage() {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const isAdmin = role === 'admin' || (role as string) === 'kesra_pkk' || (role as string) === 'seksi_rt';
+  const r = role as string;
+  const isAdmin = r === 'admin' || r === 'kesra_pkk' || r === 'seksi_rt';
+
   async function loadData() {
     setLoading(true);
     const { data, error } = await (supabase as any)
@@ -70,8 +73,8 @@ function JurnalKegiatanPage() {
   useEffect(() => {
     (async () => {
       try {
-        const r = await getMyAccessRole();
-        setRole(r);
+        const currentRole = await getMyAccessRole();
+        setRole(currentRole);
       } catch {}
       await loadData();
     })();
@@ -160,11 +163,18 @@ function JurnalKegiatanPage() {
     await loadData();
   }
 
+  const tanggalCetak = new Date().toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
   return (
-    <div className="min-h-screen bg-slate-50/60">
+    <div className="min-h-screen bg-slate-50/60 print:bg-white">
       <PortalNav role={role} />
-      <main className="mx-auto max-w-5xl px-4 py-7 sm:px-6">
-        <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
+      <main className="mx-auto max-w-5xl px-4 py-7 sm:px-6 print:max-w-none print:px-0 print:py-0">
+        {/* Header Layar (Sembunyi saat Print) */}
+        <div className="no-print mb-7 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-primary-deep">
               RT 06 / RW 07 · VPI-2
@@ -175,87 +185,193 @@ function JurnalKegiatanPage() {
             </p>
           </div>
           {isAdmin && (
-            <Button onClick={() => openForm(null)}>
-              <Plus /> Tambah Kegiatan
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="outline" onClick={() => window.print()}>
+                <Printer /> Cetak / Download
+              </Button>
+              <Button onClick={() => openForm(null)}>
+                <Plus /> Tambah Kegiatan
+              </Button>
+            </div>
           )}
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-7 w-7 animate-spin text-sky-600" />
-          </div>
-        ) : items.length === 0 ? (
-          <div className="rounded-2xl border bg-white p-12 text-center text-sm text-muted-foreground">
-            Belum ada dokumentasi jurnal kegiatan yang dicatat.
-          </div>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2">
-            {items.map((item) => (
-              <article
-                key={item.id}
-                className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
-              >
-                {item.foto_url ? (
-                  <div className="aspect-[16/9] w-full overflow-hidden bg-slate-100">
-                    <img
-                      src={item.foto_url}
-                      alt={item.judul}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex aspect-[16/7] w-full items-center justify-center bg-gradient-to-r from-sky-50 to-emerald-50 text-sky-700">
-                    <BookOpen className="h-9 w-9 opacity-60" />
-                  </div>
-                )}
-
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-sky-700">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                      })}
-                    </span>
-                    {item.lokasi && (
-                      <span className="inline-flex items-center gap-1 text-slate-500">
-                        <MapPin className="h-3.5 w-3.5 text-amber-600" />
-                        {item.lokasi}
-                      </span>
-                    )}
-                  </div>
-
-                  <h2 className="mt-2.5 text-lg font-extrabold text-slate-900">{item.judul}</h2>
-                  <p className="mt-2 flex-1 whitespace-pre-line text-sm leading-relaxed text-slate-600">
-                    {item.deskripsi}
-                  </p>
-
-                  {item.penanggung_jawab && (
-                    <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                      <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
-                      Koordinator: {item.penanggung_jawab}
-                    </p>
-                  )}
-
-                  {isAdmin && (
-                    <div className="mt-4 flex justify-end gap-2 border-t pt-3">
-                      <Button size="sm" variant="outline" onClick={() => openForm(item)}>
-                        <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleDelete(item)}>
-                        <Trash2 className="mr-1 h-3.5 w-3.5" /> Hapus
-                      </Button>
+        {/* Tampilan Layar (Kartu Galeri Dokumentasi) */}
+        <div className="no-print">
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-7 w-7 animate-spin text-sky-600" />
+            </div>
+          ) : items.length === 0 ? (
+            <div className="rounded-2xl border bg-white p-12 text-center text-sm text-muted-foreground">
+              Belum ada dokumentasi jurnal kegiatan yang dicatat.
+            </div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2">
+              {items.map((item) => (
+                <article
+                  key={item.id}
+                  className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
+                >
+                  {item.foto_url ? (
+                    <div className="aspect-[16/9] w-full overflow-hidden bg-slate-100">
+                      <img
+                        src={item.foto_url}
+                        alt={item.judul}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex aspect-[16/7] w-full items-center justify-center bg-gradient-to-r from-sky-50 to-emerald-50 text-sky-700">
+                      <BookOpen className="h-9 w-9 opacity-60" />
                     </div>
                   )}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
 
+                  <div className="flex flex-1 flex-col p-5">
+                    <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-sky-700">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5">
+                        <Calendar className="h-3.5 w-3.5" />
+                        {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </span>
+                      {item.lokasi && (
+                        <span className="inline-flex items-center gap-1 text-slate-500">
+                          <MapPin className="h-3.5 w-3.5 text-amber-600" />
+                          {item.lokasi}
+                        </span>
+                      )}
+                    </div>
+
+                    <h2 className="mt-2.5 text-lg font-extrabold text-slate-900">{item.judul}</h2>
+                    <p className="mt-2 flex-1 whitespace-pre-line text-sm leading-relaxed text-slate-600">
+                      {item.deskripsi}
+                    </p>
+
+                    {item.penanggung_jawab && (
+                      <p className="mt-3 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+                        <UserCheck className="h-3.5 w-3.5 text-emerald-600" />
+                        Koordinator: {item.penanggung_jawab}
+                      </p>
+                    )}
+
+                    {isAdmin && (
+                      <div className="mt-4 flex justify-end gap-2 border-t pt-3">
+                        <Button size="sm" variant="outline" onClick={() => openForm(item)}>
+                          <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDelete(item)}>
+                          <Button size="sm" variant="destructive" onClick={() => handleDelete(item)}>
+                          <Trash2 className="mr-1 h-3.5 w-3.5" /> Hapus
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Tampilan Khusus Cetak / PDF (Tabel Laporan Resmi A4) */}
+        <section className="hidden print:block w-full text-black">
+          <style>{`
+            @media print {
+              @page { size: A4 portrait; margin: 12mm; }
+              body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            }
+          `}</style>
+
+          <div className="border-b-2 border-black pb-3 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest">
+              RUKUN TETANGGA 06 / RUKUN WARGA 07
+            </p>
+            <p className="text-xs font-semibold">
+              PERUMAHAN VILLA PADURENAN INDAH 2 · KEL. PADURENAN, MUSTIKAJAYA, KOTA BEKASI
+            </p>
+            <h2 className="mt-2 text-base font-extrabold uppercase underline">
+              LAPORAN JURNAL & DOKUMENTASI KEGIATAN RT 06
+            </h2>
+            <p className="mt-0.5 text-[11px]">
+              Dicetak tanggal: {tanggalCetak} · Total: {items.length} Kegiatan Tercatat
+            </p>
+          </div>
+
+          <table className="mt-4 w-full border-collapse border border-black text-xs">
+            <thead>
+              <tr className="bg-slate-100 text-left font-bold">
+                <th className="w-8 border border-black px-2 py-2 text-center">No</th>
+                <th className="w-24 border border-black px-2 py-2 text-center">Foto</th>
+                <th className="w-28 border border-black px-2 py-2">Tanggal & Lokasi</th>
+                <th className="w-44 border border-black px-2 py-2">Nama Kegiatan</th>
+                <th className="border border-black px-2 py-2">Ringkasan & Hasil Kegiatan</th>
+                <th className="w-32 border border-black px-2 py-2">Koordinator</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="border border-black px-3 py-6 text-center">
+                    Belum ada data jurnal kegiatan.
+                  </td>
+                </tr>
+              ) : (
+                items.map((item, idx) => (
+                  <tr key={item.id} className="break-inside-avoid align-top">
+                    <td className="border border-black px-2 py-1.5 text-center">{idx + 1}</td>
+                    <td className="border border-black p-1 text-center">
+                      {item.foto_url ? (
+                        <img
+                          src={item.foto_url}
+                          alt={item.judul}
+                          className="mx-auto h-14 w-20 rounded object-cover"
+                        />
+                      ) : (
+                        <span className="text-[10px] text-slate-400">-</span>
+                      )}
+                    </td>
+                    <td className="border border-black px-2 py-1.5">
+                      <p className="font-semibold">
+                        {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </p>
+                      {item.lokasi && <p className="mt-0.5 text-[11px]">{item.lokasi}</p>}
+                    </td>
+                    <td className="border border-black px-2 py-1.5 font-bold">{item.judul}</td>
+                    <td className="border border-black px-2 py-1.5 whitespace-pre-line">
+                      {item.deskripsi}
+                    </td>
+                    <td className="border border-black px-2 py-1.5">
+                      {item.penanggung_jawab || '-'}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+
+          <div className="mt-8 grid grid-cols-2 text-center text-xs">
+            <div>
+              <p>Mengetahui,</p>
+              <p className="font-bold">Ketua RT 06 / RW 07</p>
+              <div className="h-16" />
+              <p className="font-bold underline">( ........................................ )</p>
+            </div>
+            <div>
+              <p>Bekasi, {tanggalCetak}</p>
+              <p className="font-bold">Sekretaris / Seksi Kegiatan RT 06</p>
+              <div className="h-16" />
+              <p className="font-bold underline">( ........................................ )</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Modal Tambah / Edit Jurnal Kegiatan */}
         {isAdmin && (
           <Dialog open={open} onOpenChange={(v) => !saving && setOpen(v)}>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
@@ -376,7 +492,7 @@ function JurnalKegiatanPage() {
             </DialogContent>
           </Dialog>
         )}
-      </main>
+              </main>
     </div>
   );
 }
