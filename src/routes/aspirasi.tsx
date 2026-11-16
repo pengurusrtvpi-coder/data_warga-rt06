@@ -48,7 +48,11 @@ async function compressImage(file: File): Promise<Blob> {
 
 function AspirasiWargaPage() {
   const { accessRole } = Route.useRouteContext()
-  const isAdmin = accessRole === 'admin' || (accessRole as string) === 'bendahara'
+const isAdmin =
+  accessRole === 'admin' ||
+  (accessRole as string) === 'bendahara' ||
+  (accessRole as string) === 'kesra_pkk' ||
+  (accessRole as string) === 'seksi_rt';
   const [list, setList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
