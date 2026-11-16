@@ -33,7 +33,15 @@ export function canAccessResidentPages(role: AccessRole): boolean {
 
 /** Only existing portal destinations are exposed; residents keep read-only reports. */
 export function getPortalMenu(role: AccessRole) {
-  if (role === "bendahara") return [{ to: "/keuangan", label: "Keuangan RT" }] as const;
+  if (role === "bendahara") {
+    return [
+      { to: "/keuangan", label: "Keuangan RT" },
+      { to: "/jurnal", label: "Jurnal Kegiatan" },
+      { to: "/inventaris", label: "Inventaris RT" },
+      { to: "/aspirasi", label: "Aspirasi Warga" },
+      { to: "/statistik", label: "Statistik Usia" },
+    ] as const;
+  }
   if (role === "kesra_pkk") {
     return [
       { to: "/jurnal", label: "Jurnal Kegiatan" },
