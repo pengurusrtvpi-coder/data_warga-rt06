@@ -257,13 +257,12 @@ function JurnalKegiatanPage() {
                       </p>
                     )}
 
-                    {isAdmin && (
+      {isAdmin && (
                       <div className="mt-4 flex justify-end gap-2 border-t pt-3">
                         <Button size="sm" variant="outline" onClick={() => openForm(item)}>
                           <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
                         </Button>
                         <Button size="sm" variant="destructive" onClick={() => handleDelete(item)}>
-                          <Button size="sm" variant="destructive" onClick={() => handleDelete(item)}>
                           <Trash2 className="mr-1 h-3.5 w-3.5" /> Hapus
                         </Button>
                       </div>
