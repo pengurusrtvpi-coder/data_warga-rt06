@@ -15,10 +15,12 @@ export function emailFromNik(nik: string): string {
 export type Warga = Database["public"]["Tables"]["data_warga"]["Row"];
 type WargaInsert = Database["public"]["Tables"]["data_warga"]["Insert"];
 type WargaUpdate = Database["public"]["Tables"]["data_warga"]["Update"];
-export type AccessRole = "admin" | "bendahara" | "warga";
+export type AccessRole = "admin" | "bendahara" | "kesra_pkk" | "seksi_rt" | "warga";
 
-export function getRoleHome(role: AccessRole): "/keluarga" | "/keuangan" {
-  return role === "bendahara" ? "/keuangan" : "/keluarga";
+export function getRoleHome(role: AccessRole): "/keluarga" | "/keuangan" | "/jurnal" {
+  if (role === "bendahara") return "/keuangan";
+  if (role === "kesra_pkk" || role === "seksi_rt") return "/jurnal";
+  return "/keluarga";
 }
 
 export function canManageFinance(role: AccessRole): boolean {
@@ -26,19 +28,31 @@ export function canManageFinance(role: AccessRole): boolean {
 }
 
 export function canAccessResidentPages(role: AccessRole): boolean {
-  return role !== "bendahara";
+  return role === "admin" || role === "warga";
 }
 
 /** Only existing portal destinations are exposed; residents keep read-only reports. */
 export function getPortalMenu(role: AccessRole) {
   if (role === "bendahara") return [{ to: "/keuangan", label: "Keuangan RT" }] as const;
+  if (role === "kesra_pkk") {
+    return [
+      { to: "/jurnal", label: "Jurnal Kegiatan" },
+      { to: "/inventaris", label: "Inventaris RT" },
+      { to: "/aspirasi", label: "Aspirasi Warga" },
+    ] as const;
+  }
+  if (role === "seksi_rt") {
+    return [
+      { to: "/jurnal", label: "Jurnal Kegiatan" },
+      { to: "/aspirasi", label: "Aspirasi Warga" },
+    ] as const;
+  }
   return [
     { to: "/keluarga", label: role === "admin" ? "Data Warga" : "Data Keluarga" },
     { to: "/keuangan", label: role === "admin" ? "Keuangan RT" : "Laporan Keuangan" },
     { to: "/surat", label: "Pelayanan Surat" },
   ] as const;
 }
-
 /** Columns a resident may change from the edit dialog. */
 export type EditableField =
   | "nama_lengkap"
