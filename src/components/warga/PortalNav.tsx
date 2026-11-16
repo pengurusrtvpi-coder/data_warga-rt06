@@ -37,13 +37,14 @@ export function PortalNav({ role }: { role: AccessRole }) {
   const isSeksi = r === 'seksi_rt';
   const isAdmin = r === 'admin';
 
-  let menuList = isBendahara
-    ? [
-        { to: '/keuangan' as any, label: 'Keuangan RT' },
-        { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
-        { to: '/statistik' as any, label: 'Statistik Usia' },
-      ]
-    : isKesra
+ let menuList = isBendahara
+      ? [
+          { to: '/keuangan' as any, label: 'Keuangan RT' },
+          { to: '/jurnal' as any, label: 'Jurnal Kegiatan' },
+          { to: '/inventaris' as any, label: 'Inventaris RT' },
+          { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
+          { to: '/statistik' as any, label: 'Statistik Usia' },
+        ]    : isKesra
     ? [
         { to: '/jurnal' as any, label: 'Jurnal Kegiatan' },
         { to: '/inventaris' as any, label: 'Inventaris RT' },
