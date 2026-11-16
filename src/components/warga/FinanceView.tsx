@@ -142,7 +142,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
             </Button>
           </div>
         )}
-      </div
+      </div>
       <div className="no-print mb-6 flex flex-wrap items-end gap-4">
         {monthly && (
           <div className="w-44">
