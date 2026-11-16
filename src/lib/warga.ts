@@ -420,21 +420,10 @@ export async function getMyAccessRole(): Promise<AccessRole> {
   const roles = data ?? [];
   if (roles.some((row) => row.role === "admin")) return "admin";
   if (roles.some((row) => row.role === "bendahara")) return "bendahara";
+  if (roles.some((row) => (row as { role?: string }).role === "kesra_pkk")) return "kesra_pkk";
+  if (roles.some((row) => (row as { role?: string }).role === "seksi_rt")) return "seksi_rt";
   return "warga";
 }
-
-/** Resident read path: security-definer RPC returns only the caller's own KK (from the NIK login email). */
-export async function fetchKeluargaSaya(): Promise<Warga[]> {
-  try {
-    const { data, error } = await supabase.rpc("get_my_keluarga" as never);
-    if (error) throw error;
-    return (data as unknown as Warga[]) ?? [];
-  } catch (err) {
-    console.error("[fetchKeluargaSaya]", err instanceof Error ? err.message : (err as { message?: string })?.message ?? err);
-    throw new Error("Gagal memuat data keluarga Anda. " + ((err as { message?: string })?.message ?? ""));
-  }
-}
-
 export async function fetchKeluarga(noKk: string): Promise<Warga[]> {
   const { data, error } = await supabase
     .from("data_warga")
