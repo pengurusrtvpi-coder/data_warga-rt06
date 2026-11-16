@@ -212,7 +212,7 @@ function InventarisPage() {
           )}
         </div>
 
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="no-print mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -309,7 +309,7 @@ function InventarisPage() {
                     )}
 
                     {isAdmin && (
-                      <div className="mt-4 flex justify-end gap-2 border-t pt-3">
+                     <div className="no-print mt-4 flex justify-end gap-2 border-t pt-3">
                         <Button size="sm" variant="outline" onClick={() => openForm(item)}>
                           <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
                         </Button>
