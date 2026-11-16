@@ -41,6 +41,7 @@ export function PortalNav({ role }: { role: AccessRole }) {
     ? [
         { to: '/keuangan' as any, label: 'Keuangan RT' },
         { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
+        { to: '/statistik' as any, label: 'Statistik Usia' },
       ]
     : isKesra
     ? [
