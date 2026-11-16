@@ -31,17 +31,38 @@ export function PortalNav({ role }: { role: AccessRole }) {
     '/login': Megaphone,
   };
 
-  const isBendahara = (role as string) === 'bendahara';
-  const isAdmin = role === 'admin';
+  const r = role as string;
+  const isBendahara = r === 'bendahara';
+  const isKesra = r === 'kesra_pkk';
+  const isSeksi = r === 'seksi_rt';
+  const isAdmin = r === 'admin';
 
   let menuList = isBendahara
     ? [
         { to: '/keuangan' as any, label: 'Keuangan RT' },
         { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
       ]
+    : isKesra
+    ? [
+        { to: '/jurnal' as any, label: 'Jurnal Kegiatan' },
+        { to: '/inventaris' as any, label: 'Inventaris RT' },
+        { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
+        { to: '/keuangan' as any, label: 'Laporan Keuangan' },
+        { to: '/pengurus' as any, label: 'Struktur Pengurus' },
+        { to: '/statistik' as any, label: 'Statistik Usia' },
+      ]
+    : isSeksi
+    ? [
+        { to: '/jurnal' as any, label: 'Jurnal Kegiatan' },
+        { to: '/aspirasi' as any, label: 'Aspirasi Warga' },
+        { to: '/inventaris' as any, label: 'Inventaris RT' },
+        { to: '/keuangan' as any, label: 'Laporan Keuangan' },
+        { to: '/pengurus' as any, label: 'Struktur Pengurus' },
+        { to: '/statistik' as any, label: 'Statistik Usia' },
+      ]
     : [...getPortalMenu(role)];
 
-  if (!isBendahara) {
+  if (!isBendahara && !isKesra && !isSeksi) {
     if (!menuList.some((item) => item.to === '/pengurus')) {
       menuList.push({ to: '/pengurus' as any, label: 'Struktur Pengurus' });
     }
