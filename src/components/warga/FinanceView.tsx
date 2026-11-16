@@ -84,6 +84,42 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="hidden print:block mb-5">
+        <div className="flex items-center gap-4 border-b-4 border-double border-slate-900 pb-3">
+          <img
+            src="/logo_kota_bekasi.jpg"
+            alt="Logo Kota Bekasi"
+            className="h-16 w-16 object-contain shrink-0"
+          />
+          <div className="flex-1 text-center pr-8">
+            <p className="text-base font-extrabold uppercase text-slate-900">
+              PENGURUS RUKUN TETANGGA 06 / RW 07
+            </p>
+            <p className="text-sm font-bold text-slate-800">
+              VILLA PADURENAN INDAH 2 (VPI-2)
+            </p>
+            <p className="text-xs italic text-slate-700">
+              Motto: BERUBAH - PEDULI - BERBAGI
+            </p>
+            <p className="text-[11px] text-slate-600">
+              Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 text-center">
+          <h2 className="text-base font-extrabold uppercase underline text-slate-900">
+            {monthly ? 'LAPORAN BULANAN KEUANGAN RT 06' : 'LAPORAN KEUANGAN RT 06 / RW 07 VPI-2'}
+          </h2>
+          <p className="text-xs text-slate-600 mt-0.5">
+            Periode Tahun {year} · Dicetak:{' '}
+            {new Date().toLocaleDateString('id-ID', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
+          </p>
+        </div>
+      </div>
       <div className="no-print mb-7 flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-primary-deep">RT 06 / RW 07 · VPI-2</p>
