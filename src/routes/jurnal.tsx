@@ -283,21 +283,31 @@ function JurnalKegiatanPage() {
             }
           `}</style>
 
-          <div className="border-b-2 border-black pb-3 text-center">
-            <p className="text-xs font-bold uppercase tracking-widest">
-              RUKUN TETANGGA 06 / RUKUN WARGA 07
-            </p>
-            <p className="text-xs font-semibold">
-              PERUMAHAN VILLA PADURENAN INDAH 2 · KEL. PADURENAN, MUSTIKAJAYA, KOTA BEKASI
-            </p>
-            <h2 className="mt-2 text-base font-extrabold uppercase underline">
+          <div className="flex items-center gap-4 border-b-4 border-double border-black pb-3">
+            <img
+              src="/logo_kota_bekasi.jpg"
+              alt="Logo Kota Bekasi"
+              className="h-16 w-16 object-contain shrink-0"
+            />
+            <div className="flex-1 text-center pr-8">
+              <p className="text-sm font-extrabold uppercase tracking-wider">
+                PENGURUS RUKUN TETANGGA 06 / RW 07
+              </p>
+              <p className="text-xs font-bold">VILLA PADURENAN INDAH 2 (VPI-2)</p>
+              <p className="text-[11px] italic">Motto: BERUBAH - PEDULI - BERBAGI</p>
+              <p className="text-[11px]">
+                Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 text-center">
+            <h2 className="text-base font-extrabold uppercase underline">
               LAPORAN JURNAL & DOKUMENTASI KEGIATAN RT 06
             </h2>
             <p className="mt-0.5 text-[11px]">
               Dicetak tanggal: {tanggalCetak} · Total: {items.length} Kegiatan Tercatat
             </p>
-          </div>
-
+          </div>      
           <table className="mt-4 w-full border-collapse border border-black text-xs">
             <thead>
               <tr className="bg-slate-100 text-left font-bold">
