@@ -53,7 +53,11 @@ function getKategori(umur: number): string {
 
 function StatistikUsiaPage() {
   const { accessRole } = Route.useRouteContext()
-  const isAdmin = accessRole === 'admin'
+  const r = accessRole as string
+  const canViewDetail =
+    r === 'admin' || r === 'bendahara' || r === 'kesra_pkk' || r === 'seksi_rt'
+  const canPrint = r === 'admin' || r === 'kesra_pkk'
+
   const [stats, setStats] = useState<any[]>([])
   const [wargaList, setWargaList] = useState<Warga[]>([])
   const [selectedKat, setSelectedKat] = useState('Semua')
@@ -64,17 +68,25 @@ function StatistikUsiaPage() {
     async function loadData() {
       setLoading(true)
       let allWarga: Warga[] = []
-      if (isAdmin) {
-        const { data } = await (supabase as any)
-          .from('data_warga')
-          .select('*')
-          .order('nama_lengkap', { ascending: true })
-        if (data) {
-          allWarga = (data as Warga[]).filter((w) => {
-            const st = (w.status_warga || 'tetap').trim().toLowerCase()
-            return st === 'tetap' || st === 'kontrak/kost'
-          })
+      if (canViewDetail) {
+        const { data: rpcWarga, error: rpcWargaErr } = await (supabase as any).rpc(
+          'get_warga_statistik_usia_admin',
+        )
+        if (!rpcWargaErr && rpcWarga) {
+          allWarga = rpcWarga as Warga[]
           setWargaList(allWarga)
+        } else if (r === 'admin') {
+          const { data } = await (supabase as any)
+            .from('data_warga')
+            .select('*')
+            .order('nama_lengkap', { ascending: true })
+          if (data) {
+            allWarga = (data as Warga[]).filter((w) => {
+              const st = (w.status_warga || 'tetap').trim().toLowerCase()
+              return st === 'tetap' || st === 'kontrak/kost'
+            })
+            setWargaList(allWarga)
+          }
         }
       }
 
@@ -99,10 +111,10 @@ function StatistikUsiaPage() {
       setLoading(false)
     }
     loadData()
-  }, [isAdmin])
+  }, [canViewDetail, r])
 
   function handleSelectKategori(kat: string) {
-    if (!isAdmin) return
+    if (!canViewDetail) return
     setSelectedKat(kat)
     setTimeout(() => {
       detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -119,9 +131,8 @@ function StatistikUsiaPage() {
     const u = hitungUmur(w.tanggal_lahir)
     if (u < 0) return false
     return selectedKat === 'Semua' || getKategori(u) === selectedKat
-  })
-
-  return (
+  }) 
+    return (
     <div className="min-h-screen bg-slate-50/70 pb-16 print:bg-white print:pb-0">
       <PortalNav role={accessRole} />
 
@@ -135,7 +146,7 @@ function StatistikUsiaPage() {
             <p className="text-xs italic text-slate-700">Motto: BERUBAH - PEDULI - BERBAGI</p>
             <p className="text-[11px] text-slate-600">Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi</p>
           </div>
-          <img src="/logo_rt06.jpg" alt="Logo RT 06" className="h-16 w-16 object-contain rounded-full" />
+          
         </div>
         <div className="text-center mt-4">
           <h2 className="text-base font-bold uppercase underline">
@@ -160,7 +171,7 @@ function StatistikUsiaPage() {
               Data demografi otomatis Villa Padurenan Indah 2 • Periode 2025–2030
             </p>
           </div>
-          {isAdmin && (
+          {canPrint && (
             <button
               type="button"
               onClick={() => window.print()}
@@ -300,7 +311,7 @@ function StatistikUsiaPage() {
             </div>
 
             {/* Rincian Data Lengkap Nama, Usia & Alamat — HANYA UNTUK ADMIN & KETUA RT */}
-            {isAdmin && (
+            {canViewDetail && (
               <div ref={detailRef} className="bg-white rounded-2xl border shadow-sm overflow-hidden scroll-mt-24">
                 <div className="px-5 py-4 border-b bg-emerald-50/60 flex flex-wrap items-center justify-between gap-3">
                   <div>
