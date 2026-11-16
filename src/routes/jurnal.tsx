@@ -56,8 +56,7 @@ function JurnalKegiatanPage() {
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const isAdmin = role === 'admin';
-
+  const isAdmin = role === 'admin' || (role as string) === 'kesra_pkk' || (role as string) === 'seksi_rt';
   async function loadData() {
     setLoading(true);
     const { data, error } = await (supabase as any)
