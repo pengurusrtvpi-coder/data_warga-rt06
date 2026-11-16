@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import {
   Package,
   Plus,
+  Printer,
   Camera,
   Image as ImageIcon,
   Pencil,
@@ -11,7 +12,6 @@ import {
   MapPin,
   Loader2,
   X,
-  Printer,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -185,12 +185,19 @@ function InventarisPage() {
   });
 
   const totalUnit = items.reduce((s, r) => s + (r.jumlah || 0), 0);
+  const tanggalCetak = new Date().toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50/60">
+    <div className="min-h-screen bg-slate-50/60 print:bg-white">
       <PortalNav role={role} />
-      <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+
+      <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 print:max-w-none print:px-0 print:py-0">
+        {/* Header Layar (Disembunyikan saat Print) */}
+        <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-primary-deep">
               RT 06 / RW 07 · VPI-2
@@ -200,8 +207,8 @@ function InventarisPage() {
               Total {items.length} jenis aset ({totalUnit} unit tercatat)
             </p>
           </div>
-         {isAdmin && (
-            <div className="no-print flex flex-wrap items-center gap-2">
+          {isAdmin && (
+            <div className="flex flex-wrap items-center gap-2">
               <Button variant="outline" onClick={() => window.print()}>
                 <Printer /> Cetak / Download
               </Button>
@@ -212,6 +219,7 @@ function InventarisPage() {
           )}
         </div>
 
+        {/* Filter & Pencarian (Disembunyikan saat Print) */}
         <div className="no-print mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -240,95 +248,179 @@ function InventarisPage() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="h-7 w-7 animate-spin text-sky-600" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border bg-white p-12 text-center text-sm text-muted-foreground">
-            Belum ada data inventaris yang sesuai.
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((item) => {
-              const badgeColor =
-                item.kondisi === 'Baik'
-                  ? 'bg-emerald-100 text-emerald-800'
-                  : item.kondisi === 'Perlu Perbaikan'
-                  ? 'bg-amber-100 text-amber-800'
-                  : 'bg-rose-100 text-rose-800';
-              return (
-                <article
-                  key={item.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
-                >
-                  <div className="relative aspect-[16/10] w-full bg-slate-100">
-                    {item.foto_url ? (
-                      <img
-                        src={item.foto_url}
-                        alt={item.nama_barang}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full flex-col items-center justify-center text-slate-400">
-                        <Package className="h-10 w-10" />
-                        <span className="mt-1 text-[11px]">Tanpa Foto</span>
-                      </div>
-                    )}
-                    <span
-                      className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold shadow-xs ${badgeColor}`}
-                    >
-                      {item.kondisi}
-                      </span>
-                    <span className="absolute bottom-3 left-3 rounded-lg bg-slate-900/80 px-2.5 py-1 text-xs font-bold text-white">
-                      {item.jumlah} Unit
-                    </span>
-                  </div>
-
-                  <div className="flex flex-1 flex-col p-4">
-                    <div>
-                      {item.kode_barang && (
-                        <p className="text-[11px] font-bold uppercase tracking-wider text-sky-700">
-                          {item.kode_barang}
-                        </p>
+        {/* ============================================================
+            TAMPILAN LAYAR (KARTU GALERI FOTO) — SEMBUNYI SAAT PRINT
+           ============================================================ */}
+        <div className="no-print">
+          {loading ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-7 w-7 animate-spin text-sky-600" />
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="rounded-2xl border bg-white p-12 text-center text-sm text-muted-foreground">
+              Belum ada data inventaris yang sesuai.
+            </div>
+          ) : (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((item) => {
+                const badgeColor =
+                  item.kondisi === 'Baik'
+                    ? 'bg-emerald-100 text-emerald-800'
+                    : item.kondisi === 'Perlu Perbaikan'
+                    ? 'bg-amber-100 text-amber-800'
+                    : 'bg-rose-100 text-rose-800';
+                return (
+                  <article
+                    key={item.id}
+                    className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
+                    <div className="relative aspect-[16/10] w-full bg-slate-100">
+                      {item.foto_url ? (
+                        <img
+                          src={item.foto_url}
+                          alt={item.nama_barang}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full flex-col items-center justify-center text-slate-400">
+                          <Package className="h-10 w-10" />
+                          <span className="mt-1 text-[11px]">Tanpa Foto</span>
+                        </div>
                       )}
-                      <h2 className="text-base font-extrabold text-slate-900">
-                        {item.nama_barang}
-                      </h2>
+                      <span
+                        className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-[11px] font-extrabold shadow-xs ${badgeColor}`}
+                      >
+                        {item.kondisi}
+                      </span>
+                      <span className="absolute bottom-3 left-3 rounded-lg bg-slate-900/80 px-2.5 py-1 text-xs font-bold text-white">
+                        {item.jumlah} Unit
+                      </span>
                     </div>
 
-                    {item.lokasi_simpan && (
-                      <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-600">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-amber-600" />
-                        <span>Lokasi: {item.lokasi_simpan}</span>
-                      </p>
-                    )}
-
-                    {item.keterangan && (
-                      <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.keterangan}</p>
-                    )}
-
-                    {isAdmin && (
-                     <div className="no-print mt-4 flex justify-end gap-2 border-t pt-3">
-                        <Button size="sm" variant="outline" onClick={() => openForm(item)}>
-                          <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDelete(item)}
-                        >
-                          <Trash2 className="mr-1 h-3.5 w-3.5" /> Hapus
-                        </Button>
+                    <div className="flex flex-1 flex-col p-4">
+                      <div>
+                        {item.kode_barang && (
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-sky-700">
+                            {item.kode_barang}
+                          </p>
+                        )}
+                        <h2 className="text-base font-extrabold text-slate-900">
+                          {item.nama_barang}
+                        </h2>
                       </div>
-                    )}
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
 
+                      {item.lokasi_simpan && (
+                        <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-600">
+                          <MapPin className="h-3.5 w-3.5 shrink-0 text-amber-600" />
+                          <span>Lokasi: {item.lokasi_simpan}</span>
+                        </p>
+                      )}
+
+                      {item.keterangan && (
+                        <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.keterangan}</p>
+                      )}
+
+                      {isAdmin && (
+                        <div className="no-print mt-4 flex justify-end gap-2 border-t pt-3">
+                          <Button size="sm" variant="outline" onClick={() => openForm(item)}>
+                            <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDelete(item)}
+                          >
+                            <Trash2 className="mr-1 h-3.5 w-3.5" /> Hapus
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* ============================================================
+            TAMPILAN KHUSUS CETAK / PDF (TABEL RAPIH DARI ATAS KE BAWAH)
+           ============================================================ */}
+        <section className="hidden print:block text-black">
+          <div className="border-b-2 border-black pb-3 text-center">
+            <p className="text-xs font-bold uppercase tracking-widest">
+              RUKUN TETANGGA 06 / RUKUN WARGA 07
+            </p>
+            <p className="text-xs font-semibold">
+              PERUMAHAN VILLA PADURENAN INDAH 2 · KEL. PADURENAN, MUSTIKAJAYA, KOTA BEKASI
+            </p>
+            <h2 className="mt-2 text-base font-extrabold uppercase underline">
+              DAFTAR INVENTARIS BARANG & ASET RT 06
+            </h2>
+            <p className="mt-0.5 text-[11px]">
+              Dicetak tanggal: {tanggalCetak} · Total: {filtered.length} Jenis Barang (
+              {filtered.reduce((s, r) => s + (r.jumlah || 0), 0)} Unit)
+            </p>
+          </div>
+
+          <table className="mt-4 w-full border-collapse border border-black text-xs">
+            <thead>
+              <tr className="bg-slate-100 text-left font-bold">
+                <th className="w-9 border border-black px-2 py-2 text-center">No</th>
+                <th className="w-24 border border-black px-2 py-2">Kode</th>
+                <th className="border border-black px-2 py-2">Nama Barang / Aset</th>
+                <th className="w-16 border border-black px-2 py-2 text-center">Jumlah</th>
+                <th className="w-28 border border-black px-2 py-2 text-center">Kondisi</th>
+                <th className="w-36 border border-black px-2 py-2">Lokasi Simpan</th>
+                <th className="border border-black px-2 py-2">Keterangan</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="border border-black px-3 py-6 text-center">
+                    Tidak ada data inventaris.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((item, idx) => (
+                  <tr key={item.id} className="align-top">
+                    <td className="border border-black px-2 py-1.5 text-center">{idx + 1}</td>
+                    <td className="border border-black px-2 py-1.5 font-mono text-[11px]">
+                      {item.kode_barang || '-'}
+                    </td>
+                    <td className="border border-black px-2 py-1.5 font-semibold">
+                      {item.nama_barang}
+                    </td>
+                    <td className="border border-black px-2 py-1.5 text-center font-bold">
+                      {item.jumlah} Unit
+                    </td>
+                    <td className="border border-black px-2 py-1.5 text-center">{item.kondisi}</td>
+                    <td className="border border-black px-2 py-1.5">
+                      {item.lokasi_simpan || '-'}
+                    </td>
+                    <td className="border border-black px-2 py-1.5">{item.keterangan || '-'}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+
+          <div className="mt-8 grid grid-cols-2 text-center text-xs">
+            <div>
+              <p>Mengetahui,</p>
+              <p className="font-bold">Ketua RT 06 / RW 07</p>
+              <div className="h-16" />
+              <p className="font-bold underline">( ........................................ )</p>
+            </div>
+            <div>
+              <p>Bekasi, {tanggalCetak}</p>
+              <p className="font-bold">Pengurus / Seksi Perlengkapan & Kesra</p>
+              <div className="h-16" />
+              <p className="font-bold underline">( ........................................ )</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Modal Tambah / Edit Inventaris */}
         {isAdmin && (
           <Dialog open={open} onOpenChange={(v) => !saving && setOpen(v)}>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
@@ -400,7 +492,7 @@ function InventarisPage() {
                     value={keterangan}
                     onChange={(e) => setKeterangan(e.target.value)}
                   />
-                </div>
+                  </div>
 
                 <div className="space-y-2">
                   <Label>Foto Barang (Kamera / Galeri HP)</Label>
