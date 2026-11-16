@@ -83,7 +83,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+   <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 print:px-0 print:py-0">
       <div className="hidden print:block mb-5">
         <div className="flex items-center gap-4 border-b-4 border-double border-slate-900 pb-3">
           <img
@@ -142,13 +142,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
             </Button>
           </div>
         )}
-      </div>
-      <h1 className="print-only mb-4 text-center text-xl font-bold">
-        LAPORAN KEUANGAN RT 06 / RW 07 VPI-2
-        <br />
-        {monthly ? `${BULAN[month - 1]} ${year}` : `Tahun ${year}`}
-      </h1>
-
+      </div
       <div className="no-print mb-6 flex flex-wrap items-end gap-4">
         {monthly && (
           <div className="w-44">
