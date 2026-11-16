@@ -270,10 +270,10 @@ function InventarisPage() {
                     ? 'bg-amber-100 text-amber-800'
                     : 'bg-rose-100 text-rose-800';
                 return (
-                  <article
-                    key={item.id}
-                    className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
-                    <div className="relative aspect-[16/10] w-full bg-slate-100">
+                <article
+                  key={item.id}
+                  className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
+                >                    <div className="relative aspect-[16/10] w-full bg-slate-100">
                       {item.foto_url ? (
                         <img
                           src={item.foto_url}
