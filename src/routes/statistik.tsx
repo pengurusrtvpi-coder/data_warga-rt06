@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { PortalNav } from '@/components/warga/PortalNav'
 import { getMyAccessRole, hasActiveSession, type Warga } from '@/lib/warga'
-import { BarChart3, Printer, Users, ShieldCheck, GraduationCap, Briefcase, HeartHandshake } from 'lucide-react'
+import { BarChart3, Printer, Users, Briefcase, HeartHandshake, MousePointerClick } from 'lucide-react'
 
 export const Route = createFileRoute('/statistik')({
   ssr: false,
@@ -58,16 +58,23 @@ function StatistikUsiaPage() {
   const [wargaList, setWargaList] = useState<Warga[]>([])
   const [selectedKat, setSelectedKat] = useState('Semua')
   const [loading, setLoading] = useState(true)
+  const detailRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     async function loadData() {
       setLoading(true)
       let allWarga: Warga[] = []
       if (isAdmin) {
-        const { data } = await (supabase as any).from('data_warga').select('*').order('nama_lengkap', { ascending: true })
+        const { data } = await (supabase as any)
+          .from('data_warga')
+          .select('*')
+          .order('nama_lengkap', { ascending: true })
         if (data) {
-          allWarga = data
-          setWargaList(data)
+          allWarga = (data as Warga[]).filter((w) => {
+            const st = (w.status_warga || 'tetap').trim().toLowerCase()
+            return st === 'tetap' || st === 'kontrak/kost'
+          })
+          setWargaList(allWarga)
         }
       }
 
@@ -94,6 +101,14 @@ function StatistikUsiaPage() {
     loadData()
   }, [isAdmin])
 
+  function handleSelectKategori(kat: string) {
+    if (!isAdmin) return
+    setSelectedKat(kat)
+    setTimeout(() => {
+      detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+  }
+
   const totalWarga = stats.reduce((a, c) => a + Number(c.total), 0)
   const totalLaki = stats.reduce((a, c) => a + Number(c.laki_laki), 0)
   const totalPerempuan = stats.reduce((a, c) => a + Number(c.perempuan), 0)
@@ -107,9 +122,10 @@ function StatistikUsiaPage() {
   })
 
   return (
-    <div className="min-h-screen bg-slate-50/70 pb-16">
+    <div className="min-h-screen bg-slate-50/70 pb-16 print:bg-white print:pb-0">
       <PortalNav role={accessRole} />
 
+      {/* Kop Surat Khusus Cetak PDF */}
       <div className="hidden print:block px-6 pt-4 mb-6">
         <div className="flex items-center justify-between gap-4 border-b-4 border-double border-slate-900 pb-3">
           <img src="/logo_kota_bekasi.jpg" alt="Logo Kota Bekasi" className="h-16 w-16 object-contain" />
@@ -122,13 +138,17 @@ function StatistikUsiaPage() {
           <img src="/logo_rt06.jpg" alt="Logo RT 06" className="h-16 w-16 object-contain rounded-full" />
         </div>
         <div className="text-center mt-4">
-          <h2 className="text-base font-bold uppercase underline">LAPORAN STATISTIK KEPENDUDUKAN BERDASARKAN USIA</h2>
+          <h2 className="text-base font-bold uppercase underline">
+            LAPORAN STATISTIK KEPENDUDUKAN BERDASARKAN USIA
+            {selectedKat !== 'Semua' ? ` — KATEGORI ${selectedKat.toUpperCase()}` : ''}
+          </h2>
           <p className="text-xs text-slate-600 mt-0.5">
             Tanggal Cetak: {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
       </div>
 
+      {/* Header Banner Layar */}
       <div className="no-print bg-gradient-to-r from-teal-800 via-emerald-800 to-cyan-900 text-white py-9 px-4 shadow-sm">
         <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -136,12 +156,15 @@ function StatistikUsiaPage() {
               <BarChart3 className="w-3.5 h-3.5 text-amber-300" /> Pemetaan Kependudukan RT 06
             </span>
             <h1 className="text-2xl md:text-3xl font-extrabold">Statistik Warga Berdasarkan Usia</h1>
-            <p className="text-emerald-100 text-xs md:text-sm mt-1">Data demografi otomatis Villa Padurenan Indah 2 • Periode 2025–2030</p>
+            <p className="text-emerald-100 text-xs md:text-sm mt-1">
+              Data demografi otomatis Villa Padurenan Indah 2 • Periode 2025–2030
+            </p>
           </div>
           {isAdmin && (
             <button
+              type="button"
               onClick={() => window.print()}
-              className="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-2"
+              className="bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-xs md:text-sm px-4 py-2.5 rounded-xl shadow flex items-center gap-2 cursor-pointer"
             >
               <Printer className="w-4 h-4" /> Download PDF / Cetak Laporan
             </button>
@@ -154,158 +177,201 @@ function StatistikUsiaPage() {
           <div className="text-center py-16 text-slate-500 text-sm">Menghitung statistik kependudukan...</div>
         ) : (
           <>
+            {/* Ringkasan 3 Kartu */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-2xl border p-5 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"><Users className="w-6 h-6" /></div>
+                <div className="h-12 w-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <Users className="w-6 h-6" />
+                </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">Total Penduduk Terdata</p>
-                  <p className="text-2xl font-extrabold text-slate-800">{totalWarga} <span className="text-xs font-normal text-slate-500">Jiwa</span></p>
+                  <p className="text-2xl font-extrabold text-slate-800">
+                    {totalWarga} <span className="text-xs font-normal text-slate-500">Jiwa</span>
+                  </p>
                 </div>
               </div>
               <div className="bg-white rounded-2xl border p-5 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0"><Briefcase className="w-6 h-6" /></div>
+                <div className="h-12 w-12 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center shrink-0">
+                  <Briefcase className="w-6 h-6" />
+                </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">Warga Laki-laki</p>
-                  <p className="text-2xl font-extrabold text-slate-800">{totalLaki} <span className="text-xs font-normal text-slate-500">({totalWarga ? Math.round((totalLaki / totalWarga) * 100) : 0}%)</span></p>
+                  <p className="text-2xl font-extrabold text-slate-800">
+                    {totalLaki}{' '}
+                    <span className="text-xs font-normal text-slate-500">
+                      ({totalWarga ? Math.round((totalLaki / totalWarga) * 100) : 0}%)
+                    </span>
+                  </p>
                 </div>
               </div>
               <div className="bg-white rounded-2xl border p-5 shadow-sm flex items-center gap-4">
-                <div className="h-12 w-12 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center shrink-0"><HeartHandshake className="w-6 h-6" /></div>
+                <div className="h-12 w-12 rounded-xl bg-pink-100 text-pink-700 flex items-center justify-center shrink-0">
+                  <HeartHandshake className="w-6 h-6" />
+                </div>
                 <div>
                   <p className="text-xs font-medium text-slate-500">Warga Perempuan</p>
-                  <p className="text-2xl font-extrabold text-slate-800">{totalPerempuan} <span className="text-xs font-normal text-slate-500">({totalWarga ? Math.round((totalPerempuan / totalWarga) * 100) : 0}%)</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
-                <div>
-                  <h2 className="text-lg font-extrabold text-slate-800">Grafik Distribusi Kategori Usia</h2>
-                  <p className="text-xs text-slate-500">Persentase dan perbandingan jumlah warga per kelompok umur</p>
-                </div>
-                <div className="flex items-center gap-4 text-xs font-medium">
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-sky-500 inline-block" /> Laki-laki</span>
-                  <span className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full bg-rose-400 inline-block" /> Perempuan</span>
-                </div>
-              </div>
-
-              <div className="space-y-5">
-                {stats.map((row, idx) => {
-                  const total = Number(row.total)
-                  const persen = totalWarga > 0 ? ((total / totalWarga) * 100).toFixed(1) : '0'
-                  const lebarBar = Math.round((total / maxVal) * 100)
-                  return (
-                    <div key={row.kategori} className="space-y-1.5">
-                      <div className="flex flex-wrap items-baseline justify-between gap-2">
-                        <div>
-                          <span className="font-bold text-sm text-slate-800">{row.kategori}</span>
-                          <span className="ml-2 text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">{row.rentang_usia}</span>
-                        </div>
-                        <div className="text-xs font-semibold text-slate-700">
-                          <span className="text-sky-600">L: {row.laki_laki}</span> • <span className="text-rose-600">P: {row.perempuan}</span> • <span className="font-extrabold text-slate-900 text-sm">{total} Jiwa ({persen}%)</span>
-                        </div>
-                      </div>
-                      <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden p-0.5">
-                        <div className={`h-full rounded-full bg-gradient-to-r ${COLORS[idx % COLORS.length]} transition-all duration-700`} style={{ width: `${total > 0 ? Math.max(lebarBar, 4) : 0}%` }} />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="bg-white rounded-3xl border border-slate-200/80 p-6 shadow-sm overflow-x-auto">
-              <h3 className="text-base font-extrabold text-slate-800 mb-4 flex items-center gap-2">
-                <GraduationCap className="w-5 h-5 text-emerald-700" /> Tabel Rekapitulasi Kepadatan Usia
-              </h3>
-              <table className="w-full text-sm text-left border-collapse">
-                <thead>
-                  <tr className="border-b-2 border-slate-200 text-slate-600 text-xs uppercase">
-                    <th className="py-3 px-3">No</th>
-                    <th className="py-3 px-3">Kategori Usia</th>
-                    <th className="py-3 px-3">Rentang Umur</th>
-                    <th className="py-3 px-3 text-center">Laki-laki</th>
-                    <th className="py-3 px-3 text-center">Perempuan</th>
-                    <th className="py-3 px-3 text-center">Total Jiwa</th>
-                    <th className="py-3 px-3 text-right">Persentase</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {stats.map((row, i) => (
-                    <tr key={row.kategori} className="hover:bg-slate-50">
-                      <td className="py-2.5 px-3 font-medium text-slate-500">{i + 1}</td>
-                      <td className="py-2.5 px-3 font-bold text-slate-800">{row.kategori}</td>
-                      <td className="py-2.5 px-3 text-slate-600">{row.rentang_usia}</td>
-                      <td className="py-2.5 px-3 text-center text-sky-700 font-semibold">{row.laki_laki}</td>
-                      <td className="py-2.5 px-3 text-center text-rose-700 font-semibold">{row.perempuan}</td>
-                      <td className="py-2.5 px-3 text-center font-extrabold text-slate-900">{row.total}</td>
-                      <td className="py-2.5 px-3 text-right font-semibold text-emerald-700">{totalWarga > 0 ? ((Number(row.total) / totalWarga) * 100).toFixed(1) : 0}%</td>
-                    </tr>
-                  ))}
-                  <tr className="bg-slate-100/80 font-extrabold text-slate-900 border-t-2 border-slate-300">
-                    <td colSpan={3} className="py-3 px-3 text-right">JUMLAH KESELURUHAN</td>
-                    <td className="py-3 px-3 text-center text-sky-700">{totalLaki}</td>
-                    <td className="py-3 px-3 text-center text-rose-700">{totalPerempuan}</td>
-                    <td className="py-3 px-3 text-center">{totalWarga}</td>
-                    <td className="py-3 px-3 text-right">100%</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            {isAdmin && (
-              <div className="bg-white rounded-3xl border border-emerald-200 p-6 shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                  <div>
-                    <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full mb-1">
-                      <ShieldCheck className="w-3.5 h-3.5" /> Akses Khusus Pengurus / Admin
+                  <p className="text-2xl font-extrabold text-slate-800">
+                    {totalPerempuan}{' '}
+                    <span className="text-xs font-normal text-slate-500">
+                      ({totalWarga ? Math.round((totalPerempuan / totalWarga) * 100) : 0}%)
                     </span>
-                    <h3 className="text-base font-extrabold text-slate-800">Rincian Daftar Warga per Kelompok Usia</h3>
-                  </div>
-                  <select value={selectedKat} onChange={(e) => setSelectedKat(e.target.value)} className="no-print px-3 py-2 text-xs font-semibold border rounded-xl bg-slate-50">
-                    <option value="Semua">Semua Kategori ({wargaList.length})</option>
-                    {stats.map((s) => <option key={s.kategori} value={s.kategori}>{s.kategori} ({s.total})</option>)}
-                  </select>
+                  </p>
                 </div>
-                <div className="overflow-x-auto max-h-96 print:max-h-none">
-                  <table className="w-full text-xs text-left border-collapse">
-                    <thead className="bg-slate-50 sticky top-0 border-b">
-                      <tr className="text-slate-600 uppercase">
-                        <th className="py-2.5 px-3">Nama Lengkap</th>
-                        <th className="py-2.5 px-3">L/P</th>
-                        <th className="py-2.5 px-3">Usia</th>
-                        <th className="py-2.5 px-3">Kategori</th>
-                        <th className="py-2.5 px-3">Alamat</th>
+              </div>
+            </div>
+            {/* Tabel Rekapitulasi Kategori Usia (Bisa Diklik oleh Admin & Ketua RT) */}
+            <div className="bg-white rounded-2xl border shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b bg-slate-50/70 flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 className="font-bold text-slate-800 text-base">Rekapitulasi per Kategori Usia</h2>
+                  {isAdmin && (
+                    <p className="no-print text-xs text-emerald-700 font-medium mt-0.5 flex items-center gap-1">
+                      <MousePointerClick className="w-3.5 h-3.5" /> Klik salah satu baris kategori di bawah untuk melihat rincian nama, usia, dan alamat warga
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-slate-100/80 text-slate-600 text-xs uppercase font-bold border-b">
+                    <tr>
+                      <th className="px-4 py-3 text-center w-12">No</th>
+                      <th className="px-4 py-3">Kategori Usia</th>
+                      <th className="px-4 py-3">Rentang Umur</th>
+                      <th className="px-4 py-3 text-center">Laki-laki</th>
+                      <th className="px-4 py-3 text-center">Perempuan</th>
+                      <th className="px-4 py-3 text-center">Total</th>
+                      <th className="px-4 py-3 w-44 no-print">Proporsi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y">
+                    {stats.map((row, idx) => {
+                      const val = Number(row.total)
+                      const pct = totalWarga ? ((val / totalWarga) * 100).toFixed(1) : '0.0'
+                      const barWidth = Math.round((val / maxVal) * 100)
+                      const isSelected = isAdmin && selectedKat === row.kategori
+                      return (
+                        <tr
+                          key={row.kategori}
+                          onClick={() => handleSelectKategori(row.kategori)}
+                          title={isAdmin ? `Klik untuk melihat daftar warga kategori ${row.kategori}` : undefined}
+                          className={`transition ${
+                            isAdmin ? 'cursor-pointer hover:bg-emerald-50/80' : ''
+                          } ${isSelected ? 'bg-emerald-50 font-semibold' : ''}`}
+                        >
+                          <td className="px-4 py-3.5 text-center text-slate-500 font-medium">{idx + 1}</td>
+                          <td className="px-4 py-3.5 font-bold text-slate-800">
+                            <span className={isAdmin ? 'underline decoration-emerald-400 underline-offset-4' : ''}>
+                              {row.kategori}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3.5 text-slate-600">{row.rentang_usia}</td>
+                          <td className="px-4 py-3.5 text-center text-sky-700 font-semibold">{row.laki_laki}</td>
+                          <td className="px-4 py-3.5 text-center text-pink-700 font-semibold">{row.perempuan}</td>
+                          <td className="px-4 py-3.5 text-center font-extrabold text-slate-900">
+                            {val} <span className="text-[11px] font-normal text-slate-500">({pct}%)</span>
+                          </td>
+                          <td className="px-4 py-3.5 no-print">
+                            <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                              <div
+                                className={`h-full rounded-full bg-gradient-to-r ${COLORS[idx % COLORS.length]}`}
+                                style={{ width: `${barWidth}%` }}
+                              />
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                  <tfoot className="bg-slate-100/90 font-extrabold text-slate-900 border-t-2">
+                    <tr>
+                      <td colSpan={3} className="px-4 py-3 text-right uppercase text-xs tracking-wider">
+                        Jumlah Keseluruhan
+                      </td>
+                      <td className="px-4 py-3 text-center text-sky-800">{totalLaki}</td>
+                      <td className="px-4 py-3 text-center text-pink-800">{totalPerempuan}</td>
+                      <td className="px-4 py-3 text-center">{totalWarga} Jiwa</td>
+                      <td className="no-print" />
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
+            {/* Rincian Data Lengkap Nama, Usia & Alamat — HANYA UNTUK ADMIN & KETUA RT */}
+            {isAdmin && (
+              <div ref={detailRef} className="bg-white rounded-2xl border shadow-sm overflow-hidden scroll-mt-24">
+                <div className="px-5 py-4 border-b bg-emerald-50/60 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="font-bold text-slate-900 text-base">
+                      Rincian Data Warga — Kategori: <span className="text-emerald-800">{selectedKat}</span>
+                    </h2>
+                    <p className="text-xs text-slate-600 mt-0.5">
+                      Menampilkan {filteredWarga.length} warga (Khusus Admin & Ketua RT)
+                    </p>
+                  </div>
+                  <div className="no-print flex flex-wrap items-center gap-1.5">
+                    {['Semua', ...MASTER_KAT.map((m) => m.kategori)].map((kat) => (
+                      <button
+                        key={kat}
+                        type="button"
+                        onClick={() => setSelectedKat(kat)}
+                        className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
+                          selectedKat === kat
+                            ? 'bg-emerald-700 text-white shadow-xs'
+                            : 'bg-white border text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        {kat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm text-left">
+                    <thead className="bg-slate-100 text-slate-700 text-xs uppercase font-bold border-b">
+                      <tr>
+                        <th className="px-4 py-3 text-center w-12">No</th>
+                        <th className="px-4 py-3">Nama Lengkap</th>
+                        <th className="px-4 py-3 text-center w-24">Usia</th>
+                        <th className="px-4 py-3 text-center w-28">Jenis Kelamin</th>
+                        <th className="px-4 py-3">Kategori</th>
+                        <th className="px-4 py-3">Alamat / Blok Rumah</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {filteredWarga.map((w) => {
-                        const umur = w.tanggal_lahir ? hitungUmur(w.tanggal_lahir) : 0
-                        return (
-                          <tr key={w.id} className="hover:bg-slate-50">
-                            <td className="py-2 px-3 font-bold text-slate-800">{w.nama_lengkap}</td>
-                            <td className="py-2 px-3">{(w.jenis_kelamin || '').toUpperCase().startsWith('L') ? 'L' : 'P'}</td>
-                            <td className="py-2 px-3 font-semibold">{umur} Thn</td>
-                            <td className="py-2 px-3"><span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-semibold">{getKategori(umur)}</span></td>
-                            <td className="py-2 px-3 text-slate-600">{w.alamat}</td>
-                          </tr>
-                        )
-                      })}
+                    <tbody className="divide-y">
+                      {filteredWarga.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-slate-500">
+                            Tidak ada data warga pada kategori ini.
+                          </td>
+                        </tr>
+                      ) : (
+                        filteredWarga.map((w, idx) => {
+                          const umur = w.tanggal_lahir ? hitungUmur(w.tanggal_lahir) : 0
+                          return (
+                            <tr key={w.id} className="hover:bg-slate-50">
+                              <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
+                              <td className="px-4 py-2.5 font-semibold text-slate-900">{w.nama_lengkap}</td>
+                              <td className="px-4 py-2.5 text-center font-bold text-emerald-800">
+                                {umur} Thn
+                              </td>
+                              <td className="px-4 py-2.5 text-center text-slate-600">{w.jenis_kelamin}</td>
+                              <td className="px-4 py-2.5 text-xs font-semibold text-slate-700">
+                                {getKategori(umur)}
+                              </td>
+                              <td className="px-4 py-2.5 text-slate-600">{w.alamat || '-'}</td>
+                            </tr>
+                          )
+                        })
+                      )}
                     </tbody>
                   </table>
                 </div>
               </div>
             )}
-
-            <div className="hidden print:flex justify-end pt-8 pr-8">
-              <div className="text-center text-xs">
-                <p>Bekasi, {new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                <p className="font-bold mt-0.5">Ketua RT 06 / RW 07</p>
-                <div className="h-16" />
-                <p className="font-bold underline">Andy Nugroho S</p>
-              </div>
-            </div>
           </>
         )}
       </div>
