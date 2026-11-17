@@ -1,8 +1,8 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/integrations/supabase/client'
-import { PortalNav } from '@/components/warga/PortalNav'
-import { getMyAccessRole, hasActiveSession } from '@/lib/warga'
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { PortalNav } from "@/components/warga/PortalNav";
+import { getMyAccessRole, hasActiveSession } from "@/lib/warga";
 import {
   Users,
   Shield,
@@ -16,103 +16,109 @@ import {
   Target,
   CheckCircle2,
   Crown,
-} from 'lucide-react'
+} from "lucide-react";
 
-export const Route = createFileRoute('/pengurus')({
+export const Route = createFileRoute("/pengurus")({
   ssr: false,
   beforeLoad: async () => {
-    if (!(await hasActiveSession())) throw redirect({ to: '/login', replace: true })
-    return { accessRole: await getMyAccessRole() }
+    if (!(await hasActiveSession())) throw redirect({ to: "/login", replace: true });
+    return { accessRole: await getMyAccessRole() };
   },
   component: StrukturPengurusPage,
-})
+});
 
 const MISI_LIST = [
   {
-    title: 'Kerukunan & Sosial',
-    desc: 'Meningkatkan kerukunan, kebersamaan, dan rasa gotong royong antarwarga melalui kegiatan sosial yang aktif.',
+    title: "Kerukunan & Sosial",
+    desc: "Meningkatkan kerukunan, kebersamaan, dan rasa gotong royong antarwarga melalui kegiatan sosial yang aktif.",
   },
   {
-    title: 'Keamanan & Ketertiban',
-    desc: 'Bersama-sama menjaga keamanan dan ketertiban lingkungan (siskamling) guna mengantisipasi gangguan.',
+    title: "Keamanan & Ketertiban",
+    desc: "Bersama-sama menjaga keamanan dan ketertiban lingkungan (siskamling) guna mengantisipasi gangguan.",
   },
   {
-    title: 'Kebersihan & Kesehatan',
-    desc: 'Mengajak warga aktif menjaga kebersihan lingkungan, pengelolaan sampah, serta mendukung program kesehatan.',
+    title: "Kebersihan & Kesehatan",
+    desc: "Mengajak warga aktif menjaga kebersihan lingkungan, pengelolaan sampah, serta mendukung program kesehatan.",
   },
   {
-    title: 'Administrasi & Pelayanan',
-    desc: 'Memberikan pelayanan administrasi kependudukan yang cepat, jujur, ramah, dan transparan.',
+    title: "Administrasi & Pelayanan",
+    desc: "Memberikan pelayanan administrasi kependudukan yang cepat, jujur, ramah, dan transparan.",
   },
   {
-    title: 'Keterbukaan Keuangan',
-    desc: 'Melaporkan kondisi dan pengelolaan keuangan RT (iuran warga, kas, pengeluaran) secara berkala dan terbuka.',
+    title: "Keterbukaan Keuangan",
+    desc: "Melaporkan kondisi dan pengelolaan keuangan RT (iuran warga, kas, pengeluaran) secara berkala dan terbuka.",
   },
   {
-    title: 'Pemberdayaan & Generasi',
-    desc: 'Memfasilitasi kegiatan pemuda, olahraga, keagamaan, serta pemberdayaan keluarga.',
+    title: "Pemberdayaan & Generasi",
+    desc: "Memfasilitasi kegiatan pemuda, olahraga, keagamaan, serta pemberdayaan keluarga.",
   },
-]
+];
 
 function StrukturPengurusPage() {
-  const { accessRole } = Route.useRouteContext()
-  const isAdmin = accessRole === 'admin'
-  const [list, setList] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [editId, setEditId] = useState<string | null>(null)
-  const [form, setForm] = useState({ jabatan: '', nama: '', kategori: 'Inti', urutan: 1 })
-  const [adding, setAdding] = useState(false)
+  const { accessRole } = Route.useRouteContext();
+  const isAdmin = accessRole === "admin";
+  const [list, setList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [form, setForm] = useState({ jabatan: "", nama: "", kategori: "Inti", urutan: 1 });
+  const [adding, setAdding] = useState(false);
 
   const load = async () => {
-    setLoading(true)
-    const { data } = await (supabase as any).from('pengurus_rt').select('*').order('urutan', { ascending: true })
-    if (data) setList(data)
-    setLoading(false)
-  }
+    setLoading(true);
+    const { data } = await (supabase as any)
+      .from("pengurus_rt")
+      .select("*")
+      .order("urutan", { ascending: true });
+    if (data) setList(data);
+    setLoading(false);
+  };
 
   useEffect(() => {
-    load()
-  }, [])
+    load();
+  }, []);
 
   const saveEdit = async (id: string) => {
-    await (supabase as any).from('pengurus_rt').update({ ...form, urutan: Number(form.urutan) }).eq('id', id)
-    setEditId(null)
-    load()
-  }
+    await (supabase as any)
+      .from("pengurus_rt")
+      .update({ ...form, urutan: Number(form.urutan) })
+      .eq("id", id);
+    setEditId(null);
+    load();
+  };
 
   const addNew = async () => {
-    if (!form.jabatan || !form.nama) return
-    await (supabase as any).from('pengurus_rt').insert([{ ...form, urutan: Number(form.urutan) }])
-    setAdding(false)
-    load()
-  }
+    if (!form.jabatan || !form.nama) return;
+    await (supabase as any).from("pengurus_rt").insert([{ ...form, urutan: Number(form.urutan) }]);
+    setAdding(false);
+    load();
+  };
 
   const remove = async (id: string) => {
-    if (!confirm('Hapus data pengurus ini?')) return
-    await (supabase as any).from('pengurus_rt').delete().eq('id', id)
-    load()
-  }
+    if (!confirm("Hapus data pengurus ini?")) return;
+    await (supabase as any).from("pengurus_rt").delete().eq("id", id);
+    load();
+  };
 
-  const ketua = list.find((i) => i.jabatan.toLowerCase().includes('ketua rt'))
-  const intiLain = list.filter((i) => i.kategori === 'Inti' && i.id !== ketua?.id)
-  const seksiList = list.filter((i) => i.kategori === 'Seksi')
-  const ketuaPKK = list.find((i) => i.jabatan.toLowerCase().includes('ketua kesra'))
-  const subPKK = list.filter((i) => i.kategori === 'Kesra & PKK' && i.id !== ketuaPKK?.id)
+  const ketua = list.find((i) => i.jabatan.toLowerCase().includes("ketua rt"));
+  const intiLain = list.filter((i) => i.kategori === "Inti" && i.id !== ketua?.id);
+  const seksiList = list.filter((i) => i.kategori === "Seksi");
+  const ketuaPKK = list.find((i) => i.jabatan.toLowerCase().includes("ketua kesra"));
+  const subPKK = list.filter((i) => i.kategori === "Kesra & PKK" && i.id !== ketuaPKK?.id);
 
-  const renderNode = (item: any, styleType: 'gold' | 'emerald' | 'blue' | 'rose') => {
-    if (!item) return null
+  const renderNode = (item: any, styleType: "gold" | "emerald" | "blue" | "rose") => {
+    if (!item) return null;
     const styles = {
-      gold: 'border-amber-400 bg-gradient-to-b from-amber-50 to-white ring-2 ring-amber-200/60',
-      emerald: 'border-emerald-300 bg-white',
-      blue: 'border-sky-200 bg-white',
-      rose: 'border-rose-200 bg-white',
-    }
+      gold: "border-amber-400 bg-gradient-to-b from-amber-50 to-white ring-2 ring-amber-200/60",
+      emerald: "border-emerald-300 bg-white",
+      blue: "border-sky-200 bg-white",
+      rose: "border-rose-200 bg-white",
+    };
     const badges = {
-      gold: 'bg-amber-500 text-white',
-      emerald: 'bg-emerald-100 text-emerald-800',
-      blue: 'bg-sky-100 text-sky-800',
-      rose: 'bg-rose-100 text-rose-800',
-    }
+      gold: "bg-amber-500 text-white",
+      emerald: "bg-emerald-100 text-emerald-800",
+      blue: "bg-sky-100 text-sky-800",
+      rose: "bg-rose-100 text-rose-800",
+    };
 
     return (
       <div
@@ -132,7 +138,10 @@ function StrukturPengurusPage() {
               className="w-full px-2.5 py-1.5 text-xs border rounded-lg"
             />
             <div className="flex justify-end gap-1.5 pt-1">
-              <button onClick={() => setEditId(null)} className="px-2.5 py-1 text-xs bg-slate-100 rounded-md">
+              <button
+                onClick={() => setEditId(null)}
+                className="px-2.5 py-1 text-xs bg-slate-100 rounded-md"
+              >
                 <X className="w-3 h-3 inline" /> Batal
               </button>
               <button
@@ -146,7 +155,9 @@ function StrukturPengurusPage() {
         ) : (
           <>
             <div>
-              <span className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wide mb-2 ${badges[styleType]}`}>
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-[11px] font-bold tracking-wide mb-2 ${badges[styleType]}`}
+              >
                 {item.jabatan}
               </span>
               <h3 className="text-base font-extrabold text-slate-800 leading-snug">{item.nama}</h3>
@@ -155,8 +166,13 @@ function StrukturPengurusPage() {
               <div className="mt-3 pt-2 border-t border-slate-100 flex justify-center gap-3">
                 <button
                   onClick={() => {
-                    setEditId(item.id)
-                    setForm({ jabatan: item.jabatan, nama: item.nama, kategori: item.kategori, urutan: item.urutan })
+                    setEditId(item.id);
+                    setForm({
+                      jabatan: item.jabatan,
+                      nama: item.nama,
+                      kategori: item.kategori,
+                      urutan: item.urutan,
+                    });
                   }}
                   className="text-xs text-blue-600 hover:underline flex items-center gap-1"
                 >
@@ -173,8 +189,8 @@ function StrukturPengurusPage() {
           </>
         )}
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-slate-50/70 pb-16">
@@ -196,7 +212,8 @@ function StrukturPengurusPage() {
           {/* Kartu Moto */}
           <div className="inline-block bg-white/10 border border-amber-300/40 backdrop-blur-md rounded-2xl px-8 py-4 shadow-lg">
             <p className="text-[11px] uppercase tracking-[0.2em] text-amber-300 font-bold mb-1 flex items-center justify-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Moto Pengurus RT 06 <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5" /> Moto Pengurus RT 06{" "}
+              <Sparkles className="w-3.5 h-3.5" />
             </p>
             <p className="text-xl md:text-2xl font-extrabold text-white tracking-wide">
               “Berubah – Peduli – Berbagi”
@@ -214,7 +231,8 @@ function StrukturPengurusPage() {
               <Target className="w-4 h-4" /> Visi RT 06
             </div>
             <blockquote className="text-base md:text-xl font-bold text-slate-800 italic leading-relaxed">
-              “Mewujudkan lingkungan RT yang aman, nyaman, rukun, bersih, sehat, serta berlandaskan kekeluargaan dan transparansi dalam pelayanan kepada warga.”
+              “Mewujudkan lingkungan RT yang aman, nyaman, rukun, bersih, sehat, serta berlandaskan
+              kekeluargaan dan transparansi dalam pelayanan kepada warga.”
             </blockquote>
           </div>
 
@@ -251,13 +269,15 @@ function StrukturPengurusPage() {
               <h2 className="text-xl md:text-2xl font-extrabold text-slate-800 flex items-center gap-2">
                 <Crown className="w-6 h-6 text-amber-500" /> Bagan Struktur Organisasi
               </h2>
-              <p className="text-xs text-slate-500">Susunan Kepengurusan RT 06 VPI-2 Periode 2025–2030</p>
+              <p className="text-xs text-slate-500">
+                Susunan Kepengurusan RT 06 VPI-2 Periode 2025–2030
+              </p>
             </div>
             {isAdmin && (
               <button
                 onClick={() => {
-                  setAdding(!adding)
-                  setForm({ jabatan: '', nama: '', kategori: 'Seksi', urutan: list.length + 1 })
+                  setAdding(!adding);
+                  setForm({ jabatan: "", nama: "", kategori: "Seksi", urutan: list.length + 1 });
                 }}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm flex items-center gap-1.5"
               >
@@ -289,7 +309,10 @@ function StrukturPengurusPage() {
                 <option value="Seksi">Seksi</option>
                 <option value="Kesra & PKK">Kesra & PKK</option>
               </select>
-              <button onClick={addNew} className="bg-emerald-600 text-white text-sm font-semibold rounded-xl px-4 py-2">
+              <button
+                onClick={addNew}
+                className="bg-emerald-600 text-white text-sm font-semibold rounded-xl px-4 py-2"
+              >
                 Simpan Pengurus
               </button>
             </div>
@@ -300,7 +323,7 @@ function StrukturPengurusPage() {
           ) : (
             <div className="flex flex-col items-center">
               {/* Level 1: Ketua RT */}
-              <div className="w-full max-w-sm">{renderNode(ketua, 'gold')}</div>
+              <div className="w-full max-w-sm">{renderNode(ketua, "gold")}</div>
 
               {/* Garis Penghubung Vertikal */}
               <div className="w-0.5 h-8 bg-slate-300" />
@@ -308,7 +331,7 @@ function StrukturPengurusPage() {
 
               {/* Level 2: Sekretaris & Bendahara */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl pt-4">
-                {intiLain.map((item) => renderNode(item, 'emerald'))}
+                {intiLain.map((item) => renderNode(item, "emerald"))}
               </div>
 
               {/* Garis Penghubung ke Seksi Bidang */}
@@ -318,7 +341,7 @@ function StrukturPengurusPage() {
                   <Shield className="w-4 h-4" /> Koordinator Seksi Bidang
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {seksiList.map((item) => renderNode(item, 'blue'))}
+                  {seksiList.map((item) => renderNode(item, "blue"))}
                 </div>
               </div>
 
@@ -329,12 +352,12 @@ function StrukturPengurusPage() {
                   <Users className="w-4 h-4" /> Bidang Kesra & PKK
                 </p>
                 {/* Puncak Kesra & PKK */}
-                <div className="max-w-sm mx-auto">{renderNode(ketuaPKK, 'rose')}</div>
+                <div className="max-w-sm mx-auto">{renderNode(ketuaPKK, "rose")}</div>
                 {subPKK.length > 0 && (
                   <>
                     <div className="w-0.5 h-6 bg-rose-200 mx-auto" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                      {subPKK.map((item) => renderNode(item, 'rose'))}
+                      {subPKK.map((item) => renderNode(item, "rose"))}
                     </div>
                   </>
                 )}
@@ -344,5 +367,5 @@ function StrukturPengurusPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

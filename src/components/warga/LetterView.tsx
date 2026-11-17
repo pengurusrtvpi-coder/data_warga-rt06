@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Search, Printer, Trash2, Eye, Send } from 'lucide-react';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
+import { useState } from "react";
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
+import { Search, Printer, Trash2, Eye, Send } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +13,9 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Choice } from './Choice';
-import { suratOptions } from '@/lib/portal-queries';
+} from "@/components/ui/dialog";
+import { Choice } from "./Choice";
+import { suratOptions } from "@/lib/portal-queries";
 import {
   JENIS_SURAT,
   findWargaNik,
@@ -26,30 +26,30 @@ import {
   type Warga,
   type Surat,
   type AccessRole,
-} from '@/lib/warga';
+} from "@/lib/warga";
 
 export function LetterView({ role }: { role: AccessRole }) {
   const { data: history } = useSuspenseQuery(suratOptions),
     qc = useQueryClient();
-  const [nik, setNik] = useState(''),
+  const [nik, setNik] = useState(""),
     [warga, setWarga] = useState<Warga | null>(null),
-    [jenis, setJenis] = useState(''),
-    [purpose, setPurpose] = useState(''),
-    [error, setError] = useState(''),
+    [jenis, setJenis] = useState(""),
+    [purpose, setPurpose] = useState(""),
+    [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [preview, setPreview] = useState<Surat | null>(null),
-    [search, setSearch] = useState(''),
+    [search, setSearch] = useState(""),
     [deleting, setDeleting] = useState<Surat | null>(null);
 
   async function check(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    setError('');
+    setError("");
     setWarga(null);
     try {
       setWarga(await findWargaNik(nik));
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Gagal memeriksa NIK.');
+      setError(e instanceof Error ? e.message : "Gagal memeriksa NIK.");
     } finally {
       setBusy(false);
     }
@@ -57,19 +57,19 @@ export function LetterView({ role }: { role: AccessRole }) {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (role === 'admin' && !warga) return;
+    if (role === "admin" && !warga) return;
     setBusy(true);
-    setError('');
+    setError("");
     try {
       const row =
-        role === 'admin' && warga
+        role === "admin" && warga
           ? await createSurat(warga, jenis, purpose)
           : await createSuratByNik(nik, jenis, purpose);
       setPreview(row);
-      await qc.invalidateQueries({ queryKey: ['surat'] });
-      toast.success('Surat dibuat.');
+      await qc.invalidateQueries({ queryKey: ["surat"] });
+      toast.success("Surat dibuat.");
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Gagal membuat surat.');
+      setError(e instanceof Error ? e.message : "Gagal membuat surat.");
     } finally {
       setBusy(false);
     }
@@ -82,10 +82,10 @@ export function LetterView({ role }: { role: AccessRole }) {
       await deleteSurat(deleting.id);
       if (preview?.id === deleting.id) setPreview(null);
       setDeleting(null);
-      await qc.invalidateQueries({ queryKey: ['surat'] });
-      toast.success('Surat dihapus.');
+      await qc.invalidateQueries({ queryKey: ["surat"] });
+      toast.success("Surat dihapus.");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Gagal menghapus.');
+      toast.error(e instanceof Error ? e.message : "Gagal menghapus.");
     } finally {
       setBusy(false);
     }
@@ -94,7 +94,7 @@ export function LetterView({ role }: { role: AccessRole }) {
   const rows = history.filter(
     (r) =>
       r.nik.includes(search.trim()) ||
-      r.nama_pemohon.toLowerCase().includes(search.trim().toLowerCase())
+      r.nama_pemohon.toLowerCase().includes(search.trim().toLowerCase()),
   );
 
   return (
@@ -104,7 +104,7 @@ export function LetterView({ role }: { role: AccessRole }) {
         <h1 className="mt-1 mb-7 text-3xl font-extrabold">Pelayanan Surat</h1>
         <section className="mb-8 border-b pb-8">
           <h2 className="mb-4 text-lg font-bold">Pengajuan Surat</h2>
-          {role === 'admin' ? (
+          {role === "admin" ? (
             <form onSubmit={check} autoComplete="off" className="flex max-w-xl items-end gap-2">
               <div className="min-w-0 flex-1">
                 <Label htmlFor="cek-nik-admin">NIK Pemohon</Label>
@@ -156,20 +156,20 @@ export function LetterView({ role }: { role: AccessRole }) {
               {error}
             </p>
           )}
-          {(warga || role !== 'admin') && (
+          {(warga || role !== "admin") && (
             <form onSubmit={submit} autoComplete="off" className="mt-6 space-y-5">
               {warga && (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {[
-                    { label: 'Nama Lengkap', value: warga.nama_lengkap },
+                    { label: "Nama Lengkap", value: warga.nama_lengkap },
                     {
-                      label: 'Tempat / Tanggal Lahir',
+                      label: "Tempat / Tanggal Lahir",
                       value: `${warga.tempat_lahir}, ${formatTanggal(warga.tanggal_lahir)}`,
                     },
-                    { label: 'Jenis Kelamin', value: warga.jenis_kelamin },
-                    { label: 'Agama', value: warga.agama },
-                    { label: 'Pekerjaan', value: warga.pekerjaan || '—' },
-                    { label: 'Alamat', value: warga.alamat },
+                    { label: "Jenis Kelamin", value: warga.jenis_kelamin },
+                    { label: "Agama", value: warga.agama },
+                    { label: "Pekerjaan", value: warga.pekerjaan || "—" },
+                    { label: "Alamat", value: warga.alamat },
                   ].map((o) => (
                     <div key={o.label}>
                       <Label>{o.label}</Label>
@@ -201,11 +201,11 @@ export function LetterView({ role }: { role: AccessRole }) {
                   busy ||
                   !jenis ||
                   !purpose.trim() ||
-                  (role !== 'admin' && nik.trim().length !== 16)
+                  (role !== "admin" && nik.trim().length !== 16)
                 }
               >
                 <Send />
-                {busy ? 'Membuat…' : 'Kirim & Buat Surat'}
+                {busy ? "Membuat…" : "Kirim & Buat Surat"}
               </Button>
             </form>
           )}
@@ -250,35 +250,35 @@ export function LetterView({ role }: { role: AccessRole }) {
             </header>
             <div className="letter-title">
               <h2>
-                {preview.jenis_surat === 'Lainnya'
-                  ? 'SURAT KETERANGAN'
+                {preview.jenis_surat === "Lainnya"
+                  ? "SURAT KETERANGAN"
                   : preview.jenis_surat.toUpperCase()}
               </h2>
-              <p>Nomor: {preview.nomor_surat || '—'}</p>
+              <p>Nomor: {preview.nomor_surat || "—"}</p>
             </div>
             <p>
-              Yang bertanda tangan di bawah ini, Ketua RT 06 / RW 07, Kelurahan Padurenan,
-              Kecamatan Mustikajaya, Kota Bekasi, menerangkan bahwa:
+              Yang bertanda tangan di bawah ini, Ketua RT 06 / RW 07, Kelurahan Padurenan, Kecamatan
+              Mustikajaya, Kota Bekasi, menerangkan bahwa:
             </p>
             <dl className="letter-biodata">
               {[
-                ['Nama', preview.nama_pemohon],
-                ['NIK', preview.nik],
-          ['Tempat / Tgl Lahir', preview.tempat_tgl_lahir],
-                ['Jenis Kelamin', preview.jenis_kelamin],
-                ['Agama', preview.agama],
-                ['Pekerjaan', preview.pekerjaan],
-                ['Alamat', preview.alamat],
+                ["Nama", preview.nama_pemohon],
+                ["NIK", preview.nik],
+                ["Tempat / Tgl Lahir", preview.tempat_tgl_lahir],
+                ["Jenis Kelamin", preview.jenis_kelamin],
+                ["Agama", preview.agama],
+                ["Pekerjaan", preview.pekerjaan],
+                ["Alamat", preview.alamat],
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt>{label}</dt>
-                  <dd>: {value || '—'}</dd>
+                  <dd>: {value || "—"}</dd>
                 </div>
               ))}
             </dl>
             <p>
-              Nama tersebut di atas adalah warga di lingkungan RT 06 / RW 07. Surat ini dibuat
-              untuk keperluan:
+              Nama tersebut di atas adalah warga di lingkungan RT 06 / RW 07. Surat ini dibuat untuk
+              keperluan:
             </p>
             <p className="letter-purpose">{preview.keperluan}</p>
             <p>
@@ -287,15 +287,15 @@ export function LetterView({ role }: { role: AccessRole }) {
             </p>
             <div className="letter-signature">
               <p>
-                Bekasi,{' '}
+                Bekasi,{" "}
                 {preview.created_at
-                  ? new Date(preview.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      timeZone: 'Asia/Jakarta',
+                  ? new Date(preview.created_at).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                      timeZone: "Asia/Jakarta",
                     })
-                  : '—'}
+                  : "—"}
               </p>
               <p>Ketua RT 06 / RW 07</p>
               <div className="signature-space" />
@@ -323,13 +323,13 @@ export function LetterView({ role }: { role: AccessRole }) {
             <thead>
               <tr>
                 {[
-                  'Tanggal',
-                  'Nomor Surat',
-                  'NIK',
-                  'Nama Pemohon',
-                  'Jenis Surat',
-                  'Keperluan',
-                  'Aksi',
+                  "Tanggal",
+                  "Nomor Surat",
+                  "NIK",
+                  "Nama Pemohon",
+                  "Jenis Surat",
+                  "Keperluan",
+                  "Aksi",
                 ].map((v) => (
                   <th key={v}>{v}</th>
                 ))}
@@ -350,7 +350,7 @@ export function LetterView({ role }: { role: AccessRole }) {
                         <Eye />
                         Lihat / Cetak Ulang
                       </Button>
-                      {role === 'admin' && (
+                      {role === "admin" && (
                         <Button
                           variant="ghost"
                           size="icon"
@@ -368,7 +368,7 @@ export function LetterView({ role }: { role: AccessRole }) {
               {!rows.length && (
                 <tr>
                   <td colSpan={7} className="py-12 text-center">
-                    {search ? 'Surat tidak ditemukan.' : 'Belum ada surat.'}
+                    {search ? "Surat tidak ditemukan." : "Belum ada surat."}
                   </td>
                 </tr>
               )}
@@ -382,7 +382,7 @@ export function LetterView({ role }: { role: AccessRole }) {
           <DialogHeader>
             <DialogTitle>Hapus Riwayat Surat?</DialogTitle>
             <DialogDescription>
-              Surat nomor <strong>{deleting?.nomor_surat}</strong> atas nama{' '}
+              Surat nomor <strong>{deleting?.nomor_surat}</strong> atas nama{" "}
               <strong>{deleting?.nama_pemohon}</strong> akan dihapus permanen.
             </DialogDescription>
           </DialogHeader>
@@ -391,7 +391,7 @@ export function LetterView({ role }: { role: AccessRole }) {
               Batal
             </Button>
             <Button variant="destructive" disabled={busy} onClick={remove}>
-              {busy ? 'Menghapus…' : 'Hapus Surat'}
+              {busy ? "Menghapus…" : "Hapus Surat"}
             </Button>
           </DialogFooter>
         </DialogContent>

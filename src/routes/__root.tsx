@@ -9,6 +9,7 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
@@ -81,9 +82,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Portal Warga RT 06 VPI-2" },
-      { name: "description", content: "Portal warga RT 06 VPI-2 untuk melihat dan memperbarui data keluarga." },
+      {
+        name: "description",
+        content: "Portal warga RT 06 VPI-2 untuk melihat dan memperbarui data keluarga.",
+      },
       { property: "og:title", content: "Portal Warga RT 06 VPI-2" },
-      { property: "og:description", content: "Portal warga RT 06 VPI-2 untuk melihat dan memperbarui data keluarga." },
+      {
+        property: "og:description",
+        content: "Portal warga RT 06 VPI-2 untuk melihat dan memperbarui data keluarga.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -139,6 +146,7 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
       <Toaster richColors position="top-center" />
+      <SpeedInsights />
     </QueryClientProvider>
   );
 }

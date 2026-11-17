@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState, type FormEvent } from 'react';
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   Package,
   Plus,
@@ -12,20 +12,20 @@ import {
   MapPin,
   Loader2,
   X,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PortalNav } from '@/components/warga/PortalNav';
-import { getMyAccessRole, type AccessRole } from '@/lib/warga';
+} from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PortalNav } from "@/components/warga/PortalNav";
+import { getMyAccessRole, type AccessRole } from "@/lib/warga";
 
-export const Route = createFileRoute('/inventaris')({
+export const Route = createFileRoute("/inventaris")({
   head: () => ({
-    meta: [{ title: 'Inventaris Aset RT — RT 06 VPI-2' }],
+    meta: [{ title: "Inventaris Aset RT — RT 06 VPI-2" }],
   }),
   component: InventarisPage,
 });
@@ -42,36 +42,36 @@ interface InventarisItem {
   foto_url: string | null;
 }
 
-const KONDISI_LIST = ['Baik', 'Perlu Perbaikan', 'Rusak Berat'];
+const KONDISI_LIST = ["Baik", "Perlu Perbaikan", "Rusak Berat"];
 
 function InventarisPage() {
-  const [role, setRole] = useState<AccessRole>('warga');
+  const [role, setRole] = useState<AccessRole>("warga");
   const [items, setItems] = useState<InventarisItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [query, setQuery] = useState('');
-  const [filterKondisi, setFilterKondisi] = useState('Semua');
+  const [query, setQuery] = useState("");
+  const [filterKondisi, setFilterKondisi] = useState("Semua");
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<InventarisItem | null>(null);
-  const [namaBarang, setNamaBarang] = useState('');
-  const [kodeBarang, setKodeBarang] = useState('');
-  const [kategori, setKategori] = useState('Perlengkapan Umum');
-  const [jumlah, setJumlah] = useState('1');
-  const [kondisi, setKondisi] = useState('Baik');
-  const [lokasiSimpan, setLokasiSimpan] = useState('');
-  const [keterangan, setKeterangan] = useState('');
+  const [namaBarang, setNamaBarang] = useState("");
+  const [kodeBarang, setKodeBarang] = useState("");
+  const [kategori, setKategori] = useState("Perlengkapan Umum");
+  const [jumlah, setJumlah] = useState("1");
+  const [kondisi, setKondisi] = useState("Baik");
+  const [lokasiSimpan, setLokasiSimpan] = useState("");
+  const [keterangan, setKeterangan] = useState("");
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  const isAdmin = role === 'admin' || (role as string) === 'kesra_pkk';
+  const isAdmin = role === "admin" || (role as string) === "kesra_pkk";
 
   async function loadData() {
     setLoading(true);
     const { data, error } = await (supabase as any)
-      .from('inventaris_rt')
-      .select('*')
-      .order('nama_barang', { ascending: true });
+      .from("inventaris_rt")
+      .select("*")
+      .order("nama_barang", { ascending: true });
     if (!error && data) setItems(data);
     setLoading(false);
   }
@@ -88,13 +88,13 @@ function InventarisPage() {
 
   function openForm(item: InventarisItem | null) {
     setEditing(item);
-    setNamaBarang(item?.nama_barang || '');
-    setKodeBarang(item?.kode_barang || '');
-    setKategori(item?.kategori || 'Perlengkapan Umum');
-    setJumlah(item?.jumlah ? String(item.jumlah) : '1');
-    setKondisi(item?.kondisi || 'Baik');
-    setLokasiSimpan(item?.lokasi_simpan || '');
-    setKeterangan(item?.keterangan || '');
+    setNamaBarang(item?.nama_barang || "");
+    setKodeBarang(item?.kode_barang || "");
+    setKategori(item?.kategori || "Perlengkapan Umum");
+    setJumlah(item?.jumlah ? String(item.jumlah) : "1");
+    setKondisi(item?.kondisi || "Baik");
+    setLokasiSimpan(item?.lokasi_simpan || "");
+    setKeterangan(item?.keterangan || "");
     setFotoFile(null);
     setFotoPreview(item?.foto_url || null);
     setOpen(true);
@@ -103,7 +103,7 @@ function InventarisPage() {
   function handleSelectPhoto(file?: File) {
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Ukuran foto maksimal 5 MB.');
+      toast.error("Ukuran foto maksimal 5 MB.");
       return;
     }
     setFotoFile(file);
@@ -117,13 +117,13 @@ function InventarisPage() {
     try {
       let finalFotoUrl = editing?.foto_url || null;
       if (fotoFile) {
-        const ext = fotoFile.name.split('.').pop() || 'jpg';
+        const ext = fotoFile.name.split(".").pop() || "jpg";
         const path = `inventaris/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
         const { error: upErr } = await supabase.storage
-          .from('dokumen-rt06')
+          .from("dokumen-rt06")
           .upload(path, fotoFile, { upsert: true });
         if (upErr) throw new Error(upErr.message);
-        const { data: pub } = supabase.storage.from('dokumen-rt06').getPublicUrl(path);
+        const { data: pub } = supabase.storage.from("dokumen-rt06").getPublicUrl(path);
         finalFotoUrl = pub.publicUrl;
       } else if (!fotoPreview) {
         finalFotoUrl = null;
@@ -132,7 +132,7 @@ function InventarisPage() {
       const payload = {
         nama_barang: namaBarang.trim(),
         kode_barang: kodeBarang.trim() || null,
-        kategori: kategori.trim() || 'Perlengkapan Umum',
+        kategori: kategori.trim() || "Perlengkapan Umum",
         jumlah: Math.max(1, Number(jumlah) || 1),
         kondisi,
         lokasi_simpan: lokasiSimpan.trim() || null,
@@ -143,20 +143,20 @@ function InventarisPage() {
 
       if (editing) {
         const { error } = await (supabase as any)
-          .from('inventaris_rt')
+          .from("inventaris_rt")
           .update(payload)
-          .eq('id', editing.id);
+          .eq("id", editing.id);
         if (error) throw new Error(error.message);
-        toast.success('Data inventaris diperbarui.');
+        toast.success("Data inventaris diperbarui.");
       } else {
-        const { error } = await (supabase as any).from('inventaris_rt').insert([payload]);
+        const { error } = await (supabase as any).from("inventaris_rt").insert([payload]);
         if (error) throw new Error(error.message);
-        toast.success('Barang inventaris ditambahkan.');
+        toast.success("Barang inventaris ditambahkan.");
       }
       setOpen(false);
       await loadData();
     } catch (err: any) {
-      toast.error(err?.message || 'Gagal menyimpan data inventaris.');
+      toast.error(err?.message || "Gagal menyimpan data inventaris.");
     } finally {
       setSaving(false);
     }
@@ -164,31 +164,31 @@ function InventarisPage() {
 
   async function handleDelete(item: InventarisItem) {
     if (!confirm(`Hapus barang "${item.nama_barang}" dari daftar inventaris?`)) return;
-    const { error } = await (supabase as any).from('inventaris_rt').delete().eq('id', item.id);
+    const { error } = await (supabase as any).from("inventaris_rt").delete().eq("id", item.id);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success('Barang inventaris dihapus.');
+    toast.success("Barang inventaris dihapus.");
     await loadData();
   }
 
   const filtered = items.filter((item) => {
-    const matchKondisi = filterKondisi === 'Semua' || item.kondisi === filterKondisi;
+    const matchKondisi = filterKondisi === "Semua" || item.kondisi === filterKondisi;
     const q = query.toLowerCase();
     const matchText =
       !q ||
       item.nama_barang.toLowerCase().includes(q) ||
-      (item.kode_barang || '').toLowerCase().includes(q) ||
-      (item.lokasi_simpan || '').toLowerCase().includes(q);
+      (item.kode_barang || "").toLowerCase().includes(q) ||
+      (item.lokasi_simpan || "").toLowerCase().includes(q);
     return matchKondisi && matchText;
   });
 
   const totalUnit = items.reduce((s, r) => s + (r.jumlah || 0), 0);
-  const tanggalCetak = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+  const tanggalCetak = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 
   return (
@@ -231,15 +231,15 @@ function InventarisPage() {
             />
           </div>
           <div className="flex flex-wrap gap-1.5">
-            {['Semua', ...KONDISI_LIST].map((k) => (
+            {["Semua", ...KONDISI_LIST].map((k) => (
               <button
                 key={k}
                 type="button"
                 onClick={() => setFilterKondisi(k)}
                 className={`rounded-full px-3 py-1.5 text-xs font-bold transition ${
                   filterKondisi === k
-                    ? 'bg-sky-700 text-white shadow-xs'
-                    : 'border bg-white text-slate-600 hover:bg-slate-100'
+                    ? "bg-sky-700 text-white shadow-xs"
+                    : "border bg-white text-slate-600 hover:bg-slate-100"
                 }`}
               >
                 {k}
@@ -264,16 +264,18 @@ function InventarisPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((item) => {
                 const badgeColor =
-                  item.kondisi === 'Baik'
-                    ? 'bg-emerald-100 text-emerald-800'
-                    : item.kondisi === 'Perlu Perbaikan'
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'bg-rose-100 text-rose-800';
+                  item.kondisi === "Baik"
+                    ? "bg-emerald-100 text-emerald-800"
+                    : item.kondisi === "Perlu Perbaikan"
+                      ? "bg-amber-100 text-amber-800"
+                      : "bg-rose-100 text-rose-800";
                 return (
-                <article
-                  key={item.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
-                >                    <div className="relative aspect-[16/10] w-full bg-slate-100">
+                  <article
+                    key={item.id}
+                    className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
+                  >
+                    {" "}
+                    <div className="relative aspect-[16/10] w-full bg-slate-100">
                       {item.foto_url ? (
                         <img
                           src={item.foto_url}
@@ -295,7 +297,6 @@ function InventarisPage() {
                         {item.jumlah} Unit
                       </span>
                     </div>
-
                     <div className="flex flex-1 flex-col p-4">
                       <div>
                         {item.kode_barang && (
@@ -316,7 +317,9 @@ function InventarisPage() {
                       )}
 
                       {item.keterangan && (
-                        <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.keterangan}</p>
+                        <p className="mt-2 line-clamp-2 text-xs text-slate-500">
+                          {item.keterangan}
+                        </p>
                       )}
 
                       {isAdmin && (
@@ -385,7 +388,7 @@ function InventarisPage() {
                   <tr key={item.id} className="align-top">
                     <td className="border border-black px-2 py-1.5 text-center">{idx + 1}</td>
                     <td className="border border-black px-2 py-1.5 font-mono text-[11px]">
-                      {item.kode_barang || '-'}
+                      {item.kode_barang || "-"}
                     </td>
                     <td className="border border-black px-2 py-1.5 font-semibold">
                       {item.nama_barang}
@@ -394,10 +397,8 @@ function InventarisPage() {
                       {item.jumlah} Unit
                     </td>
                     <td className="border border-black px-2 py-1.5 text-center">{item.kondisi}</td>
-                    <td className="border border-black px-2 py-1.5">
-                      {item.lokasi_simpan || '-'}
-                    </td>
-                    <td className="border border-black px-2 py-1.5">{item.keterangan || '-'}</td>
+                    <td className="border border-black px-2 py-1.5">{item.lokasi_simpan || "-"}</td>
+                    <td className="border border-black px-2 py-1.5">{item.keterangan || "-"}</td>
                   </tr>
                 ))
               )}
@@ -425,7 +426,9 @@ function InventarisPage() {
           <Dialog open={open} onOpenChange={(v) => !saving && setOpen(v)}>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editing ? 'Edit Aset Inventaris' : 'Tambah Aset Inventaris'}</DialogTitle>
+                <DialogTitle>
+                  {editing ? "Edit Aset Inventaris" : "Tambah Aset Inventaris"}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSave} className="space-y-4">
                 <div className="space-y-1.5">
@@ -492,7 +495,7 @@ function InventarisPage() {
                     value={keterangan}
                     onChange={(e) => setKeterangan(e.target.value)}
                   />
-                  </div>
+                </div>
 
                 <div className="space-y-2">
                   <Label>Foto Barang (Kamera / Galeri HP)</Label>
@@ -548,7 +551,7 @@ function InventarisPage() {
                     Batal
                   </Button>
                   <Button type="submit" disabled={saving}>
-                    {saving ? 'Menyimpan…' : 'Simpan Aset'}
+                    {saving ? "Menyimpan…" : "Simpan Aset"}
                   </Button>
                 </div>
               </form>

@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router';
-import { useEffect, useState, type FormEvent } from 'react';
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   BookOpen,
   Plus,
@@ -13,20 +13,20 @@ import {
   UserCheck,
   Loader2,
   X,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { PortalNav } from '@/components/warga/PortalNav';
-import { getMyAccessRole, jakartaToday, type AccessRole } from '@/lib/warga';
+} from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { PortalNav } from "@/components/warga/PortalNav";
+import { getMyAccessRole, jakartaToday, type AccessRole } from "@/lib/warga";
 
-export const Route = createFileRoute('/jurnal')({
+export const Route = createFileRoute("/jurnal")({
   head: () => ({
-    meta: [{ title: 'Jurnal Kegiatan RT — RT 06 VPI-2' }],
+    meta: [{ title: "Jurnal Kegiatan RT — RT 06 VPI-2" }],
   }),
   component: JurnalKegiatanPage,
 });
@@ -42,30 +42,30 @@ interface JurnalItem {
 }
 
 function JurnalKegiatanPage() {
-  const [role, setRole] = useState<AccessRole>('warga');
+  const [role, setRole] = useState<AccessRole>("warga");
   const [items, setItems] = useState<JurnalItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<JurnalItem | null>(null);
-  const [judul, setJudul] = useState('');
+  const [judul, setJudul] = useState("");
   const [tanggal, setTanggal] = useState(jakartaToday());
-  const [lokasi, setLokasi] = useState('');
-  const [pj, setPj] = useState('');
-  const [deskripsi, setDeskripsi] = useState('');
+  const [lokasi, setLokasi] = useState("");
+  const [pj, setPj] = useState("");
+  const [deskripsi, setDeskripsi] = useState("");
   const [fotoFile, setFotoFile] = useState<File | null>(null);
   const [fotoPreview, setFotoPreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const r = role as string;
-  const isAdmin = r === 'admin' || r === 'kesra_pkk' || r === 'seksi_rt';
+  const isAdmin = r === "admin" || r === "kesra_pkk" || r === "seksi_rt";
 
   async function loadData() {
     setLoading(true);
     const { data, error } = await (supabase as any)
-      .from('jurnal_kegiatan')
-      .select('*')
-      .order('tanggal_kegiatan', { ascending: false });
+      .from("jurnal_kegiatan")
+      .select("*")
+      .order("tanggal_kegiatan", { ascending: false });
     if (!error && data) setItems(data);
     setLoading(false);
   }
@@ -82,11 +82,11 @@ function JurnalKegiatanPage() {
 
   function openForm(item: JurnalItem | null) {
     setEditing(item);
-    setJudul(item?.judul || '');
+    setJudul(item?.judul || "");
     setTanggal(item?.tanggal_kegiatan || jakartaToday());
-    setLokasi(item?.lokasi || 'Lingkungan RT 06 VPI-2');
-    setPj(item?.penanggung_jawab || 'Pengurus RT 06');
-    setDeskripsi(item?.deskripsi || '');
+    setLokasi(item?.lokasi || "Lingkungan RT 06 VPI-2");
+    setPj(item?.penanggung_jawab || "Pengurus RT 06");
+    setDeskripsi(item?.deskripsi || "");
     setFotoFile(null);
     setFotoPreview(item?.foto_url || null);
     setOpen(true);
@@ -95,7 +95,7 @@ function JurnalKegiatanPage() {
   function handleSelectPhoto(file?: File) {
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) {
-      toast.error('Ukuran foto maksimal 5 MB.');
+      toast.error("Ukuran foto maksimal 5 MB.");
       return;
     }
     setFotoFile(file);
@@ -109,13 +109,13 @@ function JurnalKegiatanPage() {
     try {
       let finalFotoUrl = editing?.foto_url || null;
       if (fotoFile) {
-        const ext = fotoFile.name.split('.').pop() || 'jpg';
+        const ext = fotoFile.name.split(".").pop() || "jpg";
         const path = `jurnal/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
         const { error: upErr } = await supabase.storage
-          .from('dokumen-rt06')
+          .from("dokumen-rt06")
           .upload(path, fotoFile, { upsert: true });
         if (upErr) throw new Error(upErr.message);
-        const { data: pub } = supabase.storage.from('dokumen-rt06').getPublicUrl(path);
+        const { data: pub } = supabase.storage.from("dokumen-rt06").getPublicUrl(path);
         finalFotoUrl = pub.publicUrl;
       } else if (!fotoPreview) {
         finalFotoUrl = null;
@@ -133,20 +133,20 @@ function JurnalKegiatanPage() {
 
       if (editing) {
         const { error } = await (supabase as any)
-          .from('jurnal_kegiatan')
+          .from("jurnal_kegiatan")
           .update(payload)
-          .eq('id', editing.id);
+          .eq("id", editing.id);
         if (error) throw new Error(error.message);
-        toast.success('Jurnal kegiatan diperbarui.');
+        toast.success("Jurnal kegiatan diperbarui.");
       } else {
-        const { error } = await (supabase as any).from('jurnal_kegiatan').insert([payload]);
+        const { error } = await (supabase as any).from("jurnal_kegiatan").insert([payload]);
         if (error) throw new Error(error.message);
-        toast.success('Jurnal kegiatan ditambahkan.');
+        toast.success("Jurnal kegiatan ditambahkan.");
       }
       setOpen(false);
       await loadData();
     } catch (err: any) {
-      toast.error(err?.message || 'Gagal menyimpan jurnal kegiatan.');
+      toast.error(err?.message || "Gagal menyimpan jurnal kegiatan.");
     } finally {
       setSaving(false);
     }
@@ -154,19 +154,19 @@ function JurnalKegiatanPage() {
 
   async function handleDelete(item: JurnalItem) {
     if (!confirm(`Hapus dokumentasi kegiatan "${item.judul}"?`)) return;
-    const { error } = await (supabase as any).from('jurnal_kegiatan').delete().eq('id', item.id);
+    const { error } = await (supabase as any).from("jurnal_kegiatan").delete().eq("id", item.id);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success('Jurnal kegiatan dihapus.');
+    toast.success("Jurnal kegiatan dihapus.");
     await loadData();
   }
 
-  const tanggalCetak = new Date().toLocaleDateString('id-ID', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+  const tanggalCetak = new Date().toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
 
   return (
@@ -231,10 +231,10 @@ function JurnalKegiatanPage() {
                     <div className="flex flex-wrap items-center gap-3 text-xs font-semibold text-sky-700">
                       <span className="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-0.5">
                         <Calendar className="h-3.5 w-3.5" />
-                        {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric',
+                        {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
                         })}
                       </span>
                       {item.lokasi && (
@@ -257,7 +257,7 @@ function JurnalKegiatanPage() {
                       </p>
                     )}
 
-      {isAdmin && (
+                    {isAdmin && (
                       <div className="mt-4 flex justify-end gap-2 border-t pt-3">
                         <Button size="sm" variant="outline" onClick={() => openForm(item)}>
                           <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
@@ -295,9 +295,7 @@ function JurnalKegiatanPage() {
               </p>
               <p className="text-xs font-bold">VILLA PADURENAN INDAH 2 (VPI-2)</p>
               <p className="text-[11px] italic">Motto: BERUBAH - PEDULI - BERBAGI</p>
-              <p className="text-[11px]">
-                Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi
-              </p>
+              <p className="text-[11px]">Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi</p>
             </div>
           </div>
           <div className="mt-3 text-center">
@@ -307,7 +305,7 @@ function JurnalKegiatanPage() {
             <p className="mt-0.5 text-[11px]">
               Dicetak tanggal: {tanggalCetak} · Total: {items.length} Kegiatan Tercatat
             </p>
-          </div>      
+          </div>
           <table className="mt-4 w-full border-collapse border border-black text-xs">
             <thead>
               <tr className="bg-slate-100 text-left font-bold">
@@ -343,10 +341,10 @@ function JurnalKegiatanPage() {
                     </td>
                     <td className="border border-black px-2 py-1.5">
                       <p className="font-semibold">
-                        {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
+                        {new Date(`${item.tanggal_kegiatan}T00:00:00`).toLocaleDateString("id-ID", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
                         })}
                       </p>
                       {item.lokasi && <p className="mt-0.5 text-[11px]">{item.lokasi}</p>}
@@ -356,7 +354,7 @@ function JurnalKegiatanPage() {
                       {item.deskripsi}
                     </td>
                     <td className="border border-black px-2 py-1.5">
-                      {item.penanggung_jawab || '-'}
+                      {item.penanggung_jawab || "-"}
                     </td>
                   </tr>
                 ))
@@ -386,7 +384,7 @@ function JurnalKegiatanPage() {
             <DialogContent className="max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
-                  {editing ? 'Edit Jurnal Kegiatan' : 'Tambah Dokumentasi Kegiatan'}
+                  {editing ? "Edit Jurnal Kegiatan" : "Tambah Dokumentasi Kegiatan"}
                 </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSave} className="space-y-4">
@@ -494,14 +492,14 @@ function JurnalKegiatanPage() {
                     Batal
                   </Button>
                   <Button type="submit" disabled={saving}>
-                    {saving ? 'Menyimpan…' : 'Simpan Kegiatan'}
+                    {saving ? "Menyimpan…" : "Simpan Kegiatan"}
                   </Button>
                 </div>
               </form>
             </DialogContent>
           </Dialog>
         )}
-              </main>
+      </main>
     </div>
   );
 }

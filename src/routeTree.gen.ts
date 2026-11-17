@@ -126,6 +126,23 @@ export interface FileRoutesByTo {
   '/keuangan/bulanan': typeof KeuanganBulananRoute
   '/keuangan': typeof KeuanganIndexRoute
 }
+export interface FileRoutesById {
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/aspirasi': typeof AspirasiRoute
+  '/data-warga': typeof DataWargaRoute
+  '/inventaris': typeof InventarisRoute
+  '/jurnal': typeof JurnalRoute
+  '/keluarga': typeof KeluargaRoute
+  '/keuangan': typeof KeuanganRouteWithChildren
+  '/login': typeof LoginRoute
+  '/panduan': typeof PanduanRoute
+  '/pengurus': typeof PengurusRoute
+  '/statistik': typeof StatistikRoute
+  '/surat': typeof SuratRoute
+  '/keuangan/bulanan': typeof KeuanganBulananRoute
+  '/keuangan/': typeof KeuanganIndexRoute
+}
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:

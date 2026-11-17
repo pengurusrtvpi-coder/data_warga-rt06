@@ -27,9 +27,16 @@ export const Route = createFileRoute("/keluarga")({
   head: () => ({
     meta: [
       { title: "Data Warga & Keluarga — Portal RT 06 VPI-2" },
-      { name: "description", content: "Kelola data warga sebagai pengurus RT atau perbarui data keluarga Anda di RT 06 VPI-2." },
+      {
+        name: "description",
+        content:
+          "Kelola data warga sebagai pengurus RT atau perbarui data keluarga Anda di RT 06 VPI-2.",
+      },
       { property: "og:title", content: "Data Warga & Keluarga — Portal RT 06 VPI-2" },
-      { property: "og:description", content: "Portal data keluarga warga dan pengelolaan data oleh pengurus RT 06 VPI-2." },
+      {
+        property: "og:description",
+        content: "Portal data keluarga warga dan pengelolaan data oleh pengurus RT 06 VPI-2.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
@@ -84,9 +91,9 @@ function ResidentPanel() {
             Data Keluarga
           </h1>
           <p className="mt-1.5 max-w-lg text-sm text-muted-foreground">
-            Data anggota keluarga sesuai Kartu Keluarga akun Anda. Anda dapat memperbarui data yang diizinkan.
+            Data anggota keluarga sesuai Kartu Keluarga akun Anda. Anda dapat memperbarui data yang
+            diizinkan.
           </p>
-
         </div>
       </section>
 
@@ -134,14 +141,9 @@ function ResidentPanel() {
             </div>
           </>
         )}
-
       </main>
 
-      <EditWargaDialog
-        warga={editing}
-        onClose={() => setEditing(null)}
-        onSaved={() => load()}
-      />
+      <EditWargaDialog warga={editing} onClose={() => setEditing(null)} onSaved={() => load()} />
     </>
   );
 }

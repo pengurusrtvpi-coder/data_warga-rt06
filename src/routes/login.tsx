@@ -28,7 +28,10 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Masuk — Portal Warga RT 06 VPI-2" },
-      { name: "description", content: "Masuk ke Portal Warga RT 06 VPI-2 menggunakan NIK dan password Anda." },
+      {
+        name: "description",
+        content: "Masuk ke Portal Warga RT 06 VPI-2 menggunakan NIK dan password Anda.",
+      },
       { property: "og:title", content: "Masuk — Portal Warga RT 06 VPI-2" },
       { property: "og:description", content: "Masuk dengan NIK untuk melihat data keluarga Anda." },
       { property: "og:type", content: "website" },
@@ -121,14 +124,10 @@ function LoginPage() {
 
     const channel = supabase
       .channel("realtime-running-text")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "running_text" },
-        () => {
-          hasPlayedRef.current = false;
-          loadAnnouncements();
-        }
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "running_text" }, () => {
+        hasPlayedRef.current = false;
+        loadAnnouncements();
+      })
       .subscribe();
 
     const unlockAudio = () => {
@@ -211,7 +210,9 @@ function LoginPage() {
     const credential = String(data.get(tab === "warga" ? "nik" : "email") ?? "").trim();
     const password = String(data.get("password") ?? "");
     if (!credential || !password) {
-      setError(tab === "warga" ? "NIK dan password wajib diisi." : "Email dan password wajib diisi.");
+      setError(
+        tab === "warga" ? "NIK dan password wajib diisi." : "Email dan password wajib diisi.",
+      );
       return;
     }
     setError(null);
@@ -220,7 +221,7 @@ function LoginPage() {
       if (tab === "warga") {
         const { data: statusCek, error: rpcErr } = await (supabase as any).rpc(
           "cek_status_login_warga",
-          { nik_input: credential }
+          { nik_input: credential },
         );
 
         if (rpcErr) {
@@ -229,12 +230,14 @@ function LoginPage() {
 
         if (statusCek === "NONAKTIF") {
           throw new Error(
-            "Akses login ditolak. Status kependudukan Anda tercatat Pindah/tidak aktif di RT 06. Silakan hubungi pengurus RT 06."
+            "Akses login ditolak. Status kependudukan Anda tercatat Pindah/tidak aktif di RT 06. Silakan hubungi pengurus RT 06.",
           );
         }
 
         if (statusCek === "TIDAK_DITEMUKAN") {
-          throw new Error("NIK tidak terdaftar di database warga RT 06. Silakan hubungi pengurus RT 06.");
+          throw new Error(
+            "NIK tidak terdaftar di database warga RT 06. Silakan hubungi pengurus RT 06.",
+          );
         }
 
         await signInWithNik(credential, password);
@@ -266,7 +269,12 @@ function LoginPage() {
   );
 
   const submitButton = (
-    <Button type="submit" size="lg" className="h-11 w-full text-base font-semibold" disabled={loading}>
+    <Button
+      type="submit"
+      size="lg"
+      className="h-11 w-full text-base font-semibold"
+      disabled={loading}
+    >
       {loading && <Loader2 className="animate-spin" />}
       Masuk
     </Button>
@@ -304,7 +312,11 @@ function LoginPage() {
             title="Putar suara notifikasi pengumuman"
             className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/50 bg-slate-900/85 px-3 py-1.5 text-xs font-bold text-amber-300 shadow-sm hover:bg-slate-900"
           >
-            {soundPlayed ? <Volume2 className="h-3.5 w-3.5" /> : <VolumeX className="h-3.5 w-3.5" />}
+            {soundPlayed ? (
+              <Volume2 className="h-3.5 w-3.5" />
+            ) : (
+              <VolumeX className="h-3.5 w-3.5" />
+            )}
             <span className="hidden sm:inline">Suara Info</span>
           </button>
 
@@ -352,7 +364,8 @@ function LoginPage() {
         {isAdmin && showManager && (
           <div className="mb-6 w-full max-w-2xl rounded-2xl border-2 border-amber-400 bg-card p-5 shadow-lg">
             <h2 className="mb-3 flex items-center gap-2 text-base font-extrabold text-foreground">
-              <Megaphone className="h-4 w-4 text-amber-500" /> Kelola Pengumuman Running Text (Khusus Admin)
+              <Megaphone className="h-4 w-4 text-amber-500" /> Kelola Pengumuman Running Text
+              (Khusus Admin)
             </h2>
 
             <form onSubmit={handleAddAnnouncement} className="mb-4 flex gap-2">
@@ -362,7 +375,11 @@ function LoginPage() {
                 onChange={(e) => setNewPesan(e.target.value)}
                 required
               />
-              <Button type="submit" disabled={savingText} className="shrink-0 bg-amber-500 font-bold text-slate-950 hover:bg-amber-400">
+              <Button
+                type="submit"
+                disabled={savingText}
+                className="shrink-0 bg-amber-500 font-bold text-slate-950 hover:bg-amber-400"
+              >
                 <Plus className="mr-1 h-4 w-4" /> Tambah
               </Button>
             </form>
@@ -380,7 +397,11 @@ function LoginPage() {
                         onChange={(e) => setEditPesan(e.target.value)}
                         className="h-8 text-xs"
                       />
-                      <Button size="sm" onClick={() => handleSaveEdit(item.id)} disabled={savingText}>
+                      <Button
+                        size="sm"
+                        onClick={() => handleSaveEdit(item.id)}
+                        disabled={savingText}
+                      >
                         <Check className="h-3.5 w-3.5" />
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => setEditId(null)}>
@@ -390,7 +411,9 @@ function LoginPage() {
                   ) : (
                     <>
                       <div className="flex-1 pr-2">
-                        <p className={`font-semibold ${item.aktif ? "text-foreground" : "text-muted-foreground line-through"}`}>
+                        <p
+                          className={`font-semibold ${item.aktif ? "text-foreground" : "text-muted-foreground line-through"}`}
+                        >
                           {item.pesan}
                         </p>
                       </div>
@@ -435,8 +458,12 @@ function LoginPage() {
           <div className="rounded-2xl border bg-card p-6 shadow-lift">
             <Tabs value={tab} onValueChange={changeTab}>
               <TabsList className="grid h-11 w-full grid-cols-2">
-                <TabsTrigger value="warga" className="h-9">Login Warga</TabsTrigger>
-                <TabsTrigger value="admin" className="h-9">Login Admin</TabsTrigger>
+                <TabsTrigger value="warga" className="h-9">
+                  Login Warga
+                </TabsTrigger>
+                <TabsTrigger value="admin" className="h-9">
+                  Login Admin
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="warga" className="mt-5">
@@ -523,7 +550,7 @@ function LoginPage() {
               </TabsContent>
             </Tabs>
           </div>
-         <p className="mt-6 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-xs text-muted-foreground">
             Lupa password? Hubungi pengurus RT 06 ·{" "}
             <a href="/panduan" className="font-bold text-primary-deep underline">
               Lihat Pamflet Panduan & Keamanan Data

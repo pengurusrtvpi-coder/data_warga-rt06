@@ -111,25 +111,25 @@ export function AdminPanel() {
           </div>
 
           {view === "data" && (
-          <form
-            onSubmit={onSearch}
-            className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-3 shadow-lift sm:flex-row sm:items-center"
-          >
-            <div className="relative flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                aria-label="Cari data warga"
-                placeholder="Cari nama, NIK, atau No. KK"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                className="h-11 border-0 pl-10 shadow-none focus-visible:ring-0"
-              />
-            </div>
-            <Button type="submit" size="lg" className="h-11 font-semibold" disabled={loading}>
-              {loading && <Loader2 className="animate-spin" />}
-              Tampilkan Data Warga
-            </Button>
-          </form>
+            <form
+              onSubmit={onSearch}
+              className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-3 shadow-lift sm:flex-row sm:items-center"
+            >
+              <div className="relative flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  aria-label="Cari data warga"
+                  placeholder="Cari nama, NIK, atau No. KK"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="h-11 border-0 pl-10 shadow-none focus-visible:ring-0"
+                />
+              </div>
+              <Button type="submit" size="lg" className="h-11 font-semibold" disabled={loading}>
+                {loading && <Loader2 className="animate-spin" />}
+                Tampilkan Data Warga
+              </Button>
+            </form>
           )}
         </div>
       </section>
@@ -137,69 +137,77 @@ export function AdminPanel() {
       {view === "audit" ? (
         <AuditLogPanel />
       ) : (
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-        {error && (
-          <div
-            role="alert"
-            className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
-          >
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-            {error}
-          </div>
-        )}
-
-        {loading && !rows && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-72 rounded-2xl" />
-            ))}
-          </div>
-        )}
-
-        {rows && rows.length === 0 && (
-          <div className="rounded-2xl border border-dashed bg-card px-6 py-14 text-center">
-            <Users className="mx-auto h-8 w-8 text-muted-foreground" />
-            <p className="mt-3 font-semibold text-foreground">Data warga tidak ditemukan</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {activeQuery ? `Tidak ada hasil untuk “${activeQuery}”.` : "Belum ada data warga yang tersimpan."}
-            </p>
-            {activeQuery && (
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={() => {
-                  setQuery("");
-                  void load("");
-                }}
-              >
-                Tampilkan Semua
-              </Button>
-            )}
-          </div>
-        )}
-
-        {rows && rows.length > 0 && (
-          <>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-muted-foreground">
-                {activeQuery ? <>Hasil untuk <span className="text-foreground">“{activeQuery}”</span></> : "Seluruh data warga"}
-              </h2>
-              <span className="text-sm text-muted-foreground">{rows.length} warga</span>
+        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+          {error && (
+            <div
+              role="alert"
+              className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+            >
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+              {error}
             </div>
-            <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {rows.map((warga) => (
-                <WargaCard
-                  key={warga.id}
-                  warga={warga}
-                  isAdmin
-                  onEdit={setEditing}
-                  onDelete={setDeleting}
-                />
+          )}
+
+          {loading && !rows && (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-72 rounded-2xl" />
               ))}
             </div>
-          </>
-        )}
-      </main>
+          )}
+
+          {rows && rows.length === 0 && (
+            <div className="rounded-2xl border border-dashed bg-card px-6 py-14 text-center">
+              <Users className="mx-auto h-8 w-8 text-muted-foreground" />
+              <p className="mt-3 font-semibold text-foreground">Data warga tidak ditemukan</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {activeQuery
+                  ? `Tidak ada hasil untuk “${activeQuery}”.`
+                  : "Belum ada data warga yang tersimpan."}
+              </p>
+              {activeQuery && (
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => {
+                    setQuery("");
+                    void load("");
+                  }}
+                >
+                  Tampilkan Semua
+                </Button>
+              )}
+            </div>
+          )}
+
+          {rows && rows.length > 0 && (
+            <>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-muted-foreground">
+                  {activeQuery ? (
+                    <>
+                      Hasil untuk <span className="text-foreground">“{activeQuery}”</span>
+                    </>
+                  ) : (
+                    "Seluruh data warga"
+                  )}
+                </h2>
+                <span className="text-sm text-muted-foreground">{rows.length} warga</span>
+              </div>
+              <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {rows.map((warga) => (
+                  <WargaCard
+                    key={warga.id}
+                    warga={warga}
+                    isAdmin
+                    onEdit={setEditing}
+                    onDelete={setDeleting}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </main>
       )}
 
       <EditWargaDialog
@@ -213,13 +221,16 @@ export function AdminPanel() {
         onSaved={() => load(activeQuery)}
       />
 
-      <AlertDialog open={Boolean(deleting)} onOpenChange={(open) => !open && !deleteSaving && setDeleting(null)}>
+      <AlertDialog
+        open={Boolean(deleting)}
+        onOpenChange={(open) => !open && !deleteSaving && setDeleting(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus data warga?</AlertDialogTitle>
             <AlertDialogDescription>
-              Data <strong>{deleting?.nama_lengkap}</strong> dengan NIK {deleting?.nik} akan dihapus permanen.
-              Tindakan ini tidak dapat dibatalkan.
+              Data <strong>{deleting?.nama_lengkap}</strong> dengan NIK {deleting?.nik} akan dihapus
+              permanen. Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">

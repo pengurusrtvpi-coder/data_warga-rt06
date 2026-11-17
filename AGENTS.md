@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,9 +8,11 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 ## Project rules
+
 - All data access and auth calls for the resident portal live in `src/lib/warga.ts`; pages and components only call its functions. Why: the backend is the user's own external Supabase, so swapping/wiring the client touches one file.
 - Protected portal pages use client-only `beforeLoad` guards and shared role helpers: `/keluarga` is the existing admin/resident home, while bendahara lands on `/keuangan` and cannot enter resident/letter pages. Why: preserve the external-Supabase URLs while making login, navigation, and guards agree.
 - Finance UI and mutations share `canManageFinance`; bendahara enters payer names without fetching resident records. Why: finance CRUD must not grant access to private resident biodata.

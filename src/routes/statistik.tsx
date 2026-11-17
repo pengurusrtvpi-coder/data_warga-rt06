@@ -1,8 +1,8 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { useEffect, useRef, useState } from 'react'
-import { supabase } from '@/integrations/supabase/client'
-import { PortalNav } from '@/components/warga/PortalNav'
-import { getMyAccessRole, hasActiveSession, type Warga } from '@/lib/warga'
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { PortalNav } from "@/components/warga/PortalNav";
+import { getMyAccessRole, hasActiveSession, type Warga } from "@/lib/warga";
 import {
   BarChart3,
   Printer,
@@ -10,143 +10,142 @@ import {
   Briefcase,
   HeartHandshake,
   MousePointerClick,
-} from 'lucide-react'
+} from "lucide-react";
 
-export const Route = createFileRoute('/statistik')({
+export const Route = createFileRoute("/statistik")({
   ssr: false,
   beforeLoad: async () => {
-    if (!(await hasActiveSession())) throw redirect({ to: '/login', replace: true })
-    return { accessRole: await getMyAccessRole() }
+    if (!(await hasActiveSession())) throw redirect({ to: "/login", replace: true });
+    return { accessRole: await getMyAccessRole() };
   },
   component: StatistikUsiaPage,
-})
+});
 
 const MASTER_KAT = [
-  { kategori: 'Balita', rentang_usia: '0 – 4 Tahun', urutan: 1 },
-  { kategori: 'Anak-anak', rentang_usia: '5 – 12 Tahun', urutan: 2 },
-  { kategori: 'Remaja', rentang_usia: '13 – 17 Tahun', urutan: 3 },
-  { kategori: 'Pemuda / Dewasa Muda', rentang_usia: '18 – 25 Tahun', urutan: 4 },
-  { kategori: 'Dewasa Produktif', rentang_usia: '26 – 59 Tahun', urutan: 5 },
-  { kategori: 'Lansia', rentang_usia: '60+ Tahun', urutan: 6 },
-]
+  { kategori: "Balita", rentang_usia: "0 – 4 Tahun", urutan: 1 },
+  { kategori: "Anak-anak", rentang_usia: "5 – 12 Tahun", urutan: 2 },
+  { kategori: "Remaja", rentang_usia: "13 – 17 Tahun", urutan: 3 },
+  { kategori: "Pemuda / Dewasa Muda", rentang_usia: "18 – 25 Tahun", urutan: 4 },
+  { kategori: "Dewasa Produktif", rentang_usia: "26 – 59 Tahun", urutan: 5 },
+  { kategori: "Lansia", rentang_usia: "60+ Tahun", urutan: 6 },
+];
 
 const COLORS = [
-  'from-pink-500 to-rose-500',
-  'from-amber-500 to-orange-500',
-  'from-sky-500 to-blue-600',
-  'from-indigo-500 to-violet-600',
-  'from-emerald-500 to-teal-600',
-  'from-purple-600 to-fuchsia-600',
-]
+  "from-pink-500 to-rose-500",
+  "from-amber-500 to-orange-500",
+  "from-sky-500 to-blue-600",
+  "from-indigo-500 to-violet-600",
+  "from-emerald-500 to-teal-600",
+  "from-purple-600 to-fuchsia-600",
+];
 
 function hitungUmur(tgl: string): number {
-  const lahir = new Date(tgl)
-  if (isNaN(lahir.getTime())) return -1
-  const now = new Date()
-  let umur = now.getFullYear() - lahir.getFullYear()
-  const m = now.getMonth() - lahir.getMonth()
-  if (m < 0 || (m === 0 && now.getDate() < lahir.getDate())) umur--
-  return umur
+  const lahir = new Date(tgl);
+  if (isNaN(lahir.getTime())) return -1;
+  const now = new Date();
+  let umur = now.getFullYear() - lahir.getFullYear();
+  const m = now.getMonth() - lahir.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < lahir.getDate())) umur--;
+  return umur;
 }
 
 function getKategori(umur: number): string {
-  if (umur < 5) return 'Balita'
-  if (umur <= 12) return 'Anak-anak'
-  if (umur <= 17) return 'Remaja'
-  if (umur <= 25) return 'Pemuda / Dewasa Muda'
-  if (umur <= 59) return 'Dewasa Produktif'
-  return 'Lansia'
+  if (umur < 5) return "Balita";
+  if (umur <= 12) return "Anak-anak";
+  if (umur <= 17) return "Remaja";
+  if (umur <= 25) return "Pemuda / Dewasa Muda";
+  if (umur <= 59) return "Dewasa Produktif";
+  return "Lansia";
 }
 
 function StatistikUsiaPage() {
-  const { accessRole } = Route.useRouteContext()
-  const r = (accessRole || 'warga') as string
-  const canViewDetail =
-    r === 'admin' || r === 'bendahara' || r === 'kesra_pkk' || r === 'seksi_rt'
-  const canPrint = r === 'admin' || r === 'kesra_pkk'
+  const { accessRole } = Route.useRouteContext();
+  const r = (accessRole || "warga") as string;
+  const canViewDetail = r === "admin" || r === "bendahara" || r === "kesra_pkk" || r === "seksi_rt";
+  const canPrint = r === "admin" || r === "kesra_pkk";
 
-  const [stats, setStats] = useState<any[]>([])
-  const [wargaList, setWargaList] = useState<Warga[]>([])
-  const [selectedKat, setSelectedKat] = useState('Semua')
-  const [loading, setLoading] = useState(true)
-  const detailRef = useRef<HTMLDivElement>(null)
+  const [stats, setStats] = useState<any[]>([]);
+  const [wargaList, setWargaList] = useState<Warga[]>([]);
+  const [selectedKat, setSelectedKat] = useState("Semua");
+  const [loading, setLoading] = useState(true);
+  const detailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function loadData() {
-      setLoading(true)
-      let allWarga: Warga[] = []
+      setLoading(true);
+      let allWarga: Warga[] = [];
 
       if (canViewDetail) {
         const { data: rpcWarga, error: rpcWargaErr } = await (supabase as any).rpc(
-          'get_warga_statistik_usia_admin',
-        )
+          "get_warga_statistik_usia_admin",
+        );
         if (!rpcWargaErr && Array.isArray(rpcWarga)) {
-          allWarga = rpcWarga as Warga[]
-          setWargaList(allWarga)
-        } else if (r === 'admin') {
+          allWarga = rpcWarga as Warga[];
+          setWargaList(allWarga);
+        } else if (r === "admin") {
           const { data } = await (supabase as any)
-            .from('data_warga')
-            .select('*')
-            .order('nama_lengkap', { ascending: true })
+            .from("data_warga")
+            .select("*")
+            .order("nama_lengkap", { ascending: true });
           if (Array.isArray(data)) {
             allWarga = (data as Warga[]).filter((w) => {
-              const st = (w.status_warga || 'tetap').trim().toLowerCase()
-              return st === 'tetap' || st === 'kontrak/kost'
-            })
-            setWargaList(allWarga)
+              const st = (w.status_warga || "tetap").trim().toLowerCase();
+              return st === "tetap" || st === "kontrak/kost";
+            });
+            setWargaList(allWarga);
           }
         }
       }
 
       const { data: statData, error: rpcErr } = await (supabase as any).rpc(
-        'get_statistik_usia_rt06',
-      )
+        "get_statistik_usia_rt06",
+      );
       if (!rpcErr && Array.isArray(statData) && statData.length > 0) {
-        setStats(statData)
+        setStats(statData);
       } else if (allWarga.length > 0) {
         const hitungLokal = MASTER_KAT.map((m) => {
           const cocok = allWarga.filter((w) => {
-            if (!w.tanggal_lahir) return false
-            const u = hitungUmur(w.tanggal_lahir)
-            return u >= 0 && getKategori(u) === m.kategori
-          })
+            if (!w.tanggal_lahir) return false;
+            const u = hitungUmur(w.tanggal_lahir);
+            return u >= 0 && getKategori(u) === m.kategori;
+          });
           const lk = cocok.filter((w) =>
-            (w.jenis_kelamin || '').trim().toUpperCase().startsWith('L'),
-          ).length
+            (w.jenis_kelamin || "").trim().toUpperCase().startsWith("L"),
+          ).length;
           const pr = cocok.filter((w) =>
-            (w.jenis_kelamin || '').trim().toUpperCase().startsWith('P'),
-          ).length
-          return { ...m, laki_laki: lk, perempuan: pr, total: cocok.length }
-        })
-        setStats(hitungLokal)
+            (w.jenis_kelamin || "").trim().toUpperCase().startsWith("P"),
+          ).length;
+          return { ...m, laki_laki: lk, perempuan: pr, total: cocok.length };
+        });
+        setStats(hitungLokal);
       } else {
-        setStats(MASTER_KAT.map((m) => ({ ...m, laki_laki: 0, perempuan: 0, total: 0 })))
+        setStats(MASTER_KAT.map((m) => ({ ...m, laki_laki: 0, perempuan: 0, total: 0 })));
       }
 
-      setLoading(false)
+      setLoading(false);
     }
-    loadData()
-  }, [canViewDetail, r])
+    loadData();
+  }, [canViewDetail, r]);
 
   function handleSelectKategori(kat: string) {
-    if (!canViewDetail) return
-    setSelectedKat(kat)
+    if (!canViewDetail) return;
+    setSelectedKat(kat);
     setTimeout(() => {
-      detailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 80)
+      detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
   }
 
-  const totalWarga = stats.reduce((a, c) => a + Number(c.total || 0), 0)
-  const totalLaki = stats.reduce((a, c) => a + Number(c.laki_laki || 0), 0)
-  const totalPerempuan = stats.reduce((a, c) => a + Number(c.perempuan || 0), 0)
-  const maxVal = Math.max(...stats.map((s) => Number(s.total || 0)), 1)
+  const totalWarga = stats.reduce((a, c) => a + Number(c.total || 0), 0);
+  const totalLaki = stats.reduce((a, c) => a + Number(c.laki_laki || 0), 0);
+  const totalPerempuan = stats.reduce((a, c) => a + Number(c.perempuan || 0), 0);
+  const maxVal = Math.max(...stats.map((s) => Number(s.total || 0)), 1);
 
   const filteredWarga = wargaList.filter((w) => {
-    if (!w.tanggal_lahir) return false
-    const u = hitungUmur(w.tanggal_lahir)
-    if (u < 0) return false
-    return selectedKat === 'Semua' || getKategori(u) === selectedKat
-  })
+    if (!w.tanggal_lahir) return false;
+    const u = hitungUmur(w.tanggal_lahir);
+    if (u < 0) return false;
+    return selectedKat === "Semua" || getKategori(u) === selectedKat;
+  });
 
   return (
     <div className="min-h-screen bg-slate-50/70 pb-16 print:bg-white print:pb-0">
@@ -174,14 +173,14 @@ function StatistikUsiaPage() {
         <div className="text-center mt-4">
           <h2 className="text-base font-bold uppercase underline">
             LAPORAN STATISTIK KEPENDUDUKAN BERDASARKAN USIA
-            {selectedKat !== 'Semua' ? ` — KATEGORI ${selectedKat.toUpperCase()}` : ''}
+            {selectedKat !== "Semua" ? ` — KATEGORI ${selectedKat.toUpperCase()}` : ""}
           </h2>
           <p className="text-xs text-slate-600 mt-0.5">
-            Tanggal Cetak:{' '}
-            {new Date().toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
+            Tanggal Cetak:{" "}
+            {new Date().toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
             })}
           </p>
         </div>
@@ -194,7 +193,9 @@ function StatistikUsiaPage() {
             <span className="inline-flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full text-xs font-semibold mb-2">
               <BarChart3 className="w-3.5 h-3.5 text-amber-300" /> Pemetaan Kependudukan RT 06
             </span>
-            <h1 className="text-2xl md:text-3xl font-extrabold">Statistik Warga Berdasarkan Usia</h1>
+            <h1 className="text-2xl md:text-3xl font-extrabold">
+              Statistik Warga Berdasarkan Usia
+            </h1>
             <p className="text-emerald-100 text-xs md:text-sm mt-1">
               Data demografi otomatis Villa Padurenan Indah 2 • Periode 2025–2030
             </p>
@@ -238,7 +239,7 @@ function StatistikUsiaPage() {
                 <div>
                   <p className="text-xs font-medium text-slate-500">Warga Laki-laki</p>
                   <p className="text-2xl font-extrabold text-slate-800">
-                    {totalLaki}{' '}
+                    {totalLaki}{" "}
                     <span className="text-xs font-normal text-slate-500">
                       ({totalWarga ? Math.round((totalLaki / totalWarga) * 100) : 0}%)
                     </span>
@@ -252,7 +253,7 @@ function StatistikUsiaPage() {
                 <div>
                   <p className="text-xs font-medium text-slate-500">Warga Perempuan</p>
                   <p className="text-2xl font-extrabold text-slate-800">
-                    {totalPerempuan}{' '}
+                    {totalPerempuan}{" "}
                     <span className="text-xs font-normal text-slate-500">
                       ({totalWarga ? Math.round((totalPerempuan / totalWarga) * 100) : 0}%)
                     </span>
@@ -270,8 +271,8 @@ function StatistikUsiaPage() {
                   </h2>
                   {canViewDetail && (
                     <p className="no-print text-xs text-emerald-700 font-medium mt-0.5 flex items-center gap-1">
-                      <MousePointerClick className="w-3.5 h-3.5" /> Klik salah satu baris kategori di
-                      bawah untuk melihat rincian nama, usia, dan alamat warga
+                      <MousePointerClick className="w-3.5 h-3.5" /> Klik salah satu baris kategori
+                      di bawah untuk melihat rincian nama, usia, dan alamat warga
                     </p>
                   )}
                 </div>
@@ -292,10 +293,10 @@ function StatistikUsiaPage() {
                   </thead>
                   <tbody className="divide-y">
                     {stats.map((row, idx) => {
-                      const val = Number(row.total || 0)
-                      const pct = totalWarga ? ((val / totalWarga) * 100).toFixed(1) : '0.0'
-                      const barWidth = Math.round((val / maxVal) * 100)
-                      const isSelected = canViewDetail && selectedKat === row.kategori
+                      const val = Number(row.total || 0);
+                      const pct = totalWarga ? ((val / totalWarga) * 100).toFixed(1) : "0.0";
+                      const barWidth = Math.round((val / maxVal) * 100);
+                      const isSelected = canViewDetail && selectedKat === row.kategori;
                       return (
                         <tr
                           key={row.kategori}
@@ -306,8 +307,8 @@ function StatistikUsiaPage() {
                               : undefined
                           }
                           className={`transition ${
-                            canViewDetail ? 'cursor-pointer hover:bg-emerald-50/80' : ''
-                          } ${isSelected ? 'bg-emerald-50 font-semibold' : ''}`}
+                            canViewDetail ? "cursor-pointer hover:bg-emerald-50/80" : ""
+                          } ${isSelected ? "bg-emerald-50 font-semibold" : ""}`}
                         >
                           <td className="px-4 py-3.5 text-center text-slate-500 font-medium">
                             {idx + 1}
@@ -316,8 +317,8 @@ function StatistikUsiaPage() {
                             <span
                               className={
                                 canViewDetail
-                                  ? 'underline decoration-emerald-400 underline-offset-4'
-                                  : ''
+                                  ? "underline decoration-emerald-400 underline-offset-4"
+                                  : ""
                               }
                             >
                               {row.kategori}
@@ -331,7 +332,7 @@ function StatistikUsiaPage() {
                             {row.perempuan}
                           </td>
                           <td className="px-4 py-3.5 text-center font-extrabold text-slate-900">
-                            {val}{' '}
+                            {val}{" "}
                             <span className="text-[11px] font-normal text-slate-500">({pct}%)</span>
                           </td>
                           <td className="px-4 py-3.5 no-print">
@@ -343,7 +344,7 @@ function StatistikUsiaPage() {
                             </div>
                           </td>
                         </tr>
-                      )
+                      );
                     })}
                   </tbody>
                   <tfoot className="bg-slate-100/90 font-extrabold text-slate-900 border-t-2">
@@ -373,7 +374,7 @@ function StatistikUsiaPage() {
                 <div className="px-5 py-4 border-b bg-emerald-50/60 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="font-bold text-slate-900 text-base">
-                      Rincian Data Warga — Kategori:{' '}
+                      Rincian Data Warga — Kategori:{" "}
                       <span className="text-emerald-800">{selectedKat}</span>
                     </h2>
                     <p className="text-xs text-slate-600 mt-0.5">
@@ -381,15 +382,15 @@ function StatistikUsiaPage() {
                     </p>
                   </div>
                   <div className="no-print flex flex-wrap items-center gap-1.5">
-                    {['Semua', ...MASTER_KAT.map((m) => m.kategori)].map((kat) => (
+                    {["Semua", ...MASTER_KAT.map((m) => m.kategori)].map((kat) => (
                       <button
                         key={kat}
                         type="button"
                         onClick={() => setSelectedKat(kat)}
                         className={`px-3 py-1.5 rounded-full text-xs font-bold transition cursor-pointer ${
                           selectedKat === kat
-                            ? 'bg-emerald-700 text-white shadow-xs'
-                            : 'bg-white border text-slate-600 hover:bg-slate-100'
+                            ? "bg-emerald-700 text-white shadow-xs"
+                            : "bg-white border text-slate-600 hover:bg-slate-100"
                         }`}
                       >
                         {kat}
@@ -419,7 +420,7 @@ function StatistikUsiaPage() {
                         </tr>
                       ) : (
                         filteredWarga.map((w, idx) => {
-                          const umur = w.tanggal_lahir ? hitungUmur(w.tanggal_lahir) : 0
+                          const umur = w.tanggal_lahir ? hitungUmur(w.tanggal_lahir) : 0;
                           return (
                             <tr key={w.id} className="hover:bg-slate-50">
                               <td className="px-4 py-2.5 text-center text-slate-500">{idx + 1}</td>
@@ -435,9 +436,9 @@ function StatistikUsiaPage() {
                               <td className="px-4 py-2.5 text-xs font-semibold text-slate-700">
                                 {getKategori(umur)}
                               </td>
-                              <td className="px-4 py-2.5 text-slate-600">{w.alamat || '-'}</td>
+                              <td className="px-4 py-2.5 text-slate-600">{w.alamat || "-"}</td>
                             </tr>
-                          )
+                          );
                         })
                       )}
                     </tbody>
@@ -449,5 +450,5 @@ function StatistikUsiaPage() {
         )}
       </div>
     </div>
-  )
+  );
 }

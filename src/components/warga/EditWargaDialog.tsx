@@ -40,7 +40,8 @@ function toForm(w: Warga): AdminWargaForm {
   const out = createEmptyAdminWargaForm();
   for (const field of ADMIN_WARGA_FIELDS) {
     const value = w[field.key];
-    out[field.key] = value == null ? "" : String(value).slice(0, field.type === "date" ? 10 : undefined);
+    out[field.key] =
+      value == null ? "" : String(value).slice(0, field.type === "date" ? 10 : undefined);
   }
   return out;
 }
@@ -125,7 +126,11 @@ export function EditWargaDialog({
   }
 
   const errorCount = Object.keys(errors).length;
-  const title = warga ? (isAdmin ? "Edit Data Warga (Admin)" : "Edit Data Anggota") : "Tambah Data Warga";
+  const title = warga
+    ? isAdmin
+      ? "Edit Data Warga (Admin)"
+      : "Edit Data Anggota"
+    : "Tambah Data Warga";
   const description = isAdmin
     ? "Akses admin: seluruh kolom data warga dapat diisi dan diubah. ID serta waktu sistem dikelola otomatis."
     : warga
@@ -171,18 +176,24 @@ export function EditWargaDialog({
                       {field.required && <span className="ml-0.5 text-destructive">*</span>}
                     </Label>
                     {field.type === "select" ? (
-                      <Select value={form[field.key]} onValueChange={(value) => set(field.key, value)}>
+                      <Select
+                        value={form[field.key]}
+                        onValueChange={(value) => set(field.key, value)}
+                      >
                         <SelectTrigger id={id} className={cn("w-full", invalidCls)} {...aria}>
                           <SelectValue placeholder="Pilih…" />
                         </SelectTrigger>
                         <SelectContent>
-                          {[...new Set([...(field.options ?? []), ...(form[field.key] ? [form[field.key]] : [])])].map(
-                            (option) => (
-                              <SelectItem key={option} value={option}>
-                                {option === "-" ? "- (belum diketahui)" : option}
-                              </SelectItem>
-                            ),
-                          )}
+                          {[
+                            ...new Set([
+                              ...(field.options ?? []),
+                              ...(form[field.key] ? [form[field.key]] : []),
+                            ]),
+                          ].map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {option === "-" ? "- (belum diketahui)" : option}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     ) : field.type === "textarea" ? (
@@ -200,11 +211,15 @@ export function EditWargaDialog({
                       <Input
                         id={id}
                         type={field.type ?? "text"}
-                        inputMode={field.numeric ? "numeric" : field.type === "tel" ? "tel" : undefined}
+                        inputMode={
+                          field.numeric ? "numeric" : field.type === "tel" ? "tel" : undefined
+                        }
                         value={form[field.key]}
                         maxLength={field.maxLength}
                         placeholder={field.placeholder}
-                        max={field.type === "date" ? new Date().toISOString().slice(0, 10) : undefined}
+                        max={
+                          field.type === "date" ? new Date().toISOString().slice(0, 10) : undefined
+                        }
                         onChange={(e) => set(field.key, e.target.value)}
                         className={invalidCls}
                         {...aria}

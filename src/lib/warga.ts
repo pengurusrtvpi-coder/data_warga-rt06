@@ -97,54 +97,187 @@ export type FieldDef<K extends string = EditableField> = {
 export type AdminFieldDef = FieldDef<AdminEditableField>;
 
 // Option lists mirror the database enums (agama_enum, golongan_darah_enum, ...).
-export const AGAMA = ["Islam", "Kristen", "Katolik", "Hindu", "Buddha", "Khonghucu", "Lainnya"] as const;
-export const GOLONGAN_DARAH = ["-", "A", "B", "AB", "O", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Tidak Tahu"] as const;
+export const AGAMA = [
+  "Islam",
+  "Kristen",
+  "Katolik",
+  "Hindu",
+  "Buddha",
+  "Khonghucu",
+  "Lainnya",
+] as const;
+export const GOLONGAN_DARAH = [
+  "-",
+  "A",
+  "B",
+  "AB",
+  "O",
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+  "Tidak Tahu",
+] as const;
 export const JENIS_KELAMIN = ["Laki-laki", "Perempuan"] as const;
 export const STATUS_PERKAWINAN = ["Belum Kawin", "Kawin", "Cerai Hidup", "Cerai Mati"] as const;
 export const KEWARGANEGARAAN = ["WNI", "WNA"] as const;
-export const HUBUNGAN_KELUARGA = ["Kepala Keluarga", "Istri", "Suami", "Anak", "Menantu", "Cucu", "Orang Tua", "Mertua", "Famili Lain", "Lainnya"] as const;
-export const PENDIDIKAN = ["Tidak/Belum Sekolah", "Belum Tamat SD", "Tamat SD", "SLTP/Sederajat", "SLTA/Sederajat", "Diploma I/II", "Diploma III", "Diploma IV/Strata I", "Strata II", "Strata III"] as const;
+export const HUBUNGAN_KELUARGA = [
+  "Kepala Keluarga",
+  "Istri",
+  "Suami",
+  "Anak",
+  "Menantu",
+  "Cucu",
+  "Orang Tua",
+  "Mertua",
+  "Famili Lain",
+  "Lainnya",
+] as const;
+export const PENDIDIKAN = [
+  "Tidak/Belum Sekolah",
+  "Belum Tamat SD",
+  "Tamat SD",
+  "SLTP/Sederajat",
+  "SLTA/Sederajat",
+  "Diploma I/II",
+  "Diploma III",
+  "Diploma IV/Strata I",
+  "Strata II",
+  "Strata III",
+] as const;
 
 export const WARGA_FIELDS: FieldDef[] = [
   { key: "nama_lengkap", label: "Nama Lengkap", required: true, wide: true, maxLength: 100 },
-  { key: "status_hub_keluarga", label: "Hubungan Keluarga", type: "select", options: HUBUNGAN_KELUARGA, required: true },
-  { key: "jenis_kelamin", label: "Jenis Kelamin", type: "select", options: JENIS_KELAMIN, required: true },
+  {
+    key: "status_hub_keluarga",
+    label: "Hubungan Keluarga",
+    type: "select",
+    options: HUBUNGAN_KELUARGA,
+    required: true,
+  },
+  {
+    key: "jenis_kelamin",
+    label: "Jenis Kelamin",
+    type: "select",
+    options: JENIS_KELAMIN,
+    required: true,
+  },
   { key: "tempat_lahir", label: "Tempat Lahir", required: true, maxLength: 50 },
   { key: "tanggal_lahir", label: "Tanggal Lahir", type: "date", required: true },
   { key: "golongan_darah", label: "Golongan Darah", type: "select", options: GOLONGAN_DARAH },
   { key: "agama", label: "Agama", type: "select", options: AGAMA, required: true },
-  { key: "status_perkawinan", label: "Status Perkawinan", type: "select", options: STATUS_PERKAWINAN, required: true },
+  {
+    key: "status_perkawinan",
+    label: "Status Perkawinan",
+    type: "select",
+    options: STATUS_PERKAWINAN,
+    required: true,
+  },
   { key: "pendidikan_terakhir", label: "Pendidikan Terakhir", type: "select", options: PENDIDIKAN },
   { key: "pekerjaan", label: "Pekerjaan", maxLength: 50 },
-  { key: "kewarganegaraan", label: "Kewarganegaraan", type: "select", options: KEWARGANEGARAAN, required: true },
+  {
+    key: "kewarganegaraan",
+    label: "Kewarganegaraan",
+    type: "select",
+    options: KEWARGANEGARAAN,
+    required: true,
+  },
   { key: "no_hp", label: "No. HP", type: "tel", maxLength: 16, placeholder: "08xxxxxxxxxx" },
-  { key: "email", label: "Email", type: "email", wide: true, maxLength: 100, placeholder: "nama@contoh.com" },
+  {
+    key: "email",
+    label: "Email",
+    type: "email",
+    wide: true,
+    maxLength: 100,
+    placeholder: "nama@contoh.com",
+  },
   { key: "alamat", label: "Alamat", type: "textarea", wide: true, required: true, maxLength: 255 },
   { key: "catatan", label: "Catatan", type: "textarea", wide: true, maxLength: 500 },
 ];
 
 /** Every resident-data column; id and timestamps remain database-managed. */
 export const ADMIN_WARGA_FIELDS: AdminFieldDef[] = [
-  { key: "nik", label: "NIK", required: true, maxLength: 16, numeric: true, placeholder: "16 digit NIK" },
-  { key: "no_kk", label: "No. KK", required: true, maxLength: 16, numeric: true, placeholder: "16 digit Nomor KK" },
+  {
+    key: "nik",
+    label: "NIK",
+    required: true,
+    maxLength: 16,
+    numeric: true,
+    placeholder: "16 digit NIK",
+  },
+  {
+    key: "no_kk",
+    label: "No. KK",
+    required: true,
+    maxLength: 16,
+    numeric: true,
+    placeholder: "16 digit Nomor KK",
+  },
   { key: "nama_lengkap", label: "Nama Lengkap", required: true, wide: true, maxLength: 100 },
-  { key: "status_hub_keluarga", label: "Hubungan Keluarga", type: "select", options: HUBUNGAN_KELUARGA, required: true },
-  { key: "jenis_kelamin", label: "Jenis Kelamin", type: "select", options: JENIS_KELAMIN, required: true },
+  {
+    key: "status_hub_keluarga",
+    label: "Hubungan Keluarga",
+    type: "select",
+    options: HUBUNGAN_KELUARGA,
+    required: true,
+  },
+  {
+    key: "jenis_kelamin",
+    label: "Jenis Kelamin",
+    type: "select",
+    options: JENIS_KELAMIN,
+    required: true,
+  },
   { key: "tempat_lahir", label: "Tempat Lahir", required: true, maxLength: 50 },
   { key: "tanggal_lahir", label: "Tanggal Lahir", type: "date", required: true },
   { key: "golongan_darah", label: "Golongan Darah", type: "select", options: GOLONGAN_DARAH },
   { key: "agama", label: "Agama", type: "select", options: AGAMA, required: true },
-  { key: "status_perkawinan", label: "Status Perkawinan", type: "select", options: STATUS_PERKAWINAN, required: true },
-  { key: "status_warga", label: "Status Warga", required: true, maxLength: 50, placeholder: "Tetap / Kontrak/Kost / Pindah" },
+  {
+    key: "status_perkawinan",
+    label: "Status Perkawinan",
+    type: "select",
+    options: STATUS_PERKAWINAN,
+    required: true,
+  },
+  {
+    key: "status_warga",
+    label: "Status Warga",
+    required: true,
+    maxLength: 50,
+    placeholder: "Tetap / Kontrak/Kost / Pindah",
+  },
   { key: "pendidikan_terakhir", label: "Pendidikan Terakhir", type: "select", options: PENDIDIKAN },
   { key: "pekerjaan", label: "Pekerjaan", maxLength: 50 },
-  { key: "kewarganegaraan", label: "Kewarganegaraan", type: "select", options: KEWARGANEGARAAN, required: true },
+  {
+    key: "kewarganegaraan",
+    label: "Kewarganegaraan",
+    type: "select",
+    options: KEWARGANEGARAAN,
+    required: true,
+  },
   { key: "rt", label: "RT", required: true, maxLength: 10, numeric: true },
   { key: "rw", label: "RW", required: true, maxLength: 10, numeric: true },
   { key: "no_hp", label: "No. HP", type: "tel", maxLength: 16, placeholder: "08xxxxxxxxxx" },
-  { key: "email", label: "Email", type: "email", wide: true, maxLength: 100, placeholder: "nama@contoh.com" },
+  {
+    key: "email",
+    label: "Email",
+    type: "email",
+    wide: true,
+    maxLength: 100,
+    placeholder: "nama@contoh.com",
+  },
   { key: "alamat", label: "Alamat", type: "textarea", wide: true, required: true, maxLength: 255 },
-  { key: "foto_ktp_url", label: "URL Foto KTP", wide: true, maxLength: 500, placeholder: "https://…" },
+  {
+    key: "foto_ktp_url",
+    label: "URL Foto KTP",
+    wide: true,
+    maxLength: 500,
+    placeholder: "https://…",
+  },
   { key: "catatan", label: "Catatan", type: "textarea", wide: true, maxLength: 500 },
 ];
 
@@ -201,19 +334,29 @@ const optionalEnum = (label: string, values: readonly string[]) =>
     .refine((v) => v === "" || values.includes(v), pick(label));
 
 export const wargaFormSchema = z.object({
-  nama_lengkap: requiredText("Nama lengkap", 100, NAME_RE, "Nama hanya boleh berisi huruf, spasi, titik, koma, apostrof, dan tanda hubung.").refine(
-    (v) => v.length >= 2,
-    "Nama lengkap minimal 2 karakter.",
-  ),
+  nama_lengkap: requiredText(
+    "Nama lengkap",
+    100,
+    NAME_RE,
+    "Nama hanya boleh berisi huruf, spasi, titik, koma, apostrof, dan tanda hubung.",
+  ).refine((v) => v.length >= 2, "Nama lengkap minimal 2 karakter."),
   status_hub_keluarga: requiredText("Hubungan keluarga", 50),
   jenis_kelamin: requiredEnum("Jenis kelamin", JENIS_KELAMIN),
-  tempat_lahir: requiredText("Tempat lahir", 50, PLACE_RE, "Tempat lahir hanya boleh berisi huruf, spasi, titik, dan tanda hubung."),
+  tempat_lahir: requiredText(
+    "Tempat lahir",
+    50,
+    PLACE_RE,
+    "Tempat lahir hanya boleh berisi huruf, spasi, titik, dan tanda hubung.",
+  ),
   tanggal_lahir: z
     .string()
     .trim()
     .min(1, req("Tanggal lahir"))
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Format tanggal lahir tidak valid.")
-    .refine((v) => !Number.isNaN(new Date(`${v}T00:00:00Z`).getTime()), "Tanggal lahir tidak valid.")
+    .refine(
+      (v) => !Number.isNaN(new Date(`${v}T00:00:00Z`).getTime()),
+      "Tanggal lahir tidak valid.",
+    )
     .refine((v) => v >= "1900-01-01", "Tanggal lahir tidak boleh sebelum tahun 1900.")
     .refine((v) => v <= todayIso(), "Tanggal lahir tidak boleh di masa depan."),
   golongan_darah: optionalEnum("Golongan darah", GOLONGAN_DARAH),
@@ -225,13 +368,22 @@ export const wargaFormSchema = z.object({
   no_hp: z
     .string()
     .transform((v) => v.replace(/[\s-]/g, ""))
-    .refine((v) => v === "" || PHONE_RE.test(v), "No. HP harus diawali 08, 62, atau +62 dan berisi 10–15 digit angka."),
+    .refine(
+      (v) => v === "" || PHONE_RE.test(v),
+      "No. HP harus diawali 08, 62, atau +62 dan berisi 10–15 digit angka.",
+    ),
   email: z
     .string()
     .trim()
     .max(100, tooLong("Email", 100))
-    .refine((v) => v === "" || z.string().email().safeParse(v).success, "Format email tidak valid, contoh: nama@contoh.com."),
-  alamat: requiredText("Alamat", 255).refine((v) => v.length >= 5, "Alamat terlalu pendek, minimal 5 karakter."),
+    .refine(
+      (v) => v === "" || z.string().email().safeParse(v).success,
+      "Format email tidak valid, contoh: nama@contoh.com.",
+    ),
+  alamat: requiredText("Alamat", 255).refine(
+    (v) => v.length >= 5,
+    "Alamat terlalu pendek, minimal 5 karakter.",
+  ),
   catatan: optionalText("Catatan", 500),
 });
 
@@ -245,12 +397,10 @@ const adminWargaFormSchema = wargaFormSchema.extend({
 });
 
 export type ValidationResult =
-  | { ok: true; patch: WargaUpdate }
-  | { ok: false; errors: WargaFormErrors };
+  { ok: true; patch: WargaUpdate } | { ok: false; errors: WargaFormErrors };
 
 export type AdminValidationResult =
-  | { ok: true; values: WargaInsert }
-  | { ok: false; errors: WargaFormErrors };
+  { ok: true; values: WargaInsert } | { ok: false; errors: WargaFormErrors };
 
 function residentValues(d: z.infer<typeof wargaFormSchema>) {
   const orNull = (v: string) => (v === "" ? null : v);
@@ -418,7 +568,8 @@ export async function hasActiveSession(): Promise<boolean> {
 /** Role comes from the protected user_roles table through own-row RLS, never user_metadata. */
 export async function getMyAccessRole(): Promise<AccessRole> {
   const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) throw new Error("Sesi login tidak valid. Silakan masuk kembali.");
+  if (userError || !userData.user)
+    throw new Error("Sesi login tidak valid. Silakan masuk kembali.");
 
   const { data, error } = await supabase
     .from("user_roles")
@@ -429,7 +580,7 @@ export async function getMyAccessRole(): Promise<AccessRole> {
   if (roles.some((row) => row.role === "admin")) return "admin";
   if (roles.some((row) => row.role === "bendahara")) return "bendahara";
   if (roles.some((row) => (row as { role?: string }).role === "kesra_pkk")) return "kesra_pkk";
-if (roles.some((row) => (row as { role?: string }).role === "seksi_rt")) return "seksi_rt";
+  if (roles.some((row) => (row as { role?: string }).role === "seksi_rt")) return "seksi_rt";
   return "warga";
 }
 
@@ -440,8 +591,13 @@ export async function fetchKeluargaSaya(): Promise<Warga[]> {
     if (error) throw error;
     return (data as unknown as Warga[]) ?? [];
   } catch (err) {
-    console.error("[fetchKeluargaSaya]", err instanceof Error ? err.message : (err as { message?: string })?.message ?? err);
-    throw new Error("Gagal memuat data keluarga Anda. " + ((err as { message?: string })?.message ?? ""));
+    console.error(
+      "[fetchKeluargaSaya]",
+      err instanceof Error ? err.message : ((err as { message?: string })?.message ?? err),
+    );
+    throw new Error(
+      "Gagal memuat data keluarga Anda. " + ((err as { message?: string })?.message ?? ""),
+    );
   }
 }
 
@@ -532,124 +688,252 @@ export async function fetchAuditWarga(): Promise<AuditLogWarga[]> {
 }
 
 // ---------- Finance & letters ----------
-export type Transaksi = Database['public']['Tables']['transaksi_keuangan']['Row'];
-export type Bulanan = Database['public']['Views']['view_laporan_keuangan_bulanan']['Row'];
-export type Surat = Database['public']['Tables']['pelayanan_surat']['Row'];
-export const JENIS_SURAT = ['Surat Pengantar KTP/KK', 'Surat Keterangan Domisili', 'Surat Keterangan Usaha', 'Surat Keterangan Tidak Mampu', 'Surat Keterangan Kematian', 'Surat Keterangan Pindah', 'Lainnya'] as const;
-export const BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+export type Transaksi = Database["public"]["Tables"]["transaksi_keuangan"]["Row"];
+export type Bulanan = Database["public"]["Views"]["view_laporan_keuangan_bulanan"]["Row"];
+export type Surat = Database["public"]["Tables"]["pelayanan_surat"]["Row"];
+export const JENIS_SURAT = [
+  "Surat Pengantar KTP/KK",
+  "Surat Keterangan Domisili",
+  "Surat Keterangan Usaha",
+  "Surat Keterangan Tidak Mampu",
+  "Surat Keterangan Kematian",
+  "Surat Keterangan Pindah",
+  "Lainnya",
+] as const;
+export const BULAN = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
 export function jakartaToday() {
-  return new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Jakarta', year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
 }
 export function rupiah(value: number) {
-  return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(value);
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(value);
 }
 export function validDate(value: string) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value) && new Date(`${value}T00:00:00Z`).toISOString().slice(0,10) === value;
+  return (
+    /^\d{4}-\d{2}-\d{2}$/.test(value) &&
+    new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value
+  );
 }
-export const transaksiSchema = z.object({
-  tanggal:z.string().refine(v => {try {return validDate(v);} catch {return false;}},'Tanggal transaksi tidak valid.'),
-  jenis:z.enum(['Pemasukan','Pengeluaran']),
-  kategori:z.string().trim().min(1,'Kategori wajib diisi.'),
-  jumlah:z.coerce.number().finite().positive('Jumlah harus lebih dari nol.'),
-  keterangan:z.string().trim(), nama_warga:z.string().trim(),
-}).refine(v => v.kategori !== 'Iuran Bulanan' || v.nama_warga.length > 0,{message:'Pilih nama warga untuk Iuran Bulanan.',path:['nama_warga']});
+export const transaksiSchema = z
+  .object({
+    tanggal: z.string().refine((v) => {
+      try {
+        return validDate(v);
+      } catch {
+        return false;
+      }
+    }, "Tanggal transaksi tidak valid."),
+    jenis: z.enum(["Pemasukan", "Pengeluaran"]),
+    kategori: z.string().trim().min(1, "Kategori wajib diisi."),
+    jumlah: z.coerce.number().finite().positive("Jumlah harus lebih dari nol."),
+    keterangan: z.string().trim(),
+    nama_warga: z.string().trim(),
+  })
+  .refine((v) => v.kategori !== "Iuran Bulanan" || v.nama_warga.length > 0, {
+    message: "Pilih nama warga untuk Iuran Bulanan.",
+    path: ["nama_warga"],
+  });
 export type TransaksiInput = z.infer<typeof transaksiSchema>;
-export function financeSummary(rows: Pick<Transaksi,'jenis'|'jumlah'>[]) {
-  const pemasukan = rows.filter(r => r.jenis === 'Pemasukan').reduce((s,r) => s + Number(r.jumlah),0);
-  const pengeluaran = rows.filter(r => r.jenis === 'Pengeluaran').reduce((s,r) => s + Number(r.jumlah),0);
-  return {pemasukan,pengeluaran,saldo:pemasukan-pengeluaran};
+export function financeSummary(rows: Pick<Transaksi, "jenis" | "jumlah">[]) {
+  const pemasukan = rows
+    .filter((r) => r.jenis === "Pemasukan")
+    .reduce((s, r) => s + Number(r.jumlah), 0);
+  const pengeluaran = rows
+    .filter((r) => r.jenis === "Pengeluaran")
+    .reduce((s, r) => s + Number(r.jumlah), 0);
+  return { pemasukan, pengeluaran, saldo: pemasukan - pengeluaran };
 }
 export function yearSeries(rows: Bulanan[], year: number) {
-  return BULAN.map((bulan,i) => {
-    const row=rows.find(r=>Number(r.tahun_angka)===year && Number(r.bulan_angka)===i+1);
-    const pemasukan=Number(row?.total_pemasukan??0),pengeluaran=Number(row?.total_pengeluaran??0);
-    return {bulan, pemasukan,pengeluaran,saldo:pemasukan-pengeluaran};
+  return BULAN.map((bulan, i) => {
+    const row = rows.find((r) => Number(r.tahun_angka) === year && Number(r.bulan_angka) === i + 1);
+    const pemasukan = Number(row?.total_pemasukan ?? 0),
+      pengeluaran = Number(row?.total_pengeluaran ?? 0);
+    return { bulan, pemasukan, pengeluaran, saldo: pemasukan - pengeluaran };
   });
 }
 export function analyseYear(series: ReturnType<typeof yearSeries>) {
-  const active=series.filter(r=>r.pemasukan!==0||r.pengeluaran!==0);
+  const active = series.filter((r) => r.pemasukan !== 0 || r.pengeluaran !== 0);
   if (!active.length) return null;
-  const highestExpense=active.reduce((a,b)=>b.pengeluaran>a.pengeluaran?b:a);
-  const lowestExpense=active.reduce((a,b)=>b.pengeluaran<a.pengeluaran?b:a);
-  const highestIncome=active.reduce((a,b)=>b.pemasukan>a.pemasukan?b:a);
-  return {highestExpense,lowestExpense,highestIncome,saldo:series.reduce((s,r)=>s+r.saldo,0)};
+  const highestExpense = active.reduce((a, b) => (b.pengeluaran > a.pengeluaran ? b : a));
+  const lowestExpense = active.reduce((a, b) => (b.pengeluaran < a.pengeluaran ? b : a));
+  const highestIncome = active.reduce((a, b) => (b.pemasukan > a.pemasukan ? b : a));
+  return {
+    highestExpense,
+    lowestExpense,
+    highestIncome,
+    saldo: series.reduce((s, r) => s + r.saldo, 0),
+  };
 }
 export async function fetchFinance() {
-  const transaksi:Transaksi[]=[];
-  for(let from=0;;from+=1000) {
-    const {data,error}=await supabase.from('transaksi_keuangan').select('*').order('tanggal',{ascending:false}).order('id').range(from,from+999);
-    if(error) throw new Error('Gagal memuat transaksi keuangan. Silakan coba lagi.');
-    transaksi.push(...(data??[])); if(!data||data.length<1000)break;
+  const transaksi: Transaksi[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from("transaksi_keuangan")
+      .select("*")
+      .order("tanggal", { ascending: false })
+      .order("id")
+      .range(from, from + 999);
+    if (error) throw new Error("Gagal memuat transaksi keuangan. Silakan coba lagi.");
+    transaksi.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
   }
-  const bulanan:Bulanan[]=[];
-  for(let from=0;;from+=1000) {
-    const {data,error}=await supabase.from('view_laporan_keuangan_bulanan').select('*').order('bulan_tahun').range(from,from+999);
-    if(error) throw new Error('Gagal memuat laporan bulanan. Silakan coba lagi.');
-    bulanan.push(...(data??[]));if(!data||data.length<1000)break;
+  const bulanan: Bulanan[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from("view_laporan_keuangan_bulanan")
+      .select("*")
+      .order("bulan_tahun")
+      .range(from, from + 999);
+    if (error) throw new Error("Gagal memuat laporan bulanan. Silakan coba lagi.");
+    bulanan.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
   }
-  return {transaksi,bulanan};
+  return { transaksi, bulanan };
 }
 async function requireAdmin() {
-  if(await getMyAccessRole()!=='admin')throw new Error('Tindakan ini hanya untuk pengurus RT.');
+  if ((await getMyAccessRole()) !== "admin")
+    throw new Error("Tindakan ini hanya untuk pengurus RT.");
 }
 async function requireFinanceManager() {
-  if (!canManageFinance(await getMyAccessRole())) throw new Error('Tindakan ini hanya untuk pengurus keuangan (admin atau bendahara).');
+  if (!canManageFinance(await getMyAccessRole()))
+    throw new Error("Tindakan ini hanya untuk pengurus keuangan (admin atau bendahara).");
 }
-export async function saveTransaksi(input: TransaksiInput,id?:string) {
+export async function saveTransaksi(input: TransaksiInput, id?: string) {
   await requireFinanceManager();
-  const d=transaksiSchema.parse(input);
-  const values={...d,nama_warga:d.kategori==='Iuran Bulanan'?d.nama_warga:null,keterangan:d.keterangan||null};
-  const query=id?supabase.from('transaksi_keuangan').update(values).eq('id',id):supabase.from('transaksi_keuangan').insert(values);
-  const {data,error}=await query.select('id');
-  if(error||!data?.length)throw new Error('Transaksi tidak tersimpan. Periksa isian dan hak akses Anda.');
+  const d = transaksiSchema.parse(input);
+  const values = {
+    ...d,
+    nama_warga: d.kategori === "Iuran Bulanan" ? d.nama_warga : null,
+    keterangan: d.keterangan || null,
+  };
+  const query = id
+    ? supabase.from("transaksi_keuangan").update(values).eq("id", id)
+    : supabase.from("transaksi_keuangan").insert(values);
+  const { data, error } = await query.select("id");
+  if (error || !data?.length)
+    throw new Error("Transaksi tidak tersimpan. Periksa isian dan hak akses Anda.");
 }
-export async function deleteTransaksi(id:string) {
-  await requireFinanceManager();const {data,error}=await supabase.from('transaksi_keuangan').delete().eq('id',id).select('id');
-  if(error||!data?.length)throw new Error('Transaksi tidak berhasil dihapus.');
+export async function deleteTransaksi(id: string) {
+  await requireFinanceManager();
+  const { data, error } = await supabase
+    .from("transaksi_keuangan")
+    .delete()
+    .eq("id", id)
+    .select("id");
+  if (error || !data?.length) throw new Error("Transaksi tidak berhasil dihapus.");
 }
-export async function findWargaNik(nik:string) {
-  if(!/^\d{16}$/.test(nik.trim()))throw new Error('NIK harus terdiri dari 16 digit angka.');
-  const {data,error}=await supabase.from('data_warga').select('*').eq('nik',nik.trim()).maybeSingle();
-  if(error){console.error('[findWargaNik]',error.message);throw new Error(`Gagal memeriksa NIK: ${error.message}`);}
-  if(!data)throw new Error('NIK tidak ditemukan atau bukan anggota keluarga akun Anda.');
+export async function findWargaNik(nik: string) {
+  if (!/^\d{16}$/.test(nik.trim())) throw new Error("NIK harus terdiri dari 16 digit angka.");
+  const { data, error } = await supabase
+    .from("data_warga")
+    .select("*")
+    .eq("nik", nik.trim())
+    .maybeSingle();
+  if (error) {
+    console.error("[findWargaNik]", error.message);
+    throw new Error(`Gagal memeriksa NIK: ${error.message}`);
+  }
+  if (!data) throw new Error("NIK tidak ditemukan atau bukan anggota keluarga akun Anda.");
   return data;
 }
-export async function fetchSurat():Promise<Surat[]> {
-  const rows:Surat[]=[];
-  for(let from=0;;from+=1000){
-    const {data,error}=await supabase.from('pelayanan_surat').select('*').order('created_at',{ascending:false}).order('id').range(from,from+999);
-    if(error){console.error('[fetchSurat]',error.message);throw new Error(`Gagal memuat riwayat surat: ${error.message}`);}
-    rows.push(...(data??[]));if(!data||data.length<1000)break;
+export async function fetchSurat(): Promise<Surat[]> {
+  const rows: Surat[] = [];
+  for (let from = 0; ; from += 1000) {
+    const { data, error } = await supabase
+      .from("pelayanan_surat")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(from, from + 999);
+    if (error) {
+      console.error("[fetchSurat]", error.message);
+      throw new Error(`Gagal memuat riwayat surat: ${error.message}`);
+    }
+    rows.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
   }
   return rows;
 }
-export function letterPayload(w:Warga,jenis:string,keperluan:string) {
-  if(!JENIS_SURAT.includes(jenis as typeof JENIS_SURAT[number]))throw new Error('Pilih jenis surat dari daftar.');
-  if(!keperluan.trim())throw new Error('Keperluan surat wajib diisi.');
-  return {nik:w.nik,nama_pemohon:w.nama_lengkap,tempat_tgl_lahir:`${w.tempat_lahir}, ${formatTanggal(w.tanggal_lahir)}`,jenis_kelamin:w.jenis_kelamin,agama:w.agama,pekerjaan:w.pekerjaan,alamat:w.alamat,jenis_surat:jenis,keperluan:keperluan.trim()};
+export function letterPayload(w: Warga, jenis: string, keperluan: string) {
+  if (!JENIS_SURAT.includes(jenis as (typeof JENIS_SURAT)[number]))
+    throw new Error("Pilih jenis surat dari daftar.");
+  if (!keperluan.trim()) throw new Error("Keperluan surat wajib diisi.");
+  return {
+    nik: w.nik,
+    nama_pemohon: w.nama_lengkap,
+    tempat_tgl_lahir: `${w.tempat_lahir}, ${formatTanggal(w.tanggal_lahir)}`,
+    jenis_kelamin: w.jenis_kelamin,
+    agama: w.agama,
+    pekerjaan: w.pekerjaan,
+    alamat: w.alamat,
+    jenis_surat: jenis,
+    keperluan: keperluan.trim(),
+  };
 }
-export async function createSurat(w:Warga,jenis:string,keperluan:string):Promise<Surat> {
-  const {data,error}=await supabase.from('pelayanan_surat').insert(letterPayload(w,jenis,keperluan)).select('*').single();
-  if(error||!data)throw new Error('Surat tidak tersimpan. Periksa isian dan akses NIK Anda.');
+export async function createSurat(w: Warga, jenis: string, keperluan: string): Promise<Surat> {
+  const { data, error } = await supabase
+    .from("pelayanan_surat")
+    .insert(letterPayload(w, jenis, keperluan))
+    .select("*")
+    .single();
+  if (error || !data) throw new Error("Surat tidak tersimpan. Periksa isian dan akses NIK Anda.");
   return data;
 }
 /** Resident path: insert by NIK only; the DB trigger fills biodata and enforces own-KK, RLS checks the creator. */
-export async function createSuratByNik(nik:string,jenis:string,keperluan:string):Promise<Surat> {
-  const n=nik.trim();
-  if(!/^\d{16}$/.test(n))throw new Error('NIK harus terdiri dari 16 digit angka.');
-  if(!JENIS_SURAT.includes(jenis as typeof JENIS_SURAT[number]))throw new Error('Pilih jenis surat dari daftar.');
-  if(!keperluan.trim())throw new Error('Keperluan surat wajib diisi.');
-  const {data:u}=await supabase.auth.getUser();
-  const {data,error}=await supabase.from('pelayanan_surat').insert({nik:n,nama_pemohon:'-',jenis_surat:jenis,keperluan:keperluan.trim(),email_pembuat:u.user?.email??null}).select('*').single();
-  if(error||!data){
-    console.error('[createSuratByNik]',error?.message);
-    const msg=error?.message??'';
-    if(/row-level security/i.test(msg))throw new Error('Pengajuan ditolak: akun Anda tidak berhak mengajukan surat untuk NIK ini.');
-    throw new Error(msg?`Surat tidak tersimpan: ${msg}`:'Surat tidak tersimpan.');
+export async function createSuratByNik(
+  nik: string,
+  jenis: string,
+  keperluan: string,
+): Promise<Surat> {
+  const n = nik.trim();
+  if (!/^\d{16}$/.test(n)) throw new Error("NIK harus terdiri dari 16 digit angka.");
+  if (!JENIS_SURAT.includes(jenis as (typeof JENIS_SURAT)[number]))
+    throw new Error("Pilih jenis surat dari daftar.");
+  if (!keperluan.trim()) throw new Error("Keperluan surat wajib diisi.");
+  const { data: u } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from("pelayanan_surat")
+    .insert({
+      nik: n,
+      nama_pemohon: "-",
+      jenis_surat: jenis,
+      keperluan: keperluan.trim(),
+      email_pembuat: u.user?.email ?? null,
+    })
+    .select("*")
+    .single();
+  if (error || !data) {
+    console.error("[createSuratByNik]", error?.message);
+    const msg = error?.message ?? "";
+    if (/row-level security/i.test(msg))
+      throw new Error("Pengajuan ditolak: akun Anda tidak berhak mengajukan surat untuk NIK ini.");
+    throw new Error(msg ? `Surat tidak tersimpan: ${msg}` : "Surat tidak tersimpan.");
   }
   return data;
 }
-export async function deleteSurat(id:string) {
-  await requireAdmin();const {data,error}=await supabase.from('pelayanan_surat').delete().eq('id',id).select('id');
-  if(error||!data?.length)throw new Error('Surat tidak berhasil dihapus.');
+export async function deleteSurat(id: string) {
+  await requireAdmin();
+  const { data, error } = await supabase.from("pelayanan_surat").delete().eq("id", id).select("id");
+  if (error || !data?.length) throw new Error("Surat tidak berhasil dihapus.");
 }
