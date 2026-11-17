@@ -3,14 +3,10 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
     <div className="flex items-center gap-3">
       <div
         className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs shrink-0 ${
-          compact ? 'h-10 w-10' : 'h-12 w-12'
+          compact ? "h-10 w-10" : "h-12 w-12"
         }`}
       >
-        <img
-          src="/logo_rt06.jpg"
-          alt="Logo RT 06 VPI-2"
-          className="h-full w-full object-cover"
-        />
+        <img src="/logo_rt06.jpg" alt="Logo RT 06 VPI-2" className="h-full w-full object-cover" />
       </div>
       <div>
         <div className="flex items-center gap-2">
@@ -22,9 +18,7 @@ export function BrandMark({ compact = false }: { compact?: boolean }) {
           </span>
         </div>
         {!compact && (
-          <p className="text-xs text-slate-500">
-            Villa Padurenan Indah 2 · RW 07 Padurenan
-          </p>
+          <p className="text-xs text-slate-500">Villa Padurenan Indah 2 · RW 07 Padurenan</p>
         )}
       </div>
     </div>

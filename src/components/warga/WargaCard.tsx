@@ -37,7 +37,8 @@ export function WargaCard({
     .filter(Boolean)
     .join(", ");
   const rtRw = warga.rt || warga.rw ? `RT ${warga.rt ?? "—"} / RW ${warga.rw ?? "—"}` : null;
-  const safeFotoUrl = warga.foto_ktp_url && /^https?:\/\//i.test(warga.foto_ktp_url) ? warga.foto_ktp_url : null;
+  const safeFotoUrl =
+    warga.foto_ktp_url && /^https?:\/\//i.test(warga.foto_ktp_url) ? warga.foto_ktp_url : null;
 
   return (
     <article className="flex flex-col rounded-2xl border bg-card p-5 shadow-soft transition-shadow hover:shadow-lift">
@@ -48,7 +49,9 @@ export function WargaCard({
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-base font-bold text-foreground">{warga.nama_lengkap}</h3>
           <p className="font-mono text-xs text-muted-foreground">NIK {warga.nik}</p>
-          {isAdmin && <p className="mt-0.5 font-mono text-xs text-muted-foreground">KK {warga.no_kk}</p>}
+          {isAdmin && (
+            <p className="mt-0.5 font-mono text-xs text-muted-foreground">KK {warga.no_kk}</p>
+          )}
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {warga.status_hub_keluarga && (
               <span className="rounded-full bg-accent px-2.5 py-0.5 text-[11px] font-semibold text-accent-foreground">
@@ -84,10 +87,17 @@ export function WargaCard({
         </div>
         {isAdmin && (
           <div className="col-span-2">
-            <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Foto KTP</dt>
+            <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Foto KTP
+            </dt>
             <dd className="mt-0.5 break-all text-sm">
               {safeFotoUrl ? (
-                <a href={safeFotoUrl} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                <a
+                  href={safeFotoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
                   Buka foto KTP
                 </a>
               ) : (
@@ -112,7 +122,11 @@ export function WargaCard({
         )}
       </dl>
 
-      <div className={isAdmin ? "mt-auto grid grid-cols-2 gap-2 border-t pt-4" : "mt-auto border-t pt-4"}>
+      <div
+        className={
+          isAdmin ? "mt-auto grid grid-cols-2 gap-2 border-t pt-4" : "mt-auto border-t pt-4"
+        }
+      >
         <Button variant="outline" className="w-full" onClick={() => onEdit(warga)}>
           <Pencil />
           Edit

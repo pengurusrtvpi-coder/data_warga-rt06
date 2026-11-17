@@ -13,7 +13,10 @@ import {
   type AuditLogWarga,
 } from "@/lib/warga";
 
-const actionMeta: Record<string, { label: string; variant: "default" | "secondary" | "destructive" }> = {
+const actionMeta: Record<
+  string,
+  { label: string; variant: "default" | "secondary" | "destructive" }
+> = {
   TAMBAH: { label: "Ditambahkan", variant: "default" },
   EDIT: { label: "Diedit", variant: "secondary" },
   HAPUS: { label: "Dihapus", variant: "destructive" },
@@ -29,7 +32,9 @@ function AuditEntry({ log }: { log: AuditLogWarga }) {
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant={action.variant}>{action.label}</Badge>
-            <h3 className="break-words font-bold text-foreground">{log.warga_nama || "Data warga"}</h3>
+            <h3 className="break-words font-bold text-foreground">
+              {log.warga_nama || "Data warga"}
+            </h3>
           </div>
           <p className="mt-1.5 text-xs text-muted-foreground">NIK {log.warga_nik || "—"}</p>
         </div>
@@ -58,8 +63,12 @@ function AuditEntry({ log }: { log: AuditLogWarga }) {
                 <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start">
                   {"dari" in change && (
                     <div className="min-w-0 flex-1 rounded-lg bg-card px-3 py-2">
-                      <span className="mb-0.5 block text-[11px] font-semibold text-muted-foreground">Sebelum</span>
-                      <span className="break-words text-foreground">{formatAuditValue(change.dari)}</span>
+                      <span className="mb-0.5 block text-[11px] font-semibold text-muted-foreground">
+                        Sebelum
+                      </span>
+                      <span className="break-words text-foreground">
+                        {formatAuditValue(change.dari)}
+                      </span>
                     </div>
                   )}
                   {"dari" in change && "menjadi" in change && (
@@ -67,8 +76,12 @@ function AuditEntry({ log }: { log: AuditLogWarga }) {
                   )}
                   {"menjadi" in change && (
                     <div className="min-w-0 flex-1 rounded-lg bg-card px-3 py-2">
-                      <span className="mb-0.5 block text-[11px] font-semibold text-muted-foreground">Sesudah</span>
-                      <span className="break-words font-medium text-foreground">{formatAuditValue(change.menjadi)}</span>
+                      <span className="mb-0.5 block text-[11px] font-semibold text-muted-foreground">
+                        Sesudah
+                      </span>
+                      <span className="break-words font-medium text-foreground">
+                        {formatAuditValue(change.menjadi)}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -111,14 +124,22 @@ export function AuditLogPanel() {
             Menampilkan hingga {AUDIT_LOG_LIMIT} catatan tambah, edit, dan hapus terbaru.
           </p>
         </div>
-        <Button variant="outline" onClick={() => void load()} disabled={loading} className="shrink-0 self-start sm:self-auto">
+        <Button
+          variant="outline"
+          onClick={() => void load()}
+          disabled={loading}
+          className="shrink-0 self-start sm:self-auto"
+        >
           <RefreshCw className={loading ? "animate-spin" : undefined} />
           Muat Ulang
         </Button>
       </div>
 
       {error && (
-        <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive">
+        <div
+          role="alert"
+          className="mb-4 flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive-soft px-4 py-3 text-sm font-medium text-destructive"
+        >
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
           {error}
         </div>

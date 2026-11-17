@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from "@tanstack/react-router";
 import {
   ShieldCheck,
   Smartphone,
@@ -15,14 +15,12 @@ import {
   MessageSquarePlus,
   Printer,
   ExternalLink,
-} from 'lucide-react';
-import { BrandMark } from '@/components/warga/BrandMark';
+} from "lucide-react";
+import { BrandMark } from "@/components/warga/BrandMark";
 
-export const Route = createFileRoute('/panduan')({
+export const Route = createFileRoute("/panduan")({
   head: () => ({
-    meta: [
-      { title: 'Pamflet Panduan & Keamanan Data — Portal Warga RT 06 VPI-2' },
-    ],
+    meta: [{ title: "Pamflet Panduan & Keamanan Data — Portal Warga RT 06 VPI-2" }],
   }),
   component: PanduanPamfletPage,
 });
@@ -80,7 +78,8 @@ function PanduanPamfletPage() {
                 <strong>1. Buka Link Portal:</strong> Ketuk tautan resmi di atas lewat browser HP.
               </li>
               <li>
-                <strong>2. Pilih Tab “Login Warga”:</strong> Masukkan <strong>16 Digit NIK</strong> dan <strong>Password</strong> dari pengurus RT.
+                <strong>2. Pilih Tab “Login Warga”:</strong> Masukkan <strong>16 Digit NIK</strong>{" "}
+                dan <strong>Password</strong> dari pengurus RT.
               </li>
               <li>
                 <strong>3. Tekan Masuk:</strong> Data keluarga dan layanan RT otomatis terbuka.
@@ -97,14 +96,14 @@ function PanduanPamfletPage() {
               <div className="rounded-xl border border-amber-200/80 bg-white p-3 text-xs">
                 <p className="font-extrabold text-emerald-800">📱 Android (Google Chrome)</p>
                 <p className="mt-1 leading-relaxed text-slate-600">
-                  Ketuk ikon <strong>titik tiga (⋮)</strong> di pojok kanan atas ➔ pilih{' '}
+                  Ketuk ikon <strong>titik tiga (⋮)</strong> di pojok kanan atas ➔ pilih{" "}
                   <strong>Tambahkan ke layar utama</strong> ➔ tekan <strong>Instal</strong>.
                 </p>
               </div>
               <div className="rounded-xl border border-amber-200/80 bg-white p-3 text-xs">
                 <p className="font-extrabold text-sky-800">🍎 iPhone (Safari)</p>
                 <p className="mt-1 leading-relaxed text-slate-600">
-                  Ketuk ikon <strong>Bagikan (⬆️)</strong> di bagian bawah layar ➔ pilih{' '}
+                  Ketuk ikon <strong>Bagikan (⬆️)</strong> di bagian bawah layar ➔ pilih{" "}
                   <strong>Tambah ke Layar Utama</strong> ➔ tekan <strong>Tambah</strong>.
                 </p>
               </div>
@@ -118,14 +117,25 @@ function PanduanPamfletPage() {
             </h2>
             <div className="grid grid-cols-2 gap-2.5 text-xs sm:grid-cols-3">
               {[
-                { Icon: Users, title: 'Data Keluarga', desc: 'Cek & perbarui data anggota KK' },
-                { Icon: Wallet, title: 'Keuangan RT', desc: 'Transparansi kas & laporan bulanan' },
-                { Icon: FileText, title: 'Pelayanan Surat', desc: 'Buat surat pengantar & cetak PDF' },
-                { Icon: Award, title: 'Struktur Pengurus', desc: 'Susunan pengurus, visi & misi' },
-                { Icon: BarChart3, title: 'Statistik Usia', desc: 'Grafik demografi warga RT 06' },
-                { Icon: MessageSquarePlus, title: 'Aspirasi Warga', desc: 'Kirim saran/laporan + foto kamera' },
+                { Icon: Users, title: "Data Keluarga", desc: "Cek & perbarui data anggota KK" },
+                { Icon: Wallet, title: "Keuangan RT", desc: "Transparansi kas & laporan bulanan" },
+                {
+                  Icon: FileText,
+                  title: "Pelayanan Surat",
+                  desc: "Buat surat pengantar & cetak PDF",
+                },
+                { Icon: Award, title: "Struktur Pengurus", desc: "Susunan pengurus, visi & misi" },
+                { Icon: BarChart3, title: "Statistik Usia", desc: "Grafik demografi warga RT 06" },
+                {
+                  Icon: MessageSquarePlus,
+                  title: "Aspirasi Warga",
+                  desc: "Kirim saran/laporan + foto kamera",
+                },
               ].map(({ Icon, title, desc }) => (
-                <div key={title} className="rounded-xl border border-slate-200 bg-slate-50/70 p-2.5">
+                <div
+                  key={title}
+                  className="rounded-xl border border-slate-200 bg-slate-50/70 p-2.5"
+                >
                   <Icon className="h-4 w-4 text-teal-700" />
                   <p className="mt-1.5 font-bold text-slate-800">{title}</p>
                   <p className="mt-0.5 text-[11px] leading-snug text-slate-500">{desc}</p>
@@ -154,7 +164,8 @@ function PanduanPamfletPage() {
                   <Database className="h-3.5 w-3.5" /> Privasi KK Terisolasi (RLS)
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-200">
-                  Dilindungi <em>Row Level Security</em>; setiap akun NIK hanya bisa melihat dan mengubah data anggota KK miliknya sendiri.
+                  Dilindungi <em>Row Level Security</em>; setiap akun NIK hanya bisa melihat dan
+                  mengubah data anggota KK miliknya sendiri.
                 </p>
               </div>
 
@@ -163,7 +174,8 @@ function PanduanPamfletPage() {
                   <Lock className="h-3.5 w-3.5" /> Enkripsi & Autentikasi Aman
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-200">
-                  Koneksi terenkripsi HTTPS/TLS serta kata sandi tersimpan teracak (<em>hashed</em>) melalui sistem Supabase Auth.
+                  Koneksi terenkripsi HTTPS/TLS serta kata sandi tersimpan teracak (<em>hashed</em>)
+                  melalui sistem Supabase Auth.
                 </p>
               </div>
 
@@ -172,7 +184,8 @@ function PanduanPamfletPage() {
                   <EyeOff className="h-3.5 w-3.5" /> Anti-Simpan Jejak NIK
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-200">
-                  Formulir masuk dan surat tidak merekam jejak nomor NIK di memori browser sehingga aman di perangkat bersama.
+                  Formulir masuk dan surat tidak merekam jejak nomor NIK di memori browser sehingga
+                  aman di perangkat bersama.
                 </p>
               </div>
 
@@ -181,7 +194,8 @@ function PanduanPamfletPage() {
                   <UserCheck className="h-3.5 w-3.5" /> Identitas Terverifikasi
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-slate-200">
-                  Nama pengirim aspirasi terkunci otomatis sesuai NIK yang login, dan hak kelola kas/administrasi dibatasi ketat per peran.
+                  Nama pengirim aspirasi terkunci otomatis sesuai NIK yang login, dan hak kelola
+                  kas/administrasi dibatasi ketat per peran.
                 </p>
               </div>
             </div>
