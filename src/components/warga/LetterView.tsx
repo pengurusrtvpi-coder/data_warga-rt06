@@ -299,7 +299,7 @@ export function LetterView({ role }: { role: AccessRole }) {
               </p>
               <p>Ketua RT 06 / RW 07</p>
               <div className="signature-space" />
-              <p>( ........................................ )</p>
+              <p className="font-bold underline">Andy Nugroho S</p>
             </div>
           </article>
         </section>
