@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Camera, Image as ImageIcon, Loader2, Pencil, Trash2 } from "lucide-react";
+import { Camera, Image as ImageIcon, KeyRound, Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { formatTanggal, type Warga } from "@/lib/warga";
-
 function Row({ label, value }: { label: string; value?: string | null | undefined }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
@@ -148,7 +149,35 @@ export function WargaCard({
       setUploading(false);
     }
   }
+const [accountModalOpen, setAccountModalOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [savingAccount, setSavingAccount] = useState(false);
 
+  async function handleCreateOrResetAccount(e: React.FormEvent) {
+    e.preventDefault();
+    if (newPassword.trim().length < 6) {
+      toast.error("Password minimal 6 karakter.");
+      return;
+    }
+    setSavingAccount(true);
+    try {
+      const { data, error } = await (supabase as any).rpc(
+        "admin_create_or_reset_warga_account",
+        {
+          p_nik: warga.nik,
+          p_password: newPassword.trim(),
+        },
+      );
+      if (error) throw new Error(error.message);
+      toast.success(data || "Akun login warga berhasil disimpan.");
+      setNewPassword("");
+      setAccountModalOpen(false);
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal membuat atau memperbarui akun login.");
+    } finally {
+      setSavingAccount(false);
+    }
+  }
   return (
     <article className="flex flex-col rounded-2xl border bg-card p-5 shadow-soft transition-shadow hover:shadow-lift">
       <header className="flex items-start gap-3">
@@ -246,22 +275,85 @@ export function WargaCard({
         )}
       </dl>
 
-      <div
-        className={
-          isAdmin ? "mt-auto grid grid-cols-2 gap-2 border-t pt-4" : "mt-auto border-t pt-4"
-        }
-      >
-        <Button variant="outline" className="w-full" onClick={() => onEdit(warga)}>
-          <Pencil />
-          Edit
-        </Button>
-        {isAdmin && onDelete && (
-          <Button variant="destructive" className="w-full" onClick={() => onDelete(warga)}>
-            <Trash2 />
-            Hapus
+      <div className="mt-auto space-y-2 border-t pt-4">
+        <div className={isAdmin ? "grid grid-cols-2 gap-2" : ""}>
+          <Button variant="outline" className="w-full" onClick={() => onEdit(warga)}>
+            <Pencil />
+            Edit
+          </Button>
+          {isAdmin && onDelete && (
+            <Button variant="destructive" className="w-full" onClick={() => onDelete(warga)}>
+              <Trash2 />
+              Hapus
+            </Button>
+          )}
+        </div>
+
+        {isAdmin && (
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full font-semibold text-sky-900 bg-sky-100 hover:bg-sky-200"
+            onClick={() => {
+              setNewPassword("");
+              setAccountModalOpen(true);
+            }}
+          >
+            <KeyRound />
+            Buat / Reset Akun Login
           </Button>
         )}
       </div>
+
+      {/* Dialog Buat / Reset Akun Login Warga (Khusus Admin & Ketua RT) */}
+      {isAdmin && (
+        <Dialog open={accountModalOpen} onOpenChange={(v) => !savingAccount && setAccountModalOpen(v)}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Akun Login — {warga.nama_lengkap}</DialogTitle>
+            </DialogHeader>
+
+            <form onSubmit={handleCreateOrResetAccount} className="space-y-4 py-1">
+              <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 space-y-1 border">
+                <p>
+                  <span className="font-semibold text-slate-800">NIK Login:</span>{" "}
+                  <span className="font-mono font-bold text-sky-800">{warga.nik}</span>
+                </p>
+                <p>
+                  Jika warga belum memiliki akun, sistem akan otomatis membuatkannya. Jika sudah ada, password akan diperbarui.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor={`pw-${warga.id}`}>Password Login Baru (Minimal 6 Karakter) *</Label>
+                <Input
+                  id={`pw-${warga.id}`}
+                  type="text"
+                  required
+                  minLength={6}
+                  placeholder="Contoh: tanggal lahir (15081985)"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={savingAccount}
+                  onClick={() => setAccountModalOpen(false)}
+                >
+                  Batal
+                </Button>
+                <Button type="submit" disabled={savingAccount || newPassword.trim().length < 6}>
+                  {savingAccount ? "Menyimpan…" : "Simpan Akun Login"}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Dialog Ambil Foto Selfie / Unggah Foto Profil */}
       <Dialog open={photoModalOpen} onOpenChange={(v) => !uploading && setPhotoModalOpen(v)}>
