@@ -1,6 +1,10 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { Camera, Image as ImageIcon, Loader2, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 import { formatTanggal, type Warga } from "@/lib/warga";
 
 function Row({ label, value }: { label: string; value?: string | null | undefined }) {
@@ -14,17 +18,67 @@ function Row({ label, value }: { label: string; value?: string | null | undefine
   );
 }
 
+/** Kompresi foto profil ringan (maks 480px) agar cepat diunggah dari HP */
+async function compressAvatar(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const maxDim = 480;
+      let { width, height } = img;
+      if (width > maxDim || height > maxDim) {
+        if (width > height) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return reject(new Error("Gagal memproses gambar."));
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) return reject(new Error("Gagal mengonversi gambar."));
+          resolve(blob);
+        },
+        "image/jpeg",
+        0.82,
+      );
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("File gambar tidak valid."));
+    };
+    img.src = url;
+  });
+}
+
 export function WargaCard({
   warga,
   isAdmin = false,
   onEdit,
   onDelete,
+  onPhotoUpdated,
 }: {
   warga: Warga;
   isAdmin?: boolean;
   onEdit: (w: Warga) => void;
   onDelete?: (w: Warga) => void;
+  onPhotoUpdated?: () => void;
 }) {
+  const rawAvatar = (warga as Warga & { foto_profil_url?: string | null }).foto_profil_url;
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(
+    rawAvatar && /^https?:\/\//i.test(rawAvatar) ? rawAvatar : null,
+  );
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
   const initials = (warga.nama_lengkap || "?")
     .split(" ")
     .filter(Boolean)
@@ -37,14 +91,87 @@ export function WargaCard({
     .filter(Boolean)
     .join(", ");
   const rtRw = warga.rt || warga.rw ? `RT ${warga.rt ?? "—"} / RW ${warga.rw ?? "—"}` : null;
-  const safeFotoUrl = warga.foto_ktp_url && /^https?:\/\//i.test(warga.foto_ktp_url) ? warga.foto_ktp_url : null;
+  const safeFotoUrl =
+    warga.foto_ktp_url && /^https?:\/\//i.test(warga.foto_ktp_url) ? warga.foto_ktp_url : null;
+
+  async function handleUploadAvatar(file?: File) {
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Ukuran foto maksimal 8 MB.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const compressed = await compressAvatar(file);
+      const path = `profil/${warga.id}-${Date.now()}.jpg`;
+      const { error: upErr } = await supabase.storage
+        .from("dokumen-rt06")
+        .upload(path, compressed, { contentType: "image/jpeg", upsert: true });
+      if (upErr) throw new Error(upErr.message);
+
+      const { data: pub } = supabase.storage.from("dokumen-rt06").getPublicUrl(path);
+      const publicUrl = pub.publicUrl;
+
+      const { error: rpcErr } = await (supabase as any).rpc("update_foto_profil_warga", {
+        p_warga_id: warga.id,
+        p_foto_url: publicUrl,
+      });
+      if (rpcErr) throw new Error(rpcErr.message);
+
+      setAvatarUrl(publicUrl);
+      setPhotoModalOpen(false);
+      toast.success(`Foto profil ${warga.nama_lengkap} berhasil diperbarui.`);
+      onPhotoUpdated?.();
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal mengunggah foto profil.");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleRemoveAvatar() {
+    setUploading(true);
+    try {
+      const { error: rpcErr } = await (supabase as any).rpc("update_foto_profil_warga", {
+        p_warga_id: warga.id,
+        p_foto_url: null,
+      });
+      if (rpcErr) throw new Error(rpcErr.message);
+
+      setAvatarUrl(null);
+      setPhotoModalOpen(false);
+      toast.success("Foto profil dihapus dan dikembalikan ke inisial nama.");
+      onPhotoUpdated?.();
+    } catch (err: any) {
+      toast.error(err?.message || "Gagal menghapus foto profil.");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <article className="flex flex-col rounded-2xl border bg-card p-5 shadow-soft transition-shadow hover:shadow-lift">
       <header className="flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-primary-soft text-sm font-bold text-primary-deep">
-          {initials}
-        </div>
+        <button
+          type="button"
+          onClick={() => setPhotoModalOpen(true)}
+          title="Klik untuk ambil foto selfie atau unggah foto profil"
+          className="group relative flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-primary/20 bg-primary-soft text-base font-bold text-primary-deep shadow-xs transition hover:border-primary"
+        >
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt={warga.nama_lengkap}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <span>{initials}</span>
+          )}
+          <span className="absolute bottom-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-sky-600 text-white shadow group-hover:bg-sky-700">
+            <Camera className="h-3 w-3" />
+          </span>
+        </button>
+
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-base font-bold text-foreground">{warga.nama_lengkap}</h3>
           <p className="font-mono text-xs text-muted-foreground">NIK {warga.nik}</p>
@@ -84,10 +211,17 @@ export function WargaCard({
         </div>
         {isAdmin && (
           <div className="col-span-2">
-            <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Foto KTP</dt>
+            <dt className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Foto KTP
+            </dt>
             <dd className="mt-0.5 break-all text-sm">
               {safeFotoUrl ? (
-                <a href={safeFotoUrl} target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                <a
+                  href={safeFotoUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
                   Buka foto KTP
                 </a>
               ) : (
@@ -112,7 +246,11 @@ export function WargaCard({
         )}
       </dl>
 
-      <div className={isAdmin ? "mt-auto grid grid-cols-2 gap-2 border-t pt-4" : "mt-auto border-t pt-4"}>
+      <div
+        className={
+          isAdmin ? "mt-auto grid grid-cols-2 gap-2 border-t pt-4" : "mt-auto border-t pt-4"
+        }
+      >
         <Button variant="outline" className="w-full" onClick={() => onEdit(warga)}>
           <Pencil />
           Edit
@@ -124,6 +262,75 @@ export function WargaCard({
           </Button>
         )}
       </div>
+
+      {/* Dialog Ambil Foto Selfie / Unggah Foto Profil */}
+      <Dialog open={photoModalOpen} onOpenChange={(v) => !uploading && setPhotoModalOpen(v)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Foto Profil — {warga.nama_lengkap}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col items-center gap-4 py-2">
+            <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4 border-sky-100 bg-primary-soft text-2xl font-extrabold text-primary-deep shadow-sm">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={warga.nama_lengkap}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span>{initials}</span>
+              )}
+            </div>
+
+            <p className="text-center text-xs text-muted-foreground">
+              Ambil foto selfie langsung lewat kamera HP atau pilih foto dari galeri untuk mengganti inisial nama.
+            </p>
+
+            {uploading ? (
+              <div className="flex items-center gap-2 py-3 text-sm font-semibold text-sky-700">
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Mengunggah foto profil…
+              </div>
+            ) : (
+              <div className="flex w-full flex-col gap-2">
+                <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-sky-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-sky-700">
+                  <Camera className="h-4 w-4" /> Ambil Foto Selfie (Kamera)
+                  <input
+                    type="file"
+                    accept="image/*"
+                    capture="user"
+                    className="hidden"
+                    onChange={(e) => handleUploadAvatar(e.target.files?.item(0) ?? undefined)}
+                  />
+                </label>
+
+                <label className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border bg-slate-50 px-4 py-2.5 text-xs font-bold text-slate-700 transition hover:bg-slate-100">
+                  <ImageIcon className="h-4 w-4" /> Pilih Foto dari Galeri
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleUploadAvatar(e.target.files?.item(0) ?? undefined)}
+                  />
+                </label>
+
+                {avatarUrl && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRemoveAvatar}
+                    className="mt-1 text-xs text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                  >
+                    <Trash2 className="mr-1 h-3.5 w-3.5" /> Hapus Foto (Kembali ke Inisial)
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </article>
   );
 }
