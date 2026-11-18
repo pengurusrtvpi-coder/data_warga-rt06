@@ -15,7 +15,7 @@ import {
   Check,
   X,
 } from "lucide-react";
-
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -77,6 +77,7 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [showPassword, setShowPassword] = useState(false);
   const [announcements, setAnnouncements] = useState<RunningTextRow[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showManager, setShowManager] = useState(false);
@@ -466,14 +467,22 @@ function LoginPage() {
                       <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         id="password-warga"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         autoComplete="new-password"
                         data-lpignore="true"
                         placeholder="••••••••"
                         name="password"
-                        className="h-11 pl-10"
+                        className="h-11 pl-10 pr-10"
                         required
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
                     </div>
                   </div>
 
@@ -507,13 +516,21 @@ function LoginPage() {
                       <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         id="password-admin"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         placeholder="••••••••"
                         name="password"
-                        className="h-11 pl-10"
+                        className="h-11 pl-10 pr-10"
                         required
                       />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
                     </div>
                   </div>
 
@@ -523,7 +540,7 @@ function LoginPage() {
               </TabsContent>
             </Tabs>
           </div>
-         <p className="mt-6 text-center text-xs text-muted-foreground">
+          <p className="mt-6 text-center text-xs text-muted-foreground">
             Lupa password? Hubungi pengurus RT 06 ·{" "}
             <a href="/panduan" className="font-bold text-primary-deep underline">
               Lihat Pamflet Panduan & Keamanan Data
