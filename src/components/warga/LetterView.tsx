@@ -264,15 +264,16 @@ export function LetterView({ role }: { role: AccessRole }) {
     </p>
     <p
       style={{
-        fontSize: "16.5px",
+        fontSize: "19px",
         fontWeight: "bold",
         textTransform: "uppercase",
-        letterSpacing: "0.6px",
+        letterSpacing: "4.2px",
+        wordSpacing: "6px",
         margin: "2px 0",
       }}
     >
-      VILLA PADURENAN INDAH 2 
-    </p>
+      VILLA PADURENAN INDAH 2
+    </p>   
     <p
       style={{
         fontSize: "13px",
