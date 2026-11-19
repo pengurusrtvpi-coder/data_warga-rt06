@@ -240,7 +240,7 @@ export function LetterView({ role }: { role: AccessRole }) {
     fontFamily: "'Times New Roman', Times, serif",
   }}
 >
-  <img
+ <img
     src="/logo_kota_bekasi.jpg"
     alt="Logo Kota Bekasi"
     style={{
@@ -248,9 +248,11 @@ export function LetterView({ role }: { role: AccessRole }) {
       width: "auto",
       objectFit: "contain",
       flexShrink: 0,
+      position: "relative",
+      left: "18px",
     }}
   />
-  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
+    <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
     <p
       style={{
         fontSize: "20px",
