@@ -286,7 +286,9 @@ export function LetterView({ role }: { role: AccessRole }) {
       Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
     </p>
   </div>
-</header>              <h2>
+</header>              
+  <div className="letter-title">
+     <h2>
                 {preview.jenis_surat === 'Lainnya'
                   ? 'SURAT KETERANGAN'
                   : preview.jenis_surat.toUpperCase()}
