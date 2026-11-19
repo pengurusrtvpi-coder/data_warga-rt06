@@ -277,7 +277,7 @@ function JurnalKegiatanPage() {
 
         {/* Tampilan Khusus Cetak / PDF (Tabel Laporan Resmi A4) */}
         <section className="hidden print:block w-full text-black">
-         <sty le>{`
+         <style>{`
             @media print {
               @page { size: A4 portrait; margin: 12mm; }
               body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
