@@ -227,31 +227,40 @@ export function LetterView({ role }: { role: AccessRole }) {
             </div>
           </div>
           <article className="letter-paper print-target">
-           <header
-  className="letter-head flex items-center justify-center gap-5 border-b-4 border-double border-slate-900 pb-4 mb-5"
-  style={{ justifyContent: "center", gap: "20px" }}
+  <header
+  className="border-b-4 border-double border-black pb-3 mb-4"
+  style={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "18px",
+  }}
 >
   <img
-    className="letter-logo h-[88px] w-auto shrink-0 object-contain"
-    style={{ height: "88px", width: "auto" }}
     src="/logo_kota_bekasi.jpg"
     alt="Logo Kota Bekasi"
-  />              <div className="letter-head-text flex-1 text-center leading-tight">
-                <p className="letter-head-title text-base sm:text-lg font-extrabold tracking-wide text-slate-900">
-                  PENGURUS RUKUN TETANGGA 06 / RW 07
-                </p>
-                <p className="letter-head-subtitle text-sm sm:text-base font-bold text-slate-800">
-                  VILLA PADURENAN INDAH 2 (VPI-2)
-                </p>
-                <p className="letter-head-motto text-xs font-semibold italic text-slate-700 mt-0.5">
-                  Motto: BERUBAH - PEDULI - BERBAGI
-                </p>
-                <p className="letter-head-address text-[11px] sm:text-xs text-slate-600 mt-1">
-                  Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
-                </p>
-              </div>
-            </header>
-            <div className="letter-title">
+    style={{
+      height: "96px",
+      width: "auto",
+      objectFit: "contain",
+      flexShrink: 0,
+    }}
+  />
+  <div style={{ textAlign: "center", lineHeight: 1.35 }}>
+    <p style={{ fontSize: "16px", fontWeight: "800", textTransform: "uppercase", margin: 0 }}>
+      PENGURUS RUKUN TETANGGA 06 / RW 07
+    </p>
+    <p style={{ fontSize: "14px", fontWeight: "700", textTransform: "uppercase", margin: 0 }}>
+      VILLA PADURENAN INDAH 2 (VPI-2)
+    </p>
+    <p style={{ fontSize: "12px", fontStyle: "italic", fontWeight: "600", margin: "2px 0" }}>
+      Motto: BERUBAH - PEDULI - BERBAGI
+    </p>
+    <p style={{ fontSize: "11px", margin: 0 }}>
+      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
+    </p>
+  </div>
+</header>            <div className="letter-title">
               <h2>
                 {preview.jenis_surat === 'Lainnya'
                   ? 'SURAT KETERANGAN'
