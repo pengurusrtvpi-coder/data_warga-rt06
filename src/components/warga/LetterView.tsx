@@ -233,29 +233,30 @@ export function LetterView({ role }: { role: AccessRole }) {
     boxSizing: "border-box",
     display: "flex",
     alignItems: "center",
-    gap: "16px",
-    padding: "0 6px 12px 6px",
+    gap: "14px",
+    padding: "0 4px 10px 4px",
     borderBottom: "4px double #000",
     marginBottom: "16px",
+    fontFamily: "'Times New Roman', Times, serif",
   }}
 >
   <img
     src="/logo_kota_bekasi.jpg"
     alt="Logo Kota Bekasi"
     style={{
-      height: "92px",
+      height: "90px",
       width: "auto",
       objectFit: "contain",
       flexShrink: 0,
     }}
   />
-  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.35 }}>
+  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
     <p
       style={{
-        fontSize: "18px",
-        fontWeight: "800",
+        fontSize: "20px",
+        fontWeight: "bold",
         textTransform: "uppercase",
-        letterSpacing: "0.4px",
+        letterSpacing: "0.8px",
         margin: 0,
       }}
     >
@@ -263,31 +264,30 @@ export function LetterView({ role }: { role: AccessRole }) {
     </p>
     <p
       style={{
-        fontSize: "15px",
-        fontWeight: "700",
+        fontSize: "16.5px",
+        fontWeight: "bold",
         textTransform: "uppercase",
-        letterSpacing: "0.3px",
-        margin: "1px 0",
+        letterSpacing: "0.6px",
+        margin: "2px 0",
       }}
     >
       VILLA PADURENAN INDAH 2 (VPI-2)
     </p>
     <p
       style={{
-        fontSize: "12.5px",
+        fontSize: "13px",
         fontStyle: "italic",
-        fontWeight: "600",
+        fontWeight: "bold",
         margin: "2px 0",
       }}
     >
       Motto: BERUBAH - PEDULI - BERBAGI
     </p>
-    <p style={{ fontSize: "11.5px", margin: 0 }}>
+    <p style={{ fontSize: "12px", margin: 0 }}>
       Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
     </p>
   </div>
-</header>              
-  <div className="letter-title">
+</header>  <div className="letter-title">
      <h2>
                 {preview.jenis_surat === 'Lainnya'
                   ? 'SURAT KETERANGAN'
@@ -324,8 +324,16 @@ export function LetterView({ role }: { role: AccessRole }) {
               Demikian surat ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana
               mestinya.
             </p>
-           <div className="mt-8 grid grid-cols-2 break-inside-avoid text-center text-xs">
-  <p className="col-span-2 text-left">
+         <div
+  className="break-inside-avoid"
+  style={{
+    marginTop: "36px",
+    fontFamily: "'Times New Roman', Times, serif",
+    fontSize: "15px",
+    lineHeight: 1.4,
+  }}
+>
+  <p style={{ margin: "0 0 6px 0", textAlign: "left" }}>
     Mustikajaya - Kota Bekasi,{" "}
     {preview.created_at
       ? new Date(preview.created_at).toLocaleDateString("id-ID", {
@@ -334,23 +342,48 @@ export function LetterView({ role }: { role: AccessRole }) {
           year: "numeric",
           timeZone: "Asia/Jakarta",
         })
-      : "—"}
+      : "-"}
   </p>
-
-  <div>
-    <p>Dibuat oleh,</p>
-    <div className="h-20" />
-    <p className="font-bold uppercase underline">ANDY NUGROHO S</p>
-    <p>KETUA RT 006</p>
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: "32px",
+      textAlign: "center",
+    }}
+  >
+    <div>
+      <p style={{ margin: 0 }}>Dibuat oleh,</p>
+      <div style={{ height: "54px" }} />
+      <p
+        style={{
+          margin: 0,
+          fontWeight: "bold",
+          textTransform: "uppercase",
+          textDecoration: "underline",
+        }}
+      >
+        ANDY NUGROHO S
+      </p>
+      <p style={{ margin: "2px 0 0 0" }}>KETUA RT 006</p>
+    </div>
+    <div>
+      <p style={{ margin: 0 }}>Mengetahui,</p>
+      <div style={{ height: "54px" }} />
+      <p
+        style={{
+          margin: 0,
+          fontWeight: "bold",
+          textTransform: "uppercase",
+          textDecoration: "underline",
+        }}
+      >
+        NOVITASARI
+      </p>
+      <p style={{ margin: "2px 0 0 0" }}>KETUA RW 007</p>
+    </div>
   </div>
-
-  <div>
-    <p>Mengetahui,</p>
-    <div className="h-20" />
-    <p className="font-bold uppercase underline">NOVITASARI</p>
-    <p>KETUA RW 007</p>
-  </div>
-</div>          </article>
+</div>         </article>
         </section>
       )}
 
