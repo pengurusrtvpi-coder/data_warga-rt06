@@ -288,23 +288,33 @@ export function LetterView({ role }: { role: AccessRole }) {
               Demikian surat ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana
               mestinya.
             </p>
-            <div className="letter-signature">
-              <p>
-                Bekasi,{' '}
-                {preview.created_at
-                  ? new Date(preview.created_at).toLocaleDateString('id-ID', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                      timeZone: 'Asia/Jakarta',
-                    })
-                  : '—'}
-              </p>
-              <p>Ketua RT 06 / RW 07</p>
-              <div className="signature-space" />
-              <p className="font-bold underline">Andy Nugroho S</p>
-            </div>
-          </article>
+           <div className="mt-8 grid grid-cols-2 break-inside-avoid text-center text-xs">
+  <p className="col-span-2 text-left">
+    Mustikajaya - Kota Bekasi,{" "}
+    {preview.created_at
+      ? new Date(preview.created_at).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+          timeZone: "Asia/Jakarta",
+        })
+      : "—"}
+  </p>
+
+  <div>
+    <p>Dibuat oleh,</p>
+    <div className="h-20" />
+    <p className="font-bold uppercase underline">ANDY NUGROHO S</p>
+    <p>KETUA RT 006</p>
+  </div>
+
+  <div>
+    <p>Mengetahui,</p>
+    <div className="h-20" />
+    <p className="font-bold uppercase underline">NOVITASARI</p>
+    <p>KETUA RW 007</p>
+  </div>
+</div>          </article>
         </section>
       )}
 
