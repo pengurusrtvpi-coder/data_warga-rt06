@@ -80,6 +80,7 @@ function JurnalKegiatanPage() {
     })();
   }, []);
 
+
   function openForm(item: JurnalItem | null) {
     setEditing(item);
     setJudul(item?.judul || '');
@@ -276,30 +277,77 @@ function JurnalKegiatanPage() {
 
         {/* Tampilan Khusus Cetak / PDF (Tabel Laporan Resmi A4) */}
         <section className="hidden print:block w-full text-black">
-          <style>{`
+         <sty le>{`
             @media print {
               @page { size: A4 portrait; margin: 12mm; }
               body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             }
           `}</style>
 
-          <div className="flex items-center gap-4 border-b-4 border-double border-black pb-3">
-            <img
-              src="/logo_kota_bekasi.jpg"
-              alt="Logo Kota Bekasi"
-              className="h-16 w-16 object-contain shrink-0"
-            />
-            <div className="flex-1 text-center pr-8">
-              <p className="text-sm font-extrabold uppercase tracking-wider">
-                PENGURUS RUKUN TETANGGA 06 / RW 07
-              </p>
-              <p className="text-xs font-bold">VILLA PADURENAN INDAH 2 (VPI-2)</p>
-              <p className="text-[11px] italic">Motto: BERUBAH - PEDULI - BERBAGI</p>
-              <p className="text-[11px]">
-                Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi
-              </p>
-            </div>
-          </div>
+          <header
+  style={{
+    width: "100%",
+    boxSizing: "border-box",
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    padding: "0 4px 10px 4px",
+    borderBottom: "4px double #000",
+    marginBottom: "16px",
+    fontFamily: "'Times New Roman', Times, serif",
+  }}
+>
+  <img
+    src="/logo_kota_bekasi.jpg"
+    alt="Logo Kota Bekasi"
+    style={{
+      height: "90px",
+      width: "auto",
+      objectFit: "contain",
+      flexShrink: 0,
+      position: "relative",
+      left: "18px",
+    }}
+  />
+  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
+    <p
+      style={{
+        fontSize: "20px",
+        fontWeight: "bold",
+        textTransform: "uppercase",
+        letterSpacing: "0.8px",
+        margin: 0,
+      }}
+    >
+      PENGURUS RUKUN TETANGGA 06 / RW 07
+    </p>
+    <p
+      style={{
+        fontSize: "19px",
+        fontWeight: "bold",
+        textTransform: "uppercase",
+        letterSpacing: "4.2px",
+        wordSpacing: "6px",
+        margin: "2px 0",
+      }}
+    >
+      VILLA PADURENAN INDAH 2
+    </p>
+    <p
+      style={{
+        fontSize: "13px",
+        fontStyle: "italic",
+        fontWeight: "bold",
+        margin: "2px 0",
+      }}
+    >
+      Motto: BERUBAH - PEDULI - BERBAGI
+    </p>
+    <p style={{ fontSize: "12px", margin: 0 }}>
+      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
+    </p>
+  </div>
+</header>
           <div className="mt-3 text-center">
             <h2 className="text-base font-extrabold uppercase underline">
               LAPORAN JURNAL & DOKUMENTASI KEGIATAN RT 06

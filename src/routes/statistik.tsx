@@ -154,24 +154,70 @@ function StatistikUsiaPage() {
 
       {/* Kop Surat Khusus Cetak PDF (Hanya Logo Kota Bekasi) */}
       <div className="hidden print:block px-6 pt-4 mb-6">
-        <div className="flex items-center gap-4 border-b-4 border-double border-slate-900 pb-3">
-          <img
-            src="/logo_kota_bekasi.jpg"
-            alt="Logo Kota Bekasi"
-            className="h-16 w-16 object-contain shrink-0"
-          />
-          <div className="text-center flex-1 pr-8">
-            <p className="text-base font-extrabold text-slate-900">
-              PENGURUS RUKUN TETANGGA 06 / RW 07
-            </p>
-            <p className="text-sm font-bold text-slate-800">VILLA PADURENAN INDAH 2 (VPI-2)</p>
-            <p className="text-xs italic text-slate-700">Motto: BERUBAH - PEDULI - BERBAGI</p>
-            <p className="text-[11px] text-slate-600">
-              Kelurahan Padurenan, Kecamatan Mustikajaya, Kota Bekasi
-            </p>
-          </div>
-        </div>
-        <div className="text-center mt-4">
+<header
+  style={{
+    width: "100%",
+    boxSizing: "border-box",
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    padding: "0 4px 10px 4px",
+    borderBottom: "4px double #000",
+    marginBottom: "16px",
+    fontFamily: "'Times New Roman', Times, serif",
+  }}
+>
+  <img
+    src="/logo_kota_bekasi.jpg"
+    alt="Logo Kota Bekasi"
+    style={{
+      height: "90px",
+      width: "auto",
+      objectFit: "contain",
+      flexShrink: 0,
+      position: "relative",
+      left: "18px",
+    }}
+  />
+  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
+    <p
+      style={{
+        fontSize: "20px",
+        fontWeight: "bold",
+        textTransform: "uppercase",
+        letterSpacing: "0.8px",
+        margin: 0,
+      }}
+    >
+      PENGURUS RUKUN TETANGGA 06 / RW 07
+    </p>
+    <p
+      style={{
+        fontSize: "19px",
+        fontWeight: "bold",
+        textTransform: "uppercase",
+        letterSpacing: "4.2px",
+        wordSpacing: "6px",
+        margin: "2px 0",
+      }}
+    >
+      VILLA PADURENAN INDAH 2
+    </p>
+    <p
+      style={{
+        fontSize: "13px",
+        fontStyle: "italic",
+        fontWeight: "bold",
+        margin: "2px 0",
+      }}
+    >
+      Motto: BERUBAH - PEDULI - BERBAGI
+    </p>
+    <p style={{ fontSize: "12px", margin: 0 }}>
+      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
+    </p>
+  </div>
+</header>        <div className="text-center mt-4">
           <h2 className="text-base font-bold uppercase underline">
             LAPORAN STATISTIK KEPENDUDUKAN BERDASARKAN USIA
             {selectedKat !== 'Semua' ? ` — KATEGORI ${selectedKat.toUpperCase()}` : ''}
