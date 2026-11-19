@@ -271,7 +271,7 @@ export function LetterView({ role }: { role: AccessRole }) {
         margin: "2px 0",
       }}
     >
-      VILLA PADURENAN INDAH 2 (VPI-2)
+      VILLA PADURENAN INDAH 2 
     </p>
     <p
       style={{
