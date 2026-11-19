@@ -541,7 +541,7 @@ function LoginPage() {
             </Tabs>
                     </div>
           <div className="text-center mt-6 text-xs text-slate-500">
-            <p>© 2026 Kesekretariatan RT 06 / RW 07 VPI-2</p>
+            <p>© 2026 Sekretariat RT 06 / RW 07 VPI-2</p>
             <p>Villa Padurenan Indah 2 • Kel. Padurenan, Mustikajaya</p>
           </div>
           <p className="mt-6 text-center text-xs text-muted-foreground">
