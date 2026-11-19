@@ -227,13 +227,16 @@ export function LetterView({ role }: { role: AccessRole }) {
             </div>
           </div>
           <article className="letter-paper print-target">
-            <header className="letter-head flex items-center justify-between gap-3 border-b-4 border-double border-slate-900 pb-4 mb-5">
-              <img
-                className="letter-logo h-20 w-20 shrink-0 object-contain"
-                src="/logo_kota_bekasi.jpg"
-                alt="Logo Kota Bekasi"
-              />
-              <div className="letter-head-text flex-1 text-center leading-tight">
+           <header
+  className="letter-head flex items-center justify-center gap-5 border-b-4 border-double border-slate-900 pb-4 mb-5"
+  style={{ justifyContent: "center", gap: "20px" }}
+>
+  <img
+    className="letter-logo h-[88px] w-auto shrink-0 object-contain"
+    style={{ height: "88px", width: "auto" }}
+    src="/logo_kota_bekasi.jpg"
+    alt="Logo Kota Bekasi"
+  />              <div className="letter-head-text flex-1 text-center leading-tight">
                 <p className="letter-head-title text-base sm:text-lg font-extrabold tracking-wide text-slate-900">
                   PENGURUS RUKUN TETANGGA 06 / RW 07
                 </p>
