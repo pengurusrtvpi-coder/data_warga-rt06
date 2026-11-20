@@ -1,24 +1,3 @@
-import type { CSSProperties } from 'react';
-
-const headerStyle: CSSProperties = {
-  width: '100%',
-  boxSizing: 'border-box',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '10px',
-  padding: '0 0 6px 0',
-  color: '#000000',
-};
-
-const textStyle: CSSProperties = {
-  flex: 1,
-  minWidth: 0,
-  textAlign: 'center',
-  color: '#000000',
-  fontFamily: 'Arial, Helvetica, sans-serif',
-  lineHeight: 1.15,
-};
-
 export function KopSurat() {
   return (
     <header
@@ -42,15 +21,19 @@ export function KopSurat() {
           src="/logo_kota_bekasi.jpg"
           alt="Logo Kota Bekasi"
           style={{
-            display: 'block',
-            flexShrink: 0,
             width: '76px',
             height: '84px',
             objectFit: 'contain',
             flexShrink: 0,
           }}
         />
-        <div style={textStyle}>
+        <div
+          style={{
+            flex: 1,
+            textAlign: 'center',
+            lineHeight: 1.15,
+          }}
+        >
           <p
             style={{
               fontSize: '19px',
@@ -80,8 +63,8 @@ export function KopSurat() {
               fontWeight: 700,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              whiteSpace: 'nowrap',
               margin: '0 0 2px 0',
+              whiteSpace: 'nowrap',
             }}
           >
             KELURAHAN PADURENAN KECAMATAN MUSTIKA JAYA KOTA BEKASI 17156
@@ -91,29 +74,18 @@ export function KopSurat() {
               fontSize: '13.2px',
               fontWeight: 700,
               letterSpacing: '0.3px',
-              whiteSpace: 'nowrap',
               margin: 0,
+              whiteSpace: 'nowrap',
             }}
           >
             Sekretariat : Villa Padurenan Indah 2 Blok C No 5 Telp 089611492332
           </p>
         </div>
-      </header>
-      <div
-        aria-hidden="true"
-        style={{
-          width: '100%',
-          boxSizing: 'border-box',
-          marginTop: '2px',
-          marginBottom: '16px',
-          borderTop: '3px solid #000000',
-          borderBottom: '1px solid #000000',
-          paddingTop: '2px',
-        }}
-      />
-    </>
+      </div>
+      <div style={{ borderBottom: '3px solid #000000' }} />
+      <div style={{ borderBottom: '1px solid #000000', marginTop: '2px' }} />
+    </header>
   );
 }
 
 export default KopSurat;
-
