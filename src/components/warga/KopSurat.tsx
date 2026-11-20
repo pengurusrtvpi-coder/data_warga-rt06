@@ -21,8 +21,23 @@ const textStyle: CSSProperties = {
 
 export function KopSurat() {
   return (
-    <>
-      <header style={headerStyle}>
+    <header
+      style={{
+        width: '100%',
+        boxSizing: 'border-box',
+        fontFamily: 'Arial, Helvetica, sans-serif',
+        color: '#000000',
+        marginBottom: '12px',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '0 0 6px 0',
+        }}
+      >
         <img
           src="/logo_kota_bekasi.jpg"
           alt="Logo Kota Bekasi"
@@ -32,6 +47,7 @@ export function KopSurat() {
             width: '76px',
             height: '84px',
             objectFit: 'contain',
+            flexShrink: 0,
           }}
         />
         <div style={textStyle}>
@@ -100,3 +116,4 @@ export function KopSurat() {
 }
 
 export default KopSurat;
+
