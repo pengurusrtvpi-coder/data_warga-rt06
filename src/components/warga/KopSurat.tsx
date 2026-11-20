@@ -5,24 +5,18 @@ const headerStyle: CSSProperties = {
   boxSizing: 'border-box',
   display: 'flex',
   alignItems: 'center',
-  gap: '12px',
+  gap: '10px',
+  padding: '0 0 6px 0',
   color: '#000000',
-  fontFamily: 'Arial, Helvetica, sans-serif',
 };
 
 const textStyle: CSSProperties = {
-  flex: '1 1 auto',
+  flex: 1,
   minWidth: 0,
   textAlign: 'center',
   color: '#000000',
   fontFamily: 'Arial, Helvetica, sans-serif',
   lineHeight: 1.15,
-};
-
-const baseLineStyle: CSSProperties = {
-  margin: '2px 0',
-  color: '#000000',
-  whiteSpace: 'nowrap',
 };
 
 export function KopSurat() {
@@ -34,51 +28,55 @@ export function KopSurat() {
           alt="Logo Kota Bekasi"
           style={{
             display: 'block',
-            flex: '0 0 auto',
-            height: '76px',
-            width: 'auto',
+            flexShrink: 0,
+            width: '76px',
+            height: '84px',
             objectFit: 'contain',
           }}
         />
         <div style={textStyle}>
           <p
             style={{
-              ...baseLineStyle,
-              fontSize: '15px',
+              fontSize: '19px',
               fontWeight: 800,
               textTransform: 'uppercase',
-              letterSpacing: '0.8px',
+              letterSpacing: '2.2px',
+              margin: '0 0 2px 0',
             }}
           >
             PEMERINTAH KOTA BEKASI
           </p>
           <p
             style={{
-              ...baseLineStyle,
-              fontSize: '22px',
+              fontSize: '27px',
               fontWeight: 900,
               textTransform: 'uppercase',
-              letterSpacing: '0.5px',
+              letterSpacing: '2px',
               lineHeight: 1.05,
+              margin: '0 0 3px 0',
             }}
           >
             RUKUN TETANGGA 06 RW 07
           </p>
           <p
             style={{
-              ...baseLineStyle,
-              fontSize: '11px',
+              fontSize: '13.2px',
               fontWeight: 700,
               textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              whiteSpace: 'nowrap',
+              margin: '0 0 2px 0',
             }}
           >
             KELURAHAN PADURENAN KECAMATAN MUSTIKA JAYA KOTA BEKASI 17156
           </p>
           <p
             style={{
-              ...baseLineStyle,
-              fontSize: '11.5px',
+              fontSize: '13.2px',
               fontWeight: 700,
+              letterSpacing: '0.3px',
+              whiteSpace: 'nowrap',
+              margin: 0,
             }}
           >
             Sekretariat : Villa Padurenan Indah 2 Blok C No 5 Telp 089611492332
