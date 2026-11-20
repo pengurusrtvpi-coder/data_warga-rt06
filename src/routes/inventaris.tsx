@@ -21,6 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PortalNav } from '@/components/warga/PortalNav';
+import { KopSurat } from '@/components/warga/KopSurat';
 import { getMyAccessRole, type AccessRole } from '@/lib/warga';
 
 export const Route = createFileRoute('/inventaris')({
@@ -267,13 +268,14 @@ function InventarisPage() {
                   item.kondisi === 'Baik'
                     ? 'bg-emerald-100 text-emerald-800'
                     : item.kondisi === 'Perlu Perbaikan'
-                    ? 'bg-amber-100 text-amber-800'
-                    : 'bg-rose-100 text-rose-800';
+                      ? 'bg-amber-100 text-amber-800'
+                      : 'bg-rose-100 text-rose-800';
                 return (
-                <article
-                  key={item.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
-                >                    <div className="relative aspect-[16/10] w-full bg-slate-100">
+                  <article
+                    key={item.id}
+                    className="flex flex-col overflow-hidden rounded-2xl border bg-white shadow-xs transition hover:shadow-md"
+                  >
+                    <div className="relative aspect-[16/10] w-full bg-slate-100">
                       {item.foto_url ? (
                         <img
                           src={item.foto_url}
@@ -346,70 +348,7 @@ function InventarisPage() {
            ============================================================ */}
         <section className="hidden print:block text-black">
           <div className="border-b-2 border-black pb-3 text-center">
-            <header
-  style={{
-    width: "100%",
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    padding: "0 4px 10px 4px",
-    borderBottom: "4px double #000",
-    marginBottom: "16px",
-    fontFamily: "'Times New Roman', Times, serif",
-  }}
->
-  <img
-    src="/logo_kota_bekasi.jpg"
-    alt="Logo Kota Bekasi"
-    style={{
-      height: "90px",
-      width: "auto",
-      objectFit: "contain",
-      flexShrink: 0,
-      position: "relative",
-      left: "18px",
-    }}
-  />
-  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
-    <p
-      style={{
-        fontSize: "20px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "0.8px",
-        margin: 0,
-      }}
-    >
-      PENGURUS RUKUN TETANGGA 06 / RW 07
-    </p>
-    <p
-      style={{
-        fontSize: "19px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "4.2px",
-        wordSpacing: "6px",
-        margin: "2px 0",
-      }}
-    >
-      VILLA PADURENAN INDAH 2
-    </p>
-    <p
-      style={{
-        fontSize: "13px",
-        fontStyle: "italic",
-        fontWeight: "bold",
-        margin: "2px 0",
-      }}
-    >
-      Motto: BERUBAH - PEDULI - BERBAGI
-    </p>
-    <p style={{ fontSize: "12px", margin: 0 }}>
-      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
-    </p>
-  </div>
-</header>
+            <KopSurat />
             <h2 className="mt-2 text-base font-extrabold uppercase underline">
               DAFTAR INVENTARIS BARANG & ASET RT 06
             </h2>
@@ -483,7 +422,9 @@ function InventarisPage() {
           <Dialog open={open} onOpenChange={(v) => !saving && setOpen(v)}>
             <DialogContent className="max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>{editing ? 'Edit Aset Inventaris' : 'Tambah Aset Inventaris'}</DialogTitle>
+                <DialogTitle>
+                  {editing ? 'Edit Aset Inventaris' : 'Tambah Aset Inventaris'}
+                </DialogTitle>
               </DialogHeader>
               <form onSubmit={handleSave} className="space-y-4">
                 <div className="space-y-1.5">
@@ -550,7 +491,7 @@ function InventarisPage() {
                     value={keterangan}
                     onChange={(e) => setKeterangan(e.target.value)}
                   />
-                  </div>
+                </div>
 
                 <div className="space-y-2">
                   <Label>Foto Barang (Kamera / Galeri HP)</Label>
