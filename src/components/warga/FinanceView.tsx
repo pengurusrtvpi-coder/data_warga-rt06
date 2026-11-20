@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Choice } from './Choice';
+import { BayarIuranTab } from './BayarIuranTab';
 import { financeOptions } from '@/lib/portal-queries';
 import {
   BULAN,
@@ -51,7 +52,7 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
     [open, setOpen] = useState(false),
     [deleting, setDeleting] = useState<Transaksi | null>(null),
     [busy, setBusy] = useState(false);
-
+const [showIuran, setShowIuran] = useState(false);
   const series = yearSeries(data.bulanan, year),
     analysis = analyseYear(series),
     all = financeSummary(data.transaksi);
@@ -185,8 +186,23 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
             </Button>
           </div>
         )}
-      </div>
-      <div className="no-print mb-6 flex flex-wrap items-end gap-4">
+        <Button
+          variant={showIuran ? 'default' : 'outline'}
+          onClick={() => setShowIuran(!showIuran)}
+          className={
+            !showIuran
+              ? 'border-emerald-600 text-emerald-700 hover:bg-emerald-50'
+              : 'bg-emerald-600 text-white hover:bg-emerald-700'
+          }
+        >
+          {showIuran ? '← Kembali ke Laporan Keuangan' : 'Bayar Iuran Warga'}
+        </Button>
+</div>
+      {showIuran ? (
+        <BayarIuranTab />
+      ) : (
+        <>
+              <div className="no-print mb-6 flex flex-wrap items-end gap-4">
         {monthly && (
           <div className="w-44">
             <Label>Bulan</Label>
@@ -410,6 +426,8 @@ export function FinanceView({ role, monthly = false }: { role: AccessRole; month
             </DialogContent>
           </Dialog>
         </>
+      )}
+      </>
       )}
     </main>
   );
