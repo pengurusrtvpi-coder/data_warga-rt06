@@ -22,6 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PortalNav } from '@/components/warga/PortalNav';
+import { KopSurat } from '@/components/warga/KopSurat';
 import { getMyAccessRole, jakartaToday, type AccessRole } from '@/lib/warga';
 
 export const Route = createFileRoute('/jurnal')({
@@ -79,7 +80,6 @@ function JurnalKegiatanPage() {
       await loadData();
     })();
   }, []);
-
 
   function openForm(item: JurnalItem | null) {
     setEditing(item);
@@ -258,7 +258,7 @@ function JurnalKegiatanPage() {
                       </p>
                     )}
 
-      {isAdmin && (
+                    {isAdmin && (
                       <div className="mt-4 flex justify-end gap-2 border-t pt-3">
                         <Button size="sm" variant="outline" onClick={() => openForm(item)}>
                           <Pencil className="mr-1 h-3.5 w-3.5" /> Edit
@@ -277,77 +277,14 @@ function JurnalKegiatanPage() {
 
         {/* Tampilan Khusus Cetak / PDF (Tabel Laporan Resmi A4) */}
         <section className="hidden print:block w-full text-black">
-         <style>{`
+          <style>{`
             @media print {
               @page { size: A4 portrait; margin: 12mm; }
               body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             }
           `}</style>
 
-          <header
-  style={{
-    width: "100%",
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    padding: "0 4px 10px 4px",
-    borderBottom: "4px double #000",
-    marginBottom: "16px",
-    fontFamily: "'Times New Roman', Times, serif",
-  }}
->
-  <img
-    src="/logo_kota_bekasi.jpg"
-    alt="Logo Kota Bekasi"
-    style={{
-      height: "90px",
-      width: "auto",
-      objectFit: "contain",
-      flexShrink: 0,
-      position: "relative",
-      left: "18px",
-    }}
-  />
-  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
-    <p
-      style={{
-        fontSize: "20px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "0.8px",
-        margin: 0,
-      }}
-    >
-      PENGURUS RUKUN TETANGGA 06 / RW 07
-    </p>
-    <p
-      style={{
-        fontSize: "19px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "4.2px",
-        wordSpacing: "6px",
-        margin: "2px 0",
-      }}
-    >
-      VILLA PADURENAN INDAH 2
-    </p>
-    <p
-      style={{
-        fontSize: "13px",
-        fontStyle: "italic",
-        fontWeight: "bold",
-        margin: "2px 0",
-      }}
-    >
-      Motto: BERUBAH - PEDULI - BERBAGI
-    </p>
-    <p style={{ fontSize: "12px", margin: 0 }}>
-      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
-    </p>
-  </div>
-</header>
+          <KopSurat />
           <div className="mt-3 text-center">
             <h2 className="text-base font-extrabold uppercase underline">
               LAPORAN JURNAL & DOKUMENTASI KEGIATAN RT 06
@@ -355,7 +292,7 @@ function JurnalKegiatanPage() {
             <p className="mt-0.5 text-[11px]">
               Dicetak tanggal: {tanggalCetak} · Total: {items.length} Kegiatan Tercatat
             </p>
-          </div>      
+          </div>
           <table className="mt-4 w-full border-collapse border border-black text-xs">
             <thead>
               <tr className="bg-slate-100 text-left font-bold">
@@ -549,7 +486,7 @@ function JurnalKegiatanPage() {
             </DialogContent>
           </Dialog>
         )}
-              </main>
+      </main>
     </div>
   );
 }
