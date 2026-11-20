@@ -26,7 +26,7 @@ import {
   type TransaksiInput,
   type AccessRole,
 } from '@/lib/warga';
-
+import { KopSurat } from '@/components/warga/KopSurat';
 const KATEGORI_KEUANGAN = [
   'Iuran Bulanan',
   'Iuran Keamanan & Kebersihan',
@@ -86,70 +86,7 @@ const [showIuran, setShowIuran] = useState(false);
   return (
    <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 print:px-0 print:py-0">
       <div className="hidden print:block mb-5">
-       <header
-  style={{
-    width: "100%",
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    padding: "0 4px 10px 4px",
-    borderBottom: "4px double #000",
-    marginBottom: "16px",
-    fontFamily: "'Times New Roman', Times, serif",
-  }}
->
-  <img
-    src="/logo_kota_bekasi.jpg"
-    alt="Logo Kota Bekasi"
-    style={{
-      height: "90px",
-      width: "auto",
-      objectFit: "contain",
-      flexShrink: 0,
-      position: "relative",
-      left: "18px",
-    }}
-  />
-  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
-    <p
-      style={{
-        fontSize: "20px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "0.8px",
-        margin: 0,
-      }}
-    >
-      PENGURUS RUKUN TETANGGA 06 / RW 07
-    </p>
-    <p
-      style={{
-        fontSize: "19px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "4.2px",
-        wordSpacing: "6px",
-        margin: "2px 0",
-      }}
-    >
-      VILLA PADURENAN INDAH 2
-    </p>
-    <p
-      style={{
-        fontSize: "13px",
-        fontStyle: "italic",
-        fontWeight: "bold",
-        margin: "2px 0",
-      }}
-    >
-      Motto: BERUBAH - PEDULI - BERBAGI
-    </p>
-    <p style={{ fontSize: "12px", margin: 0 }}>
-      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
-    </p>
-  </div>
-</header>
+<KopSurat />
         <div className="mt-3 text-center">
           <h2 className="text-base font-extrabold uppercase underline text-slate-900">
             {monthly ? 'LAPORAN BULANAN KEUANGAN RT 06' : 'LAPORAN KEUANGAN RT 06 / RW 07 VPI-2'}
