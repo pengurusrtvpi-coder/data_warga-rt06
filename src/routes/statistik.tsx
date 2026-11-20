@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/integrations/supabase/client'
 import { PortalNav } from '@/components/warga/PortalNav'
+import { KopSurat } from '@/components/warga/KopSurat'
 import { getMyAccessRole, hasActiveSession, type Warga } from '@/lib/warga'
 import {
   BarChart3,
@@ -152,72 +153,10 @@ function StatistikUsiaPage() {
     <div className="min-h-screen bg-slate-50/70 pb-16 print:bg-white print:pb-0">
       <PortalNav role={accessRole} />
 
-      {/* Kop Surat Khusus Cetak PDF (Hanya Logo Kota Bekasi) */}
+      {/* Kop Surat Khusus Cetak PDF */}
       <div className="hidden print:block px-6 pt-4 mb-6">
-<header
-  style={{
-    width: "100%",
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    padding: "0 4px 10px 4px",
-    borderBottom: "4px double #000",
-    marginBottom: "16px",
-    fontFamily: "'Times New Roman', Times, serif",
-  }}
->
-  <img
-    src="/logo_kota_bekasi.jpg"
-    alt="Logo Kota Bekasi"
-    style={{
-      height: "90px",
-      width: "auto",
-      objectFit: "contain",
-      flexShrink: 0,
-      position: "relative",
-      left: "18px",
-    }}
-  />
-  <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
-    <p
-      style={{
-        fontSize: "20px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "0.8px",
-        margin: 0,
-      }}
-    >
-      PENGURUS RUKUN TETANGGA 06 / RW 07
-    </p>
-    <p
-      style={{
-        fontSize: "19px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "4.2px",
-        wordSpacing: "6px",
-        margin: "2px 0",
-      }}
-    >
-      VILLA PADURENAN INDAH 2
-    </p>
-    <p
-      style={{
-        fontSize: "13px",
-        fontStyle: "italic",
-        fontWeight: "bold",
-        margin: "2px 0",
-      }}
-    >
-      Motto: BERUBAH - PEDULI - BERBAGI
-    </p>
-    <p style={{ fontSize: "12px", margin: 0 }}>
-      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
-    </p>
-  </div>
-</header>        <div className="text-center mt-4">
+        <KopSurat />
+        <div className="text-center mt-4">
           <h2 className="text-base font-bold uppercase underline">
             LAPORAN STATISTIK KEPENDUDUKAN BERDASARKAN USIA
             {selectedKat !== 'Semua' ? ` — KATEGORI ${selectedKat.toUpperCase()}` : ''}
