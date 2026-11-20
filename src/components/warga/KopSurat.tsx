@@ -17,14 +17,15 @@ export function KopSurat() {
           padding: '0 0 6px 0',
         }}
       >
-        <img
+<img
           src="/logo_kota_bekasi.jpg"
           alt="Logo Kota Bekasi"
           style={{
-            width: '76px',
-            height: '84px',
+            height: '88px',
+            width: 'auto',
             objectFit: 'contain',
             flexShrink: 0,
+            display: 'block',
           }}
         />
         <div
