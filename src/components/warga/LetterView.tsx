@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Choice } from './Choice';
 import { suratOptions } from '@/lib/portal-queries';
+import { KopSurat } from '@/components/warga/KopSurat';
 import {
   JENIS_SURAT,
   findWargaNik,
@@ -227,71 +228,9 @@ export function LetterView({ role }: { role: AccessRole }) {
             </div>
           </div>
           <article className="letter-paper print-target">
-  <header
-  style={{
-    width: "100%",
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-    padding: "0 4px 10px 4px",
-    borderBottom: "4px double #000",
-    marginBottom: "16px",
-    fontFamily: "'Times New Roman', Times, serif",
-  }}
->
- <img
-    src="/logo_kota_bekasi.jpg"
-    alt="Logo Kota Bekasi"
-    style={{
-      height: "90px",
-      width: "auto",
-      objectFit: "contain",
-      flexShrink: 0,
-      position: "relative",
-      left: "18px",
-    }}
-  />
-    <div style={{ flex: 1, textAlign: "center", lineHeight: 1.32 }}>
-    <p
-      style={{
-        fontSize: "20px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "0.8px",
-        margin: 0,
-      }}
-    >
-      PENGURUS RUKUN TETANGGA 06 / RW 07
-    </p>
-    <p
-      style={{
-        fontSize: "19px",
-        fontWeight: "bold",
-        textTransform: "uppercase",
-        letterSpacing: "4.2px",
-        wordSpacing: "6px",
-        margin: "2px 0",
-      }}
-    >
-      VILLA PADURENAN INDAH 2
-    </p>   
-    <p
-      style={{
-        fontSize: "13px",
-        fontStyle: "italic",
-        fontWeight: "bold",
-        margin: "2px 0",
-      }}
-    >
-      Motto: BERUBAH - PEDULI - BERBAGI
-    </p>
-    <p style={{ fontSize: "12px", margin: 0 }}>
-      Sekretariat: Villa Padurenan Indah 2 Blok C No. 5 | HP: 08961149233
-    </p>
-  </div>
-</header>  <div className="letter-title">
-     <h2>
+            <KopSurat />
+            <div className="letter-title">
+              <h2>
                 {preview.jenis_surat === 'Lainnya'
                   ? 'SURAT KETERANGAN'
                   : preview.jenis_surat.toUpperCase()}
@@ -306,7 +245,7 @@ export function LetterView({ role }: { role: AccessRole }) {
               {[
                 ['Nama', preview.nama_pemohon],
                 ['NIK', preview.nik],
-          ['Tempat / Tgl Lahir', preview.tempat_tgl_lahir],
+                ['Tempat / Tgl Lahir', preview.tempat_tgl_lahir],
                 ['Jenis Kelamin', preview.jenis_kelamin],
                 ['Agama', preview.agama],
                 ['Pekerjaan', preview.pekerjaan],
@@ -327,66 +266,67 @@ export function LetterView({ role }: { role: AccessRole }) {
               Demikian surat ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana
               mestinya.
             </p>
-         <div
-  className="break-inside-avoid"
-  style={{
-    marginTop: "36px",
-    fontFamily: "'Times New Roman', Times, serif",
-    fontSize: "15px",
-    lineHeight: 1.4,
-  }}
->
-  <p style={{ margin: "0 0 6px 0", textAlign: "left" }}>
-    Mustikajaya - Kota Bekasi,{" "}
-    {preview.created_at
-      ? new Date(preview.created_at).toLocaleDateString("id-ID", {
-          day: "numeric",
-          month: "long",
-          year: "numeric",
-          timeZone: "Asia/Jakarta",
-        })
-      : "-"}
-  </p>
-  <div
-    style={{
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: "32px",
-      textAlign: "center",
-    }}
-  >
-    <div>
-      <p style={{ margin: 0 }}>Dibuat oleh,</p>
-      <div style={{ height: "54px" }} />
-      <p
-        style={{
-          margin: 0,
-          fontWeight: "bold",
-          textTransform: "uppercase",
-          textDecoration: "underline",
-        }}
-      >
-        ANDY NUGROHO S
-      </p>
-      <p style={{ margin: "2px 0 0 0" }}>KETUA RT 006</p>
-    </div>
-    <div>
-      <p style={{ margin: 0 }}>Mengetahui,</p>
-      <div style={{ height: "54px" }} />
-      <p
-        style={{
-          margin: 0,
-          fontWeight: "bold",
-          textTransform: "uppercase",
-          textDecoration: "underline",
-        }}
-      >
-        NOVITASARI
-      </p>
-      <p style={{ margin: "2px 0 0 0" }}>KETUA RW 007</p>
-    </div>
-  </div>
-</div>         </article>
+            <div
+              className="break-inside-avoid"
+              style={{
+                marginTop: '36px',
+                fontFamily: "'Times New Roman', Times, serif",
+                fontSize: '15px',
+                lineHeight: 1.4,
+              }}
+            >
+              <p style={{ margin: '0 0 6px 0', textAlign: 'left' }}>
+                Mustikajaya - Kota Bekasi,{' '}
+                {preview.created_at
+                  ? new Date(preview.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                      timeZone: 'Asia/Jakarta',
+                    })
+                  : '-'}
+              </p>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '32px',
+                  textAlign: 'center',
+                }}
+              >
+                <div>
+                  <p style={{ margin: 0 }}>Dibuat oleh,</p>
+                  <div style={{ height: '54px' }} />
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    ANDY NUGROHO S
+                  </p>
+                  <p style={{ margin: '2px 0 0 0' }}>KETUA RT 006</p>
+                </div>
+                <div>
+                  <p style={{ margin: 0 }}>Mengetahui,</p>
+                  <div style={{ height: '54px' }} />
+                  <p
+                    style={{
+                      margin: 0,
+                      fontWeight: 'bold',
+                      textTransform: 'uppercase',
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    NOVITASARI
+                  </p>
+                  <p style={{ margin: '2px 0 0 0' }}>KETUA RW 007</p>
+                </div>
+              </div>
+            </div>
+          </article>
         </section>
       )}
 
