@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { formatTanggal, type Warga } from "@/lib/warga";
+import { formatTanggal, maskNik, type Warga } from "@/lib/warga";
 function Row({ label, value }: { label: string; value?: string | null | undefined }) {
   return (
     <div className="flex min-w-0 flex-col gap-0.5">
@@ -203,7 +203,7 @@ const [accountModalOpen, setAccountModalOpen] = useState(false);
 
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-base font-bold text-foreground">{warga.nama_lengkap}</h3>
-          <p className="font-mono text-xs text-muted-foreground">NIK {warga.nik}</p>
+          <p className="font-mono text-xs text-muted-foreground">NIK {maskNik(warga.nik)}</p>
           {isAdmin && <p className="mt-0.5 font-mono text-xs text-muted-foreground">KK {warga.no_kk}</p>}
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {warga.status_hub_keluarga && (
@@ -317,8 +317,7 @@ const [accountModalOpen, setAccountModalOpen] = useState(false);
               <div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-600 space-y-1 border">
                 <p>
                   <span className="font-semibold text-slate-800">NIK Login:</span>{" "}
-                  <span className="font-mono font-bold text-sky-800">{warga.nik}</span>
-                </p>
+                  <span className="font-mono font-bold text-sky-800">{maskNik(warga.nik)}</span>
                 <p>
                   Jika warga belum memiliki akun, sistem akan otomatis membuatkannya. Jika sudah ada, password akan diperbarui.
                 </p>

@@ -10,6 +10,7 @@ import {
   formatAuditValue,
   formatAuditWaktu,
   getAuditChanges,
+  maskNik,
   type AuditLogWarga,
 } from "@/lib/warga";
 
@@ -31,7 +32,8 @@ function AuditEntry({ log }: { log: AuditLogWarga }) {
             <Badge variant={action.variant}>{action.label}</Badge>
             <h3 className="break-words font-bold text-foreground">{log.warga_nama || "Data warga"}</h3>
           </div>
-          <p className="mt-1.5 text-xs text-muted-foreground">NIK {log.warga_nik || "—"}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">NIK {maskNik(log.warga_nik || "—")                 
+            }</p>
         </div>
         <div className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground">
           <Clock3 className="h-3.5 w-3.5" />

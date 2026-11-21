@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditWargaDialog } from "@/components/warga/EditWargaDialog";
 import { WargaCard } from "@/components/warga/WargaCard";
-import { deleteWarga, fetchSemuaWarga, type Warga } from "@/lib/warga";
+import { deleteWarga, fetchSemuaWarga,maskNik, type Warga } from "@/lib/warga";
 
 export function AdminPanel() {
   const [query, setQuery] = useState("");
@@ -218,7 +218,7 @@ export function AdminPanel() {
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus data warga?</AlertDialogTitle>
             <AlertDialogDescription>
-              Data <strong>{deleting?.nama_lengkap}</strong> dengan NIK {deleting?.nik} akan dihapus permanen.
+              Data <strong>{deleting?.nama_lengkap}</strong> dengan NIK {maskNik(deleting?.nik)} akan dihapus permanen.
               Tindakan ini tidak dapat dibatalkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
