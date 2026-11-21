@@ -40,6 +40,166 @@ const wargaAktif = (rows ?? []).filter((w) => {
     const st = (w.status_warga || "").trim().toLowerCase();
     return st === "pindah";
   });
+const activeList = view === "pindah" ? wargaPindah : wargaAktif;
+  const activeLabel = view === "pindah" ? "DATA WARGA PINDAH" : "DATA WARGA AKTIF";
+
+  function handleDownloadCsv() {
+    if (activeList.length === 0) return;
+    const headers = [
+      "No",
+      "NIK",
+      "No KK",
+      "Nama Lengkap",
+      "Hubungan Keluarga",
+      "Tempat Lahir",
+      "Tanggal Lahir",
+      "Jenis Kelamin",
+      "Agama",
+      "Status Kawin",
+      "Pendidikan",
+      "Pekerjaan",
+      "Alamat",
+      "Status Warga",
+    ];
+    const escapeCsv = (val: unknown) =>
+      `"${String(val ?? "").replace(/"/g, '""')}"`;
+
+    const lines = activeList.map((w, idx) =>
+      [
+        idx + 1,
+        `'${w.nik ?? ""}`,
+        `'${w.no_kk ?? ""}`,
+        w.nama_lengkap,
+        w.hubungan_keluarga,
+        w.tempat_lahir,
+        w.tanggal_lahir,
+        w.jenis_kelamin,
+        w.agama,
+        w.status_perkawinan,
+        w.pendidikan,
+        w.pekerjaan,
+        w.alamat,
+        w.status_warga,
+      ]
+        .map(escapeCsv)
+        .join(",")
+    );
+
+    const csv = "\uFEFF" + [headers.join(","), ...lines].join("\r\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const prefix = view === "pindah" ? "data-warga-pindah" : "data-warga-aktif";
+    a.download = `${prefix}-rt06-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handlePrintResmi() {
+    if (activeList.length === 0) return;
+    const win = window.open("", "_blank");
+    if (!win) return;
+    const logoUrl = `${window.location.origin}/logo_kota_bekasi.jpg`;
+    const rowsHtml = activeList
+      .map(
+        (w, i) => `
+        <tr>
+          <td style="text-align:center">${i + 1}</td>
+          <td>${w.nik ?? "-"}</td>
+          <td>${w.no_kk ?? "-"}</td>
+          <td>${w.nama_lengkap ?? "-"}</td>
+          <td>${w.hubungan_keluarga ?? "-"}</td>
+          <td>${w.tempat_lahir ?? "-"}, ${w.tanggal_lahir ?? "-"}</td>
+          <td style="text-align:center">${w.jenis_kelamin === "Laki-laki" ? "L" : w.jenis_kelamin === "Perempuan" ? "P" : w.jenis_kelamin ?? "-"}</td>
+          <td>${w.alamat ?? "-"}</td>
+          <td style="text-align:center">${w.status_warga ?? "-"}</td>
+        </tr>`
+      )
+      .join("");
+
+    win.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>${activeLabel} - RT 06 RW 07 VPI-2</title>
+          <style>
+            body { font-family: Arial, Helvetica, sans-serif; color: #000; margin: 16px; font-size: 11px; }
+            .kop { width: 100%; margin-bottom: 12px; }
+            .kop-row { display: flex; align-items: center; gap: 12px; padding-bottom: 6px; }
+            .kop-text { flex: 1; text-align: center; line-height: 1.15; }
+            .kop-line1 { font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 2.2px; margin: 0 0 2px 0; }
+            .kop-line2 { font-size: 25px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; line-height: 1.05; margin: 0 0 3px 0; }
+            .kop-line3 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin: 0 0 2px 0; }
+            .kop-line4 { font-size: 13px; font-weight: 700; letter-spacing: 0.3px; margin: 0; }
+            .garis-tebal { border-bottom: 3px solid #000; margin-top: 2px; }
+            .garis-tipis { border-bottom: 1px solid #000; margin-top: 2px; }
+            .judul { text-align: center; margin: 14px 0 4px; font-size: 14px; font-weight: 800; text-decoration: underline; }
+            .subjudul { text-align: center; margin: 0 0 12px; font-size: 11px; color: #333; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 5px 6px; text-align: left; vertical-align: top; }
+            th { background: #eef2f6; font-weight: 700; text-align: center; }
+            .ttd { margin-top: 24px; display: flex; justify-content: flex-end; }
+            .ttd-box { text-align: center; width: 220px; }
+            @media print { @page { size: landscape; margin: 10mm; } }
+          </style>
+        </head>
+        <body>
+          <header class="kop">
+            <div class="kop-row">
+              <img src="${logoUrl}" alt="Logo Kota Bekasi" style="height:84px;width:auto;object-fit:contain;" />
+              <div class="kop-text">
+                <p class="kop-line1">PEMERINTAH KOTA BEKASI</p>
+                <p class="kop-line2">RUKUN TETANGGA 06 RW 07</p>
+                <p class="kop-line3">KELURAHAN PADURENAN KECAMATAN MUSTIKAJAYA</p>
+                <p class="kop-line4">Sekretariat : Villa Padurenan Indah 2 Blok C No 5 Telp. 08961149233</p>
+              </div>
+            </div>
+            <div class="garis-tebal"></div>
+            <div class="garis-tipis"></div>
+          </header>
+
+          <div class="judul">REKAPITULASI ${activeLabel}</div>
+          <div class="subjudul">
+            Total: ${activeList.length} Warga${activeQuery ? ` (Filter pencarian: "${activeQuery}")` : ""} &bull; Dicetak tanggal: ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width:28px">No</th>
+                <th style="width:115px">NIK</th>
+                <th style="width:115px">No. KK</th>
+                <th>Nama Lengkap</th>
+                <th style="width:95px">Status Keluarga</th>
+                <th style="width:145px">Tempat, Tgl Lahir</th>
+                <th style="width:32px">L/P</th>
+                <th>Alamat</th>
+                <th style="width:78px">Status</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHtml}</tbody>
+          </table>
+
+          <div class="ttd">
+            <div class="ttd-box">
+              <p style="margin:0 0 56px">Bekasi, ${new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}<br/>Ketua RT 06 RW 07</p>
+              <p style="margin:0;font-weight:700;text-decoration:underline;">( ........................................ )</p>
+            </div>
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() { window.print(); }, 350);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    win.document.close();
+  }
+
   const load = useCallback(async (search: string) => {
     setLoading(true);
     setError(null);
@@ -124,15 +284,37 @@ const wargaAktif = (rows ?? []).filter((w) => {
                   ? "Kembali ke Warga Aktif"
                   : `Warga Pindah (${wargaPindah.length})`}
               </Button>
-              {view !== "audit" && (
-                <Button
-                  size="lg"
-                  className="font-semibold"
-                  onClick={() => setCreating(true)}
-                >
-                  <Plus />
-                  Tambah Warga
-                </Button>
+{view !== "audit" && (
+                <>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="bg-card font-semibold"
+                    onClick={handlePrintResmi}
+                    disabled={activeList.length === 0}
+                  >
+                    Print / PDF
+                  </Button>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant="outline"
+                    className="bg-card font-semibold"
+                    onClick={handleDownloadCsv}
+                    disabled={activeList.length === 0}
+                  >
+                    Download Excel
+                  </Button>
+                  <Button
+                    size="lg"
+                    className="font-semibold"
+                    onClick={() => setCreating(true)}
+                  >
+                    <Plus />
+                    Tambah Warga
+                  </Button>
+                </>
               )}
             </div>
           </div>
