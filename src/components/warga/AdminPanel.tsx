@@ -14,6 +14,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { AuditLogPanel } from "@/components/warga/AuditLogPanel";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EditWargaDialog } from "@/components/warga/EditWargaDialog";
@@ -286,26 +292,28 @@ const activeList = view === "pindah" ? wargaPindah : wargaAktif;
               </Button>
 {view !== "audit" && (
                 <>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant="outline"
-                    className="bg-card font-semibold"
-                    onClick={handlePrintResmi}
-                    disabled={activeList.length === 0}
-                  >
-                    Print / PDF
-                  </Button>
-                  <Button
-                    type="button"
-                    size="lg"
-                    variant="outline"
-                    className="bg-card font-semibold"
-                    onClick={handleDownloadCsv}
-                    disabled={activeList.length === 0}
-                  >
-                    Download Excel
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        size="lg"
+                        variant="outline"
+                        className="bg-card font-semibold"
+                        disabled={activeList.length === 0}
+                      >
+                        Print / Download
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={handlePrintResmi}>
+                        Print / Simpan PDF (Kop Resmi)
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleDownloadCsv}>
+                        Download Excel (CSV)
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
                   <Button
                     size="lg"
                     className="font-semibold"
