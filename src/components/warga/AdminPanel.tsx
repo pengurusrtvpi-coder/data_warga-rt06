@@ -264,12 +264,11 @@ const activeList = view === "pindah" ? wargaPindah : wargaAktif;
                   : "Pantau siapa yang menambah, mengedit, atau menghapus data warga beserta waktu dan rincian perubahannya."}
               </p>
             </div>
-            <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-<Button
+<div className="grid shrink-0 grid-cols-1 gap-2.5 sm:grid-cols-2">
+              <Button
                 type="button"
                 size="lg"
-                variant="outline"
-                className="bg-card font-semibold"
+                className="font-semibold"
                 onClick={() =>
                   setView((current) => (current === "audit" ? "data" : "audit"))
                 }
@@ -277,11 +276,11 @@ const activeList = view === "pindah" ? wargaPindah : wargaAktif;
                 {view === "audit" ? <Users /> : <History />}
                 {view === "audit" ? "Data Warga" : "Riwayat Audit"}
               </Button>
+
               <Button
                 type="button"
                 size="lg"
-                variant={view === "pindah" ? "default" : "outline"}
-                className={view === "pindah" ? "font-semibold" : "bg-card font-semibold"}
+                className="font-semibold"
                 onClick={() =>
                   setView((current) => (current === "pindah" ? "data" : "pindah"))
                 }
@@ -290,15 +289,15 @@ const activeList = view === "pindah" ? wargaPindah : wargaAktif;
                   ? "Kembali ke Warga Aktif"
                   : `Warga Pindah (${wargaPindah.length})`}
               </Button>
-{view !== "audit" && (
+
+              {view !== "audit" && (
                 <>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
                         type="button"
                         size="lg"
-                        variant="outline"
-                        className="bg-card font-semibold"
+                        className="font-semibold"
                         disabled={activeList.length === 0}
                       >
                         Print / Download
@@ -325,7 +324,7 @@ const activeList = view === "pindah" ? wargaPindah : wargaAktif;
                 </>
               )}
             </div>
-          </div>
+            </div>
 
           {view === "audit" && (
           <form
