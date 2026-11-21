@@ -78,6 +78,7 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showNik, setShowNik] = useState(false);
   const [announcements, setAnnouncements] = useState<RunningTextRow[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showManager, setShowManager] = useState(false);
@@ -448,16 +449,24 @@ function LoginPage() {
                       <IdCard className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                       <Input
                         id="nik"
-                        type="text"
+                        type={showNik ? "text" : "password"}
                         inputMode="numeric"
                         autoComplete="off"
                         data-lpignore="true"
                         data-form-type="other"
                         placeholder="16 digit NIK"
                         name="nik"
-                        className="h-11 pl-10"
+                        className="h-11 pl-10 pr-10"
                         required
-                      />
+/>
+<button
+  type="button"
+  onClick={() => setShowNik((prev) => !prev)}
+  aria-label={showNik ? "Sembunyikan NIK" : "Tampilkan NIK"}
+  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+>
+  {showNik ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+</button>
                     </div>
                   </div>
 
