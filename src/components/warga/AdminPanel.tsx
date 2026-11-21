@@ -31,7 +31,15 @@ export function AdminPanel() {
   const [deleting, setDeleting] = useState<Warga | null>(null);
   const [deleteSaving, setDeleteSaving] = useState(false);
   const [view, setView] = useState<"data" | "audit">("data");
+const wargaAktif = (rows ?? []).filter((w) => {
+    const st = (w.status_warga || "tetap").trim().toLowerCase();
+    return st === "tetap" || st === "kontrak/kost";
+  });
 
+  const wargaPindah = (rows ?? []).filter((w) => {
+    const st = (w.status_warga || "").trim().toLowerCase();
+    return st === "pindah";
+  });
   const load = useCallback(async (search: string) => {
     setLoading(true);
     setError(null);
@@ -180,23 +188,67 @@ export function AdminPanel() {
 
         {rows && rows.length > 0 && (
           <>
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-muted-foreground">
-                {activeQuery ? <>Hasil untuk <span className="text-foreground">“{activeQuery}”</span></> : "Seluruh data warga"}
-              </h2>
-              <span className="text-sm text-muted-foreground">{rows.length} warga</span>
+{wargaAktif.length > 0 && (
+            <>
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-foreground">
+                  {activeQuery ? (
+                    <>
+                      Hasil untuk{" "}
+                      <span className="text-primary">"{activeQuery}"</span>
+                    </>
+                  ) : (
+                    "Seluruh data warga"
+                  )}
+                </h2>
+                <span className="text-sm text-muted-foreground">
+                  {wargaAktif.length} warga
+                </span>
+              </div>
+              <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {wargaAktif.map((warga) => (
+                  <WargaCard
+                    key={warga.id}
+                    warga={warga}
+                    isAdmin
+                    onEdit={setEditing}
+                    onDelete={setDeleting}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {wargaPindah.length > 0 && (
+            <div className="mt-8 border-t pt-6">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-sm font-semibold text-foreground">
+                  {activeQuery ? (
+                    <>
+                      Data warga pindah — hasil untuk{" "}
+                      <span className="text-primary">"{activeQuery}"</span>
+                    </>
+                  ) : (
+                    "Data warga pindah"
+                  )}
+                </h2>
+                <span className="text-sm text-muted-foreground">
+                  {wargaPindah.length} warga
+                </span>
+              </div>
+              <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {wargaPindah.map((warga) => (
+                  <WargaCard
+                    key={warga.id}
+                    warga={warga}
+                    isAdmin
+                    onEdit={setEditing}
+                    onDelete={setDeleting}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {rows.map((warga) => (
-                <WargaCard
-                  key={warga.id}
-                  warga={warga}
-                  isAdmin
-                  onEdit={setEditing}
-                  onDelete={setDeleting}
-                />
-              ))}
-            </div>
+          )}
           </>
         )}
       </main>
