@@ -318,6 +318,7 @@ const [accountModalOpen, setAccountModalOpen] = useState(false);
                 <p>
                   <span className="font-semibold text-slate-800">NIK Login:</span>{" "}
                   <span className="font-mono font-bold text-sky-800">{maskNik(warga.nik)}</span>
+                </p>
                 <p>
                   Jika warga belum memiliki akun, sistem akan otomatis membuatkannya. Jika sudah ada, password akan diperbarui.
                 </p>
