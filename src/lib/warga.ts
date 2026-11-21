@@ -371,8 +371,8 @@ export function getAuditChanges(perubahan: AuditLogWarga["perubahan"]): AuditCha
     changes.push({
       key,
       label: labels.get(key as AdminEditableField) ?? key.replaceAll("_", " "),
-      ...("dari" in value ? { dari: value["dari"] } : {}),
-      ...("menjadi" in value ? { menjadi: value["menjadi"] } : {}),
+      ...( "dari" in value ? { dari: value["dari"] } : {}),
+      ...( "menjadi" in value ? { menjadi: value["menjadi"] } : {}),
     });
   }
   return changes;
@@ -429,7 +429,7 @@ export async function getMyAccessRole(): Promise<AccessRole> {
   if (roles.some((row) => row.role === "admin")) return "admin";
   if (roles.some((row) => row.role === "bendahara")) return "bendahara";
   if (roles.some((row) => (row as { role?: string }).role === "kesra_pkk")) return "kesra_pkk";
-if (roles.some((row) => (row as { role?: string }).role === "seksi_rt")) return "seksi_rt";
+  if (roles.some((row) => (row as { role?: string }).role === "seksi_rt")) return "seksi_rt";
   return "warga";
 }
 
@@ -652,4 +652,12 @@ export async function createSuratByNik(nik:string,jenis:string,keperluan:string)
 export async function deleteSurat(id:string) {
   await requireAdmin();const {data,error}=await supabase.from('pelayanan_surat').delete().eq('id',id).select('id');
   if(error||!data?.length)throw new Error('Surat tidak berhasil dihapus.');
+}
+
+/** Masks NIK for on-screen display while preserving the original value for forms and printouts. */
+export function maskNik(nik?: string | null): string {
+  if (!nik) return '-';
+  const clean = String(nik).trim();
+  if (clean.length < 10) return clean;
+  return `${clean.slice(0, 6)}${'*'.repeat(Math.max(clean.length - 8, 4))}${clean.slice(-2)}`;
 }
