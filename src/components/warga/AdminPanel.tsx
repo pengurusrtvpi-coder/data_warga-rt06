@@ -30,7 +30,7 @@ export function AdminPanel() {
   const [creating, setCreating] = useState(false);
   const [deleting, setDeleting] = useState<Warga | null>(null);
   const [deleteSaving, setDeleteSaving] = useState(false);
-  const [view, setView] = useState<"data" | "audit">("data");
+const [view, setView] = useState<"data" | "audit" | "pindah">("data");
 const wargaAktif = (rows ?? []).filter((w) => {
     const st = (w.status_warga || "tetap").trim().toLowerCase();
     return st === "tetap" || st === "kontrak/kost";
@@ -99,18 +99,37 @@ const wargaAktif = (rows ?? []).filter((w) => {
               </p>
             </div>
             <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-              <Button
+<Button
                 type="button"
                 size="lg"
                 variant="outline"
                 className="bg-card font-semibold"
-                onClick={() => setView((current) => (current === "data" ? "audit" : "data"))}
+                onClick={() =>
+                  setView((current) => (current === "audit" ? "data" : "audit"))
+                }
               >
-                {view === "data" ? <History /> : <Users />}
-                {view === "data" ? "Riwayat Audit" : "Data Warga"}
+                {view === "audit" ? <Users /> : <History />}
+                {view === "audit" ? "Data Warga" : "Riwayat Audit"}
               </Button>
-              {view === "data" && (
-                <Button size="lg" className="font-semibold" onClick={() => setCreating(true)}>
+              <Button
+                type="button"
+                size="lg"
+                variant={view === "pindah" ? "default" : "outline"}
+                className={view === "pindah" ? "font-semibold" : "bg-card font-semibold"}
+                onClick={() =>
+                  setView((current) => (current === "pindah" ? "data" : "pindah"))
+                }
+              >
+                {view === "pindah"
+                  ? "Kembali ke Warga Aktif"
+                  : `Warga Pindah (${wargaPindah.length})`}
+              </Button>
+              {view !== "audit" && (
+                <Button
+                  size="lg"
+                  className="font-semibold"
+                  onClick={() => setCreating(true)}
+                >
                   <Plus />
                   Tambah Warga
                 </Button>
@@ -118,7 +137,7 @@ const wargaAktif = (rows ?? []).filter((w) => {
             </div>
           </div>
 
-          {view === "data" && (
+          {view === "audit" && (
           <form
             onSubmit={onSearch}
             className="mt-6 flex flex-col gap-3 rounded-2xl border bg-card p-3 shadow-lift sm:flex-row sm:items-center"
@@ -188,7 +207,7 @@ const wargaAktif = (rows ?? []).filter((w) => {
 
         {rows && rows.length > 0 && (
           <>
-{wargaAktif.length > 0 && (
+{view === "data" && (
             <>
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-foreground">
@@ -219,7 +238,7 @@ const wargaAktif = (rows ?? []).filter((w) => {
             </>
           )}
 
-          {wargaPindah.length > 0 && (
+          {view === "pindah" && (
             <div className="mt-8 border-t pt-6">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-sm font-semibold text-foreground">
